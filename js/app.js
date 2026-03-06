@@ -1,13 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Lenis Smooth Scroll
-  const lenis = new Lenis({
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smoothWheel: true
-  });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add((time) => lenis.raf(time * 1000));
-  gsap.ticker.lagSmoothing(0);
+  const isMobile = window.innerWidth <= 768;
+
+  // 1. Lenis Smooth Scroll — desktop only (Lenis intercepts touch events and blocks scroll-back on mobile)
+  let lenis = null;
+  if (!isMobile) {
+    lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true
+    });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+  } else {
+    // On mobile without Lenis, drive ScrollTrigger from native scroll events
+    window.addEventListener('scroll', () => ScrollTrigger.update(), { passive: true });
+  }
 
   // Nav links: use lenis.scrollTo() so transforms and absolute positioning are handled correctly.
   document.querySelectorAll('.nav-links a, .mobile-nav-link').forEach(link => {
@@ -20,7 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // Close mobile nav if open
       document.getElementById('hamburger').classList.remove('open');
       document.getElementById('mobile-nav').classList.remove('open');
-      lenis.scrollTo(target, { offset: 0, duration: 1.4, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      if (lenis) {
+        lenis.scrollTo(target, { offset: 0, duration: 1.4, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      } else {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
     });
   });
 
@@ -58,66 +70,101 @@ document.addEventListener("DOMContentLoaded", () => {
   langBtn.addEventListener('click', () => applyLang(currentLang === 'en' ? 'mm' : 'en'));
   if (currentLang === 'mm') applyLang('mm');
 
-  // Contact form — submit via mailto
+  // Contact form — POST to backend (Telegram notification), mailto fallback
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(contactForm);
       const name = fd.get('name') || '';
       const email = fd.get('email') || '';
       const message = fd.get('message') || '';
-      const subject = encodeURIComponent(`Inquiry from ${name}`);
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-      window.open(`mailto:itsolutions.mm@gmail.com?subject=${subject}&body=${body}`, '_self');
+      const submitBtn = contactForm.querySelector('[type=submit]');
+
+      submitBtn.textContent = 'Sending…';
+      submitBtn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message })
+        });
+        if (resp.ok) {
+          submitBtn.textContent = '✓ Sent!';
+          contactForm.reset();
+          setTimeout(() => { submitBtn.textContent = 'Send Message'; submitBtn.disabled = false; }, 3000);
+        } else {
+          throw new Error('server error');
+        }
+      } catch {
+        // Fallback to mailto if backend unavailable
+        const subject = encodeURIComponent(`Inquiry from ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+        window.open(`mailto:itsolutions.mm@gmail.com?subject=${subject}&body=${body}`, '_self');
+        submitBtn.textContent = 'Send Message';
+        submitBtn.disabled = false;
+      }
     });
   }
 
-  // 2. Preload Frames — start rendering after INITIAL_LOAD, continue rest in background
+  // 2. Lazy Frame Loading — only load frames near the current scroll position (desktop only)
   const FRAME_COUNT = 121;
-  const INITIAL_LOAD = 40; // start site after first 40 frames — faster initial load
-  const frames = [];
-  let loadedFrames = 0;
+  const INITIAL_LOAD = 20;
+  const frames = new Array(FRAME_COUNT).fill(null);
+  const frameRequested = new Set();
   let isLoaded = false;
   const loaderText = document.getElementById('loader-percent');
   const loaderBar = document.getElementById('loader-bar');
 
-  for (let i = 1; i <= FRAME_COUNT; i++) {
+  function requestFrame(index) {
+    if (index < 0 || index >= FRAME_COUNT) return;
+    if (frameRequested.has(index)) return;
+    frameRequested.add(index);
     const img = new Image();
-    const num = String(i).padStart(4, '0');
-
-    img.onload = () => {
-      loadedFrames++;
-      const p = Math.floor((loadedFrames / FRAME_COUNT) * 100);
-      loaderText.innerText = p + '%';
-      loaderBar.style.width = p + '%';
-      // Start after INITIAL_LOAD frames; rest keep loading in background
-      if (loadedFrames === INITIAL_LOAD && !isLoaded) {
-        isLoaded = true;
-        initRender();
-      }
-    };
-
-    img.onerror = () => {
-      loadedFrames++;
-      if (loadedFrames === INITIAL_LOAD && !isLoaded) {
-        isLoaded = true;
-        initRender();
-      }
-    };
-
-    // ALWAYS set src AFTER onload/onerror
+    const num = String(index + 1).padStart(4, '0');
+    img.onload = () => { frames[index] = img; };
+    img.onerror = () => { frames[index] = null; frameRequested.delete(index); };
     img.src = `frames/frame_${num}.jpg?v=2`;
-    frames.push(img);
   }
 
-  // Safety timeout: if frames take more than 8 seconds, just start
-  setTimeout(() => {
-    if (!isLoaded) {
-      isLoaded = true;
-      initRender();
+  function loadFrameWindow(centerIndex) {
+    for (let d = -5; d <= 25; d++) {
+      const idx = (centerIndex + d + FRAME_COUNT) % FRAME_COUNT;
+      requestFrame(idx);
     }
-  }, 8000);
+  }
+
+  if (isMobile) {
+    // Canvas is hidden on mobile — skip all frame downloads
+    document.getElementById('loader').style.display = 'none';
+    isLoaded = true;
+    initRender();
+  } else {
+    // Load first INITIAL_LOAD frames immediately to allow site to start
+    let initialLoaded = 0;
+    for (let i = 0; i < INITIAL_LOAD; i++) {
+      frameRequested.add(i);
+      const img = new Image();
+      const num = String(i + 1).padStart(4, '0');
+      img.onload = () => {
+        initialLoaded++;
+        frames[i] = img;
+        const p = Math.floor((initialLoaded / INITIAL_LOAD) * 100);
+        loaderText.innerText = p + '%';
+        loaderBar.style.width = p + '%';
+        if (initialLoaded === INITIAL_LOAD && !isLoaded) { isLoaded = true; initRender(); }
+      };
+      img.onerror = () => {
+        initialLoaded++;
+        if (initialLoaded === INITIAL_LOAD && !isLoaded) { isLoaded = true; initRender(); }
+      };
+      img.src = `frames/frame_${num}.jpg?v=2`;
+    }
+
+    // Safety timeout: start after 5 seconds even if not all initial frames loaded
+    setTimeout(() => { if (!isLoaded) { isLoaded = true; initRender(); } }, 5000);
+  }
 
   // 3. Canvas Rendering Logic
   const canvas = document.getElementById('canvas');
@@ -133,8 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('resize', resizeCanvas);
 
   function drawFrame(index) {
-    if (!frames[index]) return;
     const img = frames[index];
+    if (!img || !img.naturalWidth) return;
     const cw = canvas.width;
     const ch = canvas.height;
     const iw = img.naturalWidth;
@@ -152,50 +199,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 4. Main Init after load complete
   function initRender() {
-    gsap.to('#loader', { yPercent: -100, duration: 1.2, ease: "power4.inOut" });
-    resizeCanvas();
-    drawFrame(0);
-    currentFrame = 0;
+    if (!isMobile) {
+      gsap.to('#loader', { yPercent: -100, duration: 1.2, ease: "power4.inOut" });
+    }
 
     const scrollContainer = document.getElementById('scroll-container');
 
-    // Core Frame Scrubbing
-    ScrollTrigger.create({
-      trigger: scrollContainer,
-      start: "top top",
-      end: "bottom bottom",
-      scrub: 1.5, // Added smoothing to the scrub
-      onUpdate: (self) => {
-        // Less overall loops keeps the video moving slower, more cinematic
-        const loops = 4;
-        const progress = self.progress;
+    if (!isMobile) {
+      resizeCanvas();
+      drawFrame(0);
+      currentFrame = 0;
 
-        // Frame looping
-        let index = Math.floor(progress * FRAME_COUNT * loops) % FRAME_COUNT;
-        if (isNaN(index)) index = 0;
-
-        if (index !== currentFrame) {
-          currentFrame = index;
-          requestAnimationFrame(() => drawFrame(currentFrame));
+      // Core Frame Scrubbing
+      ScrollTrigger.create({
+        trigger: scrollContainer,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1.5,
+        onUpdate: (self) => {
+          const loops = 4;
+          const progress = self.progress;
+          let index = Math.floor(progress * FRAME_COUNT * loops) % FRAME_COUNT;
+          if (isNaN(index)) index = 0;
+          loadFrameWindow(index);
+          if (index !== currentFrame) {
+            currentFrame = index;
+            requestAnimationFrame(() => drawFrame(currentFrame));
+          }
         }
-      }
-    });
+      });
 
-    // Dark Overlay logic for readability when stats or specific marquees show up
-    const overlay = document.getElementById('dark-overlay');
-    ScrollTrigger.create({
-      trigger: scrollContainer,
-      start: "top top", end: "bottom bottom", scrub: true,
-      onUpdate: (self) => {
-        const p = self.progress * 100;
-        // Fade to dark overlay around stats section (enter 64, leave 68)
-        let op = 0;
-        if (p > 62 && p < 70) {
-          op = 0.85; // dark mode backdrop for counters
+      // Dark Overlay logic for readability when stats or specific marquees show up
+      const overlay = document.getElementById('dark-overlay');
+      ScrollTrigger.create({
+        trigger: scrollContainer,
+        start: "top top", end: "bottom bottom", scrub: true,
+        onUpdate: (self) => {
+          const p = self.progress * 100;
+          let op = 0;
+          if (p > 62 && p < 70) {
+            op = 0.85;
+          }
+          overlay.style.opacity = op;
         }
-        overlay.style.opacity = op;
-      }
-    });
+      });
+    }
 
     // Marquee logic
     document.querySelectorAll('.marquee-wrap').forEach(el => {
@@ -208,6 +256,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Section GSAP Animations
     document.querySelectorAll('.scroll-section').forEach(section => {
+      const children = section.querySelectorAll('.section-label, .section-heading, .section-body, .cta-button, .stat');
+
+      if (isMobile) {
+        // On mobile: natural flow layout — no absolute positioning, no scroll triggers
+        gsap.set(children, { clearProps: 'all' });
+        return;
+      }
+
       const type = section.dataset.animation;
       const persist = section.dataset.persist === "true";
       const enter = parseFloat(section.dataset.enter) / 100;
@@ -220,7 +276,6 @@ document.addEventListener("DOMContentLoaded", () => {
       section.style.transform = `translateY(-50%)`;
 
       const tl = gsap.timeline({ paused: true });
-      const children = section.querySelectorAll('.section-label, .section-heading, .section-body, .cta-button, .stat');
       gsap.set(children, { visibility: 'visible' });
 
       switch (type) {
@@ -265,11 +320,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Stat Count ups
     document.querySelectorAll(".stat-number").forEach(el => {
-      const section = el.closest('.scroll-section');
-      const enter = parseFloat(section.dataset.enter) / 100;
-
       const target = parseFloat(el.dataset.value);
       const dec = parseInt(el.dataset.decimals || "0");
+
+      if (isMobile) {
+        // On mobile: trigger count-up when stat scrolls into view
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && el.innerText === "0") {
+              gsap.to(el, { textContent: target, duration: 2, ease: "power1.out", snap: { textContent: dec === 0 ? 1 : 0.01 } });
+              observer.unobserve(el);
+            }
+          });
+        }, { threshold: 0.5 });
+        observer.observe(el);
+        return;
+      }
+
+      const section = el.closest('.scroll-section');
+      const enter = parseFloat(section.dataset.enter) / 100;
 
       ScrollTrigger.create({
         trigger: scrollContainer,
@@ -321,8 +390,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render Training Tools at ~85% scroll (spaced past Free Courses)
       renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
 
+      // Render Portfolio / Case Studies at ~88% scroll
+      const portfolioRes = await fetch('data/portfolio.json');
+      const portfolioData = await portfolioRes.json();
+      renderPortfolioSection(portfolioData, 'portfolio-container', 88);
+
       // Setup reveal animations
       setupCardReveal();
+
+      // Recalculate scroll positions after dynamic content is in the DOM
+      ScrollTrigger.refresh();
 
     } catch (err) {
       console.error('Failed to load services.json:', err);
@@ -333,8 +410,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    container.style.top = `${scrollPct}%`;
-    container.style.transform = 'translateY(-50%)';
+    if (!isMobile) {
+      container.style.top = `${scrollPct}%`;
+      container.style.transform = 'translateY(-50%)';
+    }
 
     let html = `
       <div class="service-group-header">
@@ -372,8 +451,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    container.style.top = `${scrollPct}%`;
-    container.style.transform = 'translateY(-50%)';
+    if (!isMobile) {
+      container.style.top = `${scrollPct}%`;
+      container.style.transform = 'translateY(-50%)';
+    }
 
     let html = `
       <div class="service-group-header">
@@ -410,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderFreeCoursesSection(data, containerId, alignPercent) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    container.style.top = `${alignPercent}%`;
+    if (!isMobile) container.style.top = `${alignPercent}%`;
 
     let html = `
       <div class="service-group-header">
@@ -456,31 +537,57 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTrainingToolsSection(data, containerId, alignPercent) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    container.style.top = `${alignPercent}%`;
+    if (!isMobile) container.style.top = `${alignPercent}%`;
 
     let html = `
       <div class="service-group-header">
         <div class="service-group-subtitle">Software Setup</div>
         <h2 class="service-group-title">Training Tools</h2>
       </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; padding:0 5vw 1.5rem;">
     `;
 
     data.tools.forEach(tool => {
       html += `
-        <div class="service-card visible">
+        <a href="${tool.download_url}" target="_blank" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; border:1px solid rgba(255,255,255,0.08); border-radius:4px; text-decoration:none; background:rgba(255,255,255,0.02);">
+          <span style="font-family:var(--font-display); font-size:0.85rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em;">${tool.name}</span>
+          <span style="font-size:0.6rem; color:#00ffff; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap;">${tool.difficulty} ↗</span>
+        </a>
+      `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+  }
+
+  function renderPortfolioSection(data, containerId, scrollPct) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!isMobile) {
+      container.style.top = `${scrollPct}%`;
+      container.style.transform = 'translateY(-50%)';
+    }
+
+    let html = `
+      <div class="service-group-header">
+        <div class="service-group-subtitle">${data.subtitle}</div>
+        <h2 class="service-group-title">${data.title}</h2>
+      </div>
+    `;
+
+    data.cases.forEach(c => {
+      const metrics = c.metrics.map(m => `<span class="topic-pill">${m}</span>`).join('');
+      html += `
+        <div class="service-card visible" data-id="${c.id}">
           <div class="service-card-header">
             <div>
-              <div class="service-card-label">${tool.category} | ${tool.difficulty}</div>
-              <div class="service-card-name" style="font-size:1.1rem;">${tool.name}</div>
+              <div class="service-card-label">${c.label}</div>
+              <div class="service-card-name">${c.name}</div>
             </div>
           </div>
-          <p class="service-card-desc" style="margin-top:0.5rem; color:var(--text-color);">${tool.description}</p>
-          <div class="service-card-topics" style="margin-top:1rem;">
-            ${tool.supported_os.map(os => `<span class="topic-pill">${os}</span>`).join('')}
-          </div>
-          <div style="margin-top: 1rem; display: flex; gap: 1rem;">
-            <a href="${tool.download_url}" target="_blank" class="service-card-cta" style="border-color:#00ffff; color:#00ffff;">Download ${tool.name} ↗</a>
-          </div>
+          <p class="service-card-desc" style="margin-top:0.5rem;">${c.description}</p>
+          <div class="service-card-topics" style="margin-top:0.8rem;">${metrics}</div>
         </div>
       `;
     });
@@ -529,7 +636,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const targetY = (targetP / 100) * maxScroll;
-      lenis.scrollTo(targetY, { duration: 1.2 });
+      if (lenis) {
+        lenis.scrollTo(targetY, { duration: 1.2 });
+      } else {
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }
     }
   });
 
