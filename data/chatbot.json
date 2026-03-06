@@ -1,0 +1,223 @@
+{
+    "platform": {
+        "name": "Antigravity AI Automation Training",
+        "founder": "Mr. Kyaw Zin Tun",
+        "version": "2.0",
+        "mission": "Teach AI automation, coding, and cloud systems through a guided AI assistant.",
+        "languages_supported": [
+            "English",
+            "Burmese"
+        ]
+    },
+    "assistant_policy": {
+        "allowed_topics": [
+            "AI training",
+            "AI coding",
+            "automation workflows",
+            "prompt engineering",
+            "cloud deployment",
+            "network automation",
+            "AI tool installation"
+        ],
+        "blocked_topics": [
+            "politics",
+            "religion",
+            "medical advice",
+            "financial speculation"
+        ],
+        "response_style": "educational"
+    },
+    "subscription_control": {
+        "plans": {
+            "free": {
+                "daily_questions": 40,
+                "api_access": "limited",
+                "features": [
+                    "Beginner AI courses",
+                    "Tool installation guides",
+                    "Basic troubleshooting"
+                ]
+            },
+            "pro": {
+                "price_usd": 9,
+                "daily_questions": 300,
+                "api_access": "priority",
+                "features": [
+                    "Advanced AI courses",
+                    "Automation workflow library",
+                    "AI troubleshooting assistant"
+                ]
+            },
+            "enterprise": {
+                "price_usd": 49,
+                "daily_questions": "unlimited",
+                "api_access": "full",
+                "features": [
+                    "Enterprise automation training",
+                    "API integration labs",
+                    "Private support"
+                ]
+            }
+        }
+    },
+    "api_usage_control": {
+        "strategy": "local_first",
+        "call_api_if": [
+            "complex programming question",
+            "unknown question",
+            "advanced explanation"
+        ],
+        "daily_budget_usd": 5,
+        "max_tokens": 300,
+        "cache_enabled": true
+    },
+    "courses": [
+        {
+            "id": "AI-101",
+            "title": "AI Automation Fundamentals",
+            "level": "Beginner",
+            "modules": [
+                "Introduction to AI",
+                "Prompt engineering basics",
+                "Automation concepts",
+                "Using AI APIs"
+            ]
+        },
+        {
+            "id": "AI-201",
+            "title": "n8n Workflow Automation",
+            "level": "Intermediate",
+            "modules": [
+                "Workflow triggers",
+                "API connections",
+                "Webhook automation",
+                "Data transformation"
+            ]
+        },
+        {
+            "id": "AI-301",
+            "title": "Advanced AI Systems",
+            "level": "Advanced",
+            "modules": [
+                "AI agents",
+                "Vector search",
+                "AI deployment",
+                "Production pipelines"
+            ]
+        }
+    ],
+    "installation_guides": [
+        {
+            "tool": "Python",
+            "download": "https://www.python.org/downloads/",
+            "steps": [
+                "Download installer",
+                "Install Python",
+                "Enable Add to PATH",
+                "Verify using python --version"
+            ]
+        },
+        {
+            "tool": "Node.js",
+            "download": "https://nodejs.org/",
+            "steps": [
+                "Download LTS version",
+                "Install Node.js",
+                "Verify using node -v"
+            ]
+        },
+        {
+            "tool": "Docker",
+            "download": "https://www.docker.com/products/docker-desktop/",
+            "steps": [
+                "Install Docker Desktop",
+                "Start Docker service",
+                "Verify using docker --version"
+            ]
+        },
+        {
+            "tool": "n8n",
+            "download": "https://n8n.io/",
+            "steps": [
+                "Install Node.js",
+                "Run npm install n8n -g",
+                "Start using n8n start"
+            ]
+        }
+    ],
+    "automation_templates": [
+        {
+            "name": "AI Chatbot Workflow",
+            "platform": "n8n",
+            "description": "Receive user message → send to AI → return response."
+        },
+        {
+            "name": "Email AI Auto Responder",
+            "platform": "Make",
+            "description": "Automatically generate replies for incoming emails."
+        },
+        {
+            "name": "AI Web Data Extractor",
+            "platform": "n8n",
+            "description": "Scrape website data and summarize using AI."
+        }
+    ],
+    "troubleshooting": [
+        {
+            "problem": "python command not recognized",
+            "solution": "Ensure Python is installed and added to system PATH."
+        },
+        {
+            "problem": "docker daemon not running",
+            "solution": "Open Docker Desktop and start the Docker service."
+        },
+        {
+            "problem": "n8n command not found",
+            "solution": "Install n8n globally using npm install n8n -g."
+        }
+    ],
+    "faq_dataset": [
+        {
+            "question": "How do I start learning AI?",
+            "answer": "Start with Python basics, then learn prompt engineering and automation tools like n8n."
+        },
+        {
+            "question": "What is AI automation?",
+            "answer": "AI automation combines artificial intelligence with automated workflows to perform tasks without manual work."
+        },
+        {
+            "question": "What is prompt engineering?",
+            "answer": "Prompt engineering is the practice of designing instructions that guide AI systems to produce accurate outputs."
+        }
+    ],
+    "intent_detection": {
+        "learn_ai": [
+            "learn ai",
+            "ai course",
+            "ai training"
+        ],
+        "install_tool": [
+            "install python",
+            "install docker",
+            "install node"
+        ],
+        "automation_help": [
+            "n8n workflow",
+            "make automation",
+            "automation example"
+        ],
+        "troubleshooting": [
+            "error",
+            "installation problem",
+            "server issue"
+        ]
+    },
+    "response_engine": {
+        "logic": [
+            "Detect intent",
+            "Search local dataset",
+            "Return answer if found",
+            "If not found call AI API"
+        ]
+    }
+}

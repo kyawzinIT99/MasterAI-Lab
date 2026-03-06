@@ -1,0 +1,14 @@
+[
+  {
+    "question": "How do I start learning AI?",
+    "answer": "Start with Python basics, then learn prompt engineering and automation tools like n8n."
+  },
+  {
+    "question": "What is AI automation?",
+    "answer": "AI automation combines artificial intelligence with automated workflows to perform tasks without manual work."
+  },
+  {
+    "question": "What is prompt engineering?",
+    "answer": "Prompt engineering is the practice of designing instructions that guide AI systems to produce accurate outputs."
+  }
+]

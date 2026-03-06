@@ -1,0 +1,17 @@
+[
+  {
+    "name": "AI Chatbot Workflow",
+    "platform": "n8n",
+    "description": "Receive user message → send to AI → return response."
+  },
+  {
+    "name": "Email AI Auto Responder",
+    "platform": "Make",
+    "description": "Automatically generate replies for incoming emails."
+  },
+  {
+    "name": "AI Web Data Extractor",
+    "platform": "n8n",
+    "description": "Scrape website data and summarize using AI."
+  }
+]

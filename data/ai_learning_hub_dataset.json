@@ -1,0 +1,129 @@
+{
+    "platform": "AI Coding Academy",
+    "version": "2.0",
+    "last_update": "2026",
+    "learning_paths": [
+        {
+            "path": "AI Beginner Path",
+            "description": "For users with no programming experience",
+            "courses": [
+                {
+                    "id": "AI101",
+                    "title": "AI For Everyone",
+                    "provider": "DeepLearning.AI",
+                    "difficulty": "Beginner",
+                    "duration": "6 hours",
+                    "course_url": "https://www.deeplearning.ai/courses/ai-for-everyone/",
+                    "video_url": "https://www.youtube.com/results?search_query=AI+For+Everyone+Andrew+Ng",
+                    "topics": [
+                        "AI introduction",
+                        "AI impact",
+                        "business AI"
+                    ],
+                    "certificate": true
+                },
+                {
+                    "id": "PY101",
+                    "title": "Python Programming Full Course",
+                    "provider": "freeCodeCamp",
+                    "difficulty": "Beginner",
+                    "duration": "4 hours",
+                    "course_url": "https://www.freecodecamp.org/learn",
+                    "video_url": "https://www.youtube.com/watch?v=rfscVS0vtbw",
+                    "topics": [
+                        "python basics",
+                        "variables",
+                        "loops",
+                        "functions"
+                    ],
+                    "certificate": false
+                },
+                {
+                    "id": "DS101",
+                    "title": "Introduction to Data Science",
+                    "provider": "MIT OpenCourseWare",
+                    "difficulty": "Beginner",
+                    "duration": "8 weeks",
+                    "course_url": "https://ocw.mit.edu",
+                    "video_url": "https://www.youtube.com/results?search_query=MIT+data+science+lecture",
+                    "topics": [
+                        "data analysis",
+                        "statistics",
+                        "data visualization"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "Machine Learning Engineer Path",
+            "description": "Develop real AI models and machine learning systems",
+            "courses": [
+                {
+                    "id": "ML201",
+                    "title": "Machine Learning Specialization",
+                    "provider": "DeepLearning.AI",
+                    "difficulty": "Intermediate",
+                    "duration": "3 months",
+                    "course_url": "https://www.coursera.org/specializations/machine-learning-introduction",
+                    "video_url": "https://www.youtube.com/results?search_query=andrew+ng+machine+learning",
+                    "topics": [
+                        "supervised learning",
+                        "regression",
+                        "classification",
+                        "neural networks"
+                    ],
+                    "certificate": true
+                },
+                {
+                    "id": "ML202",
+                    "title": "Machine Learning Crash Course",
+                    "provider": "Google",
+                    "difficulty": "Intermediate",
+                    "duration": "15 hours",
+                    "course_url": "https://developers.google.com/machine-learning/crash-course",
+                    "video_url": "https://www.youtube.com/results?search_query=google+machine+learning+crash+course",
+                    "topics": [
+                        "ML models",
+                        "TensorFlow",
+                        "training pipelines"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "Advanced AI Engineer Path",
+            "description": "Deep learning, neural networks, and AI system design",
+            "courses": [
+                {
+                    "id": "DL301",
+                    "title": "Practical Deep Learning for Coders",
+                    "provider": "fast.ai",
+                    "difficulty": "Advanced",
+                    "duration": "7 weeks",
+                    "course_url": "https://course.fast.ai/",
+                    "video_url": "https://www.youtube.com/results?search_query=fastai+course",
+                    "topics": [
+                        "deep learning",
+                        "computer vision",
+                        "NLP",
+                        "model deployment"
+                    ]
+                },
+                {
+                    "id": "DL302",
+                    "title": "Stanford Deep Learning Course",
+                    "provider": "Stanford University",
+                    "difficulty": "Advanced",
+                    "duration": "10 weeks",
+                    "course_url": "https://cs231n.stanford.edu/",
+                    "video_url": "https://www.youtube.com/results?search_query=stanford+cs231n+lecture",
+                    "topics": [
+                        "CNN",
+                        "vision AI",
+                        "advanced neural networks"
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "problem": "python command not recognized",
+    "solution": "Ensure Python is installed and added to system PATH."
+  },
+  {
+    "problem": "docker daemon not running",
+    "solution": "Open Docker Desktop and start the Docker service."
+  },
+  {
+    "problem": "n8n command not found",
+    "solution": "Install n8n globally using npm install n8n -g."
+  }
+]

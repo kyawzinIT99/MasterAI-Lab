@@ -1,0 +1,140 @@
+{
+  "ai_training": {
+    "title": "AI Training Programs",
+    "subtitle": "Master the future of intelligent systems",
+    "courses": [
+      {
+        "id": "ai-foundations",
+        "label": "Fundamentals",
+        "name": "AI & Machine Learning Foundations",
+        "price": 299,
+        "currency": "USD",
+        "duration": "6 Weeks",
+        "level": "Beginner",
+        "description": "Build a rock-solid understanding of neural networks, supervised/unsupervised learning, and model evaluation from the ground up.",
+        "topics": ["Python for AI", "NumPy & Pandas", "Scikit-Learn", "Model Training", "Data Preprocessing"]
+      },
+      {
+        "id": "prompt-engineering",
+        "label": "Prompt Craft",
+        "name": "Advanced Prompt Engineering",
+        "price": 199,
+        "currency": "USD",
+        "duration": "3 Weeks",
+        "level": "Intermediate",
+        "description": "Master the art of communicating with LLMs. Chain-of-thought, few-shot, system prompts, and guardrails for production AI.",
+        "topics": ["GPT-4 / Claude / Gemini", "System Prompts", "Chain-of-Thought", "RAG Prompting", "Safety & Guardrails"]
+      },
+      {
+        "id": "agentic-ai",
+        "label": "Agents",
+        "name": "Agentic AI & Multi-Agent Systems",
+        "price": 499,
+        "currency": "USD",
+        "duration": "8 Weeks",
+        "level": "Advanced",
+        "description": "Design autonomous AI agent swarms that plan, execute, and self-correct. Build with LangChain, CrewAI, and custom orchestrators.",
+        "topics": ["LangChain Agents", "CrewAI", "Tool Calling", "Memory Systems", "Multi-Agent Orchestration"]
+      },
+      {
+        "id": "rag-architecture",
+        "label": "RAG",
+        "name": "RAG Architecture & Vector Databases",
+        "price": 399,
+        "currency": "USD",
+        "duration": "5 Weeks",
+        "level": "Advanced",
+        "description": "Build production-grade Retrieval-Augmented Generation pipelines with Pinecone, Weaviate, and ChromaDB.",
+        "topics": ["Embeddings", "Vector Stores", "Chunking Strategies", "Hybrid Search", "Production RAG"]
+      },
+      {
+        "id": "n8n-make-automation",
+        "label": "No-Code AI",
+        "name": "n8n & Make.com AI Automation",
+        "price": 249,
+        "currency": "USD",
+        "duration": "4 Weeks",
+        "level": "Beginner",
+        "description": "Automate entire business workflows with n8n and Make.com. Connect AI models to 1000+ apps without writing code.",
+        "topics": ["n8n Workflows", "Make.com Scenarios", "Webhook Triggers", "AI Model Integration", "Error Handling"]
+      },
+      {
+        "id": "voice-ai",
+        "label": "Voice",
+        "name": "Vapi Voice AI Development",
+        "price": 349,
+        "currency": "USD",
+        "duration": "4 Weeks",
+        "level": "Intermediate",
+        "description": "Build conversational voice agents with Vapi. Real-time speech-to-text, custom voices, and telephony integration.",
+        "topics": ["Vapi SDK", "Voice Cloning", "Telephony", "Custom Functions", "Real-Time Streaming"]
+      }
+    ]
+  },
+  "network_services": {
+    "title": "Network & Infrastructure Services",
+    "subtitle": "Enterprise-grade connectivity and security",
+    "services": [
+      {
+        "id": "network-audit",
+        "label": "Assessment",
+        "name": "Network Security Audit",
+        "price": 1500,
+        "currency": "USD",
+        "period": "per audit",
+        "description": "Comprehensive vulnerability assessment of your entire network topology. Penetration testing, firewall review, and detailed remediation report.",
+        "includes": ["Penetration Testing", "Firewall Analysis", "VLAN Review", "Compliance Report", "Remediation Plan"]
+      },
+      {
+        "id": "sdwan-deployment",
+        "label": "SD-WAN",
+        "name": "SD-WAN Deployment & Migration",
+        "price": 3500,
+        "currency": "USD",
+        "period": "per site",
+        "description": "Full SD-WAN design, deployment, and migration from traditional WAN. Multi-site orchestration with failover and QoS policies.",
+        "includes": ["Site Survey", "Architecture Design", "Hardware Config", "Migration Plan", "48hr Support"]
+      },
+      {
+        "id": "zero-trust",
+        "label": "Security",
+        "name": "Zero Trust Network Architecture",
+        "price": 5000,
+        "currency": "USD",
+        "period": "base setup",
+        "description": "Design and implement a zero-trust security model. Identity-based access, micro-segmentation, and continuous verification.",
+        "includes": ["Identity Provider Setup", "Micro-Segmentation", "Policy Engine", "MFA Integration", "Staff Training"]
+      },
+      {
+        "id": "cloud-migration",
+        "label": "Cloud",
+        "name": "Cloud Infrastructure Migration",
+        "price": 4000,
+        "currency": "USD",
+        "period": "per workload",
+        "description": "Seamless migration of on-premise workloads to AWS, GCP, or Azure. Full CI/CD pipeline setup and monitoring.",
+        "includes": ["Workload Assessment", "Architecture Blueprint", "Data Migration", "CI/CD Setup", "Monitoring & Alerts"]
+      },
+      {
+        "id": "managed-firewall",
+        "label": "Firewall",
+        "name": "Managed Firewall Service",
+        "price": 800,
+        "currency": "USD",
+        "period": "per month",
+        "description": "24/7 managed firewall with real-time threat detection, automatic rule updates, and monthly security reports.",
+        "includes": ["24/7 Monitoring", "IDS/IPS", "Rule Management", "Monthly Reports", "Incident Response"]
+      },
+      {
+        "id": "fiber-routing",
+        "label": "Backbone",
+        "name": "Fiber & BGP Routing Design",
+        "price": 2500,
+        "currency": "USD",
+        "period": "per site",
+        "description": "Physical fiber backbone design with BGP/OSPF routing. Multi-path redundancy and traffic engineering for maximum uptime.",
+        "includes": ["Fiber Path Design", "BGP Configuration", "OSPF Setup", "Redundancy Planning", "Performance Tuning"]
+      }
+    ]
+  }
+}

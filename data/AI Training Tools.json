@@ -1,0 +1,159 @@
+{
+    "platform": "AI Training Toolkit",
+    "version": "1.0",
+    "tools": [
+        {
+            "id": "tool001",
+            "name": "Python",
+            "category": "Programming Language",
+            "description": "Main programming language used in AI and machine learning.",
+            "difficulty": "Beginner",
+            "download_url": "https://www.python.org/downloads/",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Go to the official Python website",
+                "Download the latest version",
+                "Run the installer",
+                "Check 'Add Python to PATH'",
+                "Click install and finish setup"
+            ]
+        },
+        {
+            "id": "tool002",
+            "name": "Visual Studio Code",
+            "category": "Code Editor",
+            "description": "Lightweight code editor widely used for AI development.",
+            "difficulty": "Beginner",
+            "download_url": "https://code.visualstudio.com/",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Download VS Code from official website",
+                "Run the installer",
+                "Install Python extension",
+                "Open folder for your AI project"
+            ]
+        },
+        {
+            "id": "tool003",
+            "name": "Anaconda",
+            "category": "Data Science Environment",
+            "description": "Popular Python distribution for AI and data science.",
+            "difficulty": "Beginner",
+            "download_url": "https://www.anaconda.com/download",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Download Anaconda installer",
+                "Run the setup file",
+                "Install with default settings",
+                "Launch Anaconda Navigator"
+            ]
+        },
+        {
+            "id": "tool004",
+            "name": "Jupyter Notebook",
+            "category": "AI Coding Environment",
+            "description": "Interactive notebook for writing and testing AI code.",
+            "difficulty": "Beginner",
+            "download_url": "https://jupyter.org/install",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Install Python or Anaconda",
+                "Open terminal",
+                "Run: pip install notebook",
+                "Start with command: jupyter notebook"
+            ]
+        },
+        {
+            "id": "tool005",
+            "name": "TensorFlow",
+            "category": "Machine Learning Framework",
+            "description": "Deep learning framework used to build AI models.",
+            "difficulty": "Intermediate",
+            "download_url": "https://www.tensorflow.org/install",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Install Python first",
+                "Open terminal",
+                "Run: pip install tensorflow",
+                "Test installation using Python"
+            ]
+        },
+        {
+            "id": "tool006",
+            "name": "PyTorch",
+            "category": "Deep Learning Framework",
+            "description": "Popular AI framework for research and production.",
+            "difficulty": "Intermediate",
+            "download_url": "https://pytorch.org/get-started/locally/",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Install Python",
+                "Open terminal",
+                "Run pip install torch",
+                "Verify installation with Python script"
+            ]
+        },
+        {
+            "id": "tool007",
+            "name": "Docker",
+            "category": "Development Environment",
+            "description": "Container platform for running AI applications.",
+            "difficulty": "Advanced",
+            "download_url": "https://www.docker.com/products/docker-desktop/",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Download Docker Desktop",
+                "Install and restart computer",
+                "Open Docker application",
+                "Run test container"
+            ]
+        },
+        {
+            "id": "tool008",
+            "name": "Git",
+            "category": "Version Control",
+            "description": "Tool for managing code versions and collaborating on projects.",
+            "difficulty": "Beginner",
+            "download_url": "https://git-scm.com/downloads",
+            "supported_os": [
+                "Windows",
+                "MacOS",
+                "Linux"
+            ],
+            "install_steps": [
+                "Download Git installer",
+                "Run setup wizard",
+                "Install default settings",
+                "Test using command: git --version"
+            ]
+        }
+    ]
+}

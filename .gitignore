@@ -1,0 +1,17 @@
+# Environment — NEVER commit API keys
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Claude Code internal tooling
+.claude/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Screenshots (optional — remove these lines if you want them tracked)
+screenshot*.png

@@ -1,0 +1,82 @@
+{
+  "platform": {
+    "name": "Antigravity AI Automation Training",
+    "founder": "Mr. Kyaw Zin Tun",
+    "version": "2.0",
+    "mission": "Teach AI automation, coding, and cloud systems through a guided AI assistant.",
+    "languages_supported": [
+      "English",
+      "Burmese"
+    ]
+  },
+  "assistant_policy": {
+    "allowed_topics": [
+      "AI training",
+      "AI coding",
+      "automation workflows",
+      "prompt engineering",
+      "cloud deployment",
+      "network automation",
+      "AI tool installation"
+    ],
+    "blocked_topics": [
+      "politics",
+      "religion",
+      "medical advice",
+      "financial speculation"
+    ],
+    "response_style": "educational"
+  },
+  "subscription_control": {
+    "plans": {
+      "free": {
+        "daily_questions": 40,
+        "api_access": "limited",
+        "features": [
+          "Beginner AI courses",
+          "Tool installation guides",
+          "Basic troubleshooting"
+        ]
+      },
+      "pro": {
+        "price_usd": 9,
+        "daily_questions": 300,
+        "api_access": "priority",
+        "features": [
+          "Advanced AI courses",
+          "Automation workflow library",
+          "AI troubleshooting assistant"
+        ]
+      },
+      "enterprise": {
+        "price_usd": 49,
+        "daily_questions": "unlimited",
+        "api_access": "full",
+        "features": [
+          "Enterprise automation training",
+          "API integration labs",
+          "Private support"
+        ]
+      }
+    }
+  },
+  "api_usage_control": {
+    "strategy": "local_first",
+    "call_api_if": [
+      "complex programming question",
+      "unknown question",
+      "advanced explanation"
+    ],
+    "daily_budget_usd": 5,
+    "max_tokens": 300,
+    "cache_enabled": true
+  },
+  "response_engine": {
+    "logic": [
+      "Detect intent",
+      "Search local dataset",
+      "Return answer if found",
+      "If not found call AI API"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "id": "AI-101",
+    "title": "AI Automation Fundamentals",
+    "level": "Beginner",
+    "modules": [
+      "Introduction to AI",
+      "Prompt engineering basics",
+      "Automation concepts",
+      "Using AI APIs"
+    ]
+  },
+  {
+    "id": "AI-201",
+    "title": "n8n Workflow Automation",
+    "level": "Intermediate",
+    "modules": [
+      "Workflow triggers",
+      "API connections",
+      "Webhook automation",
+      "Data transformation"
+    ]
+  },
+  {
+    "id": "AI-301",
+    "title": "Advanced AI Systems",
+    "level": "Advanced",
+    "modules": [
+      "AI agents",
+      "Vector search",
+      "AI deployment",
+      "Production pipelines"
+    ]
+  }
+]
