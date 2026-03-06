@@ -260,14 +260,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const freeRes = await fetch('data/ai_learning_hub_dataset.json');
       const freeData = await freeRes.json();
 
-      // Render Free Courses at ~81% scroll
-      renderFreeCoursesSection(freeData, 'ai-free-course-container', 81);
+      // Render Free Courses at ~76% scroll
+      renderFreeCoursesSection(freeData, 'ai-free-course-container', 76);
 
       const toolsRes = await fetch('data/AI%20Training%20Tools.json');
       const toolsData = await toolsRes.json();
 
-      // Render Training Tools at ~90% scroll
-      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 90);
+      // Render Training Tools at ~85% scroll (spaced past Free Courses)
+      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
 
       // Setup reveal animations
       setupCardReveal();
@@ -489,10 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById('send-btn');
   const chatMessages = document.getElementById('chat-messages');
 
-  // SECURITY: API key must be supplied via a server-side proxy — never hardcode or
-  // fetch it client-side. Set aiApiKey via your backend/proxy endpoint instead.
-  let aiApiKey = '';
-
   let aiGlobalContext = "You are MR.KYAW ZIN, an AI automation expert who teaches AI, n8n, Python, and cloud networking on the Antigravity AI platform. Keep answers educational and NO LONGER than 2-3 sentences. Always answer using the FACTUAL DATA provided below. CRITICAL: If a user asks about anything completely unrelated to AI, coding, or the platform (e.g. politics, cooking, sports), decline to answer in EXACTLY ONE short sentence (e.g. 'I only assist with AI and automation topics.') to save API tokens.\n\n--- PLATFORM KNOWLEDGE BASE ---\n\n";
 
   // Pre-fetch local datasets to feed into AI Brain
@@ -581,28 +577,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!aiApiKey) {
-      setTimeout(() => {
-        bubble.innerHTML = "My OpenAI API key is missing. I cannot process this right now. Please check your <code>.env</code> file.";
-      }, 800);
-      return;
-    }
-
-    // --- 2. Call OpenAI API ---
+    // --- 2. Call server-side proxy (keeps OpenAI key off the client) ---
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${aiApiKey}`
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages: [
-            {
-              role: 'system',
-              content: aiGlobalContext
-            },
+            { role: 'system', content: aiGlobalContext },
             { role: 'user', content: text }
           ]
         })

@@ -548,7 +548,7 @@ canvas {
 
 /* Scroll Container */
 #scroll-container {
-  height: 2800vh;
+  height: 3000vh;
   position: relative;
   z-index: 20;
 }
