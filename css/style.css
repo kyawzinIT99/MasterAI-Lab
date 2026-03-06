@@ -1075,15 +1075,29 @@ canvas {
   .section-body { font-size: 0.95rem; line-height: 1.8; }
   .hero-tagline { font-size: 0.95rem; line-height: 1.7; }
 
-  /* Hero: full width, clean padding */
+  /* Hero: flow naturally above sections on mobile */
   .hero-standalone {
+    position: relative;
     width: 100%;
-    padding: 0 6vw;
+    height: auto;
+    padding: 8rem 6vw 3rem;
   }
 
-  /* Sections: full width */
-  .scroll-section,
+  /* Sections: normal flow, no absolute scroll-driven positioning */
+  .scroll-section {
+    position: relative !important;
+    top: auto !important;
+    transform: none !important;
+    min-height: auto !important;
+    width: 100%;
+    padding: 2.5rem 6vw;
+    opacity: 1 !important;
+  }
+
   .dynamic-section-group {
+    position: relative !important;
+    top: auto !important;
+    transform: none !important;
     width: 100%;
   }
 
@@ -1171,4 +1185,71 @@ canvas {
   /* Testimonials: full width */
   .testimonials { gap: 1.2rem; }
   .testimonial-text { font-size: 0.85rem; }
+
+  /* ── Mobile Performance & Layout ── */
+
+  /* Natural height on mobile — no scroll-driven animation, just flowing content */
+  #scroll-container {
+    height: auto;
+  }
+
+  /* Hide loader instantly on mobile (frames are skipped, JS also hides it) */
+  #loader {
+    display: none !important;
+  }
+
+  /* Dark overlay not needed on mobile (canvas is hidden) */
+  #dark-overlay {
+    display: none;
+  }
+
+  /* Marquee text: smaller on mobile */
+  .marquee-text {
+    font-size: 22vw;
+  }
+
+  /* Scroll indicator: hide on mobile (scrolling distance is obvious) */
+  .scroll-indicator {
+    display: none;
+  }
+
+  /* Service group header padding on mobile */
+  .service-group-header {
+    padding: 0 6vw;
+  }
+}
+
+/* ── Mobile Visual Background ──
+   Subtle ambient glow since canvas is hidden on mobile */
+@media (max-width: 768px) {
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse 100% 55% at 50% -5%, rgba(0, 255, 255, 0.07) 0%, transparent 65%),
+      radial-gradient(ellipse 70% 40% at 90% 60%, rgba(0, 100, 255, 0.04) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 30% at 10% 80%, rgba(255, 0, 200, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Subtle grid lines — cyber aesthetic without canvas */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      linear-gradient(rgba(0, 255, 255, 0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 255, 0.018) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+    z-index: 0;
+  }
 }

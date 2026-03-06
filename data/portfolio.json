@@ -1,0 +1,27 @@
+{
+  "subtitle": "026 / Case Studies",
+  "title": "Client Results",
+  "cases": [
+    {
+      "id": "case-001",
+      "label": "N8N Automation · E-Commerce, Yangon",
+      "name": "80% Task Automation",
+      "description": "Automated order processing, inventory sync, and customer notifications for a Yangon e-commerce business. Deployed and live in 3 weeks.",
+      "metrics": ["80% tasks automated", "40 hrs/month saved", "3 weeks to deploy"]
+    },
+    {
+      "id": "case-002",
+      "label": "AWS Cloud Migration · Startup, Mandalay",
+      "name": "Zero Downtime Migration",
+      "description": "Full on-premise to AWS migration with auto-scaling EC2 and RDS. Handles 10x traffic spikes with a 99.9% uptime SLA.",
+      "metrics": ["99.9% uptime", "60% cost reduction", "0 hrs downtime"]
+    },
+    {
+      "id": "case-003",
+      "label": "Agentic AI · Training Institute, Bangkok",
+      "name": "90% Query Automation",
+      "description": "Multi-agent RAG system resolves customer queries autonomously, integrated with existing CRM and ticketing workflows.",
+      "metrics": ["90% queries resolved", "24/7 availability", "5x faster response"]
+    }
+  ]
+}

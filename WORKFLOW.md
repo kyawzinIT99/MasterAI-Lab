@@ -14,44 +14,104 @@
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Vanilla HTML / CSS / JS |
-| Animation | GSAP 3.12 + ScrollTrigger, Lenis 1.1.20 |
+| Animation | GSAP 3.12 + ScrollTrigger, Lenis 1.1.20 (desktop only) |
 | Hosting | Modal (Python ASGI, serverless) |
-| Backend | FastAPI (static files + OpenAI proxy) |
-| AI Brain | OpenAI GPT-3.5-turbo via server-side proxy |
-| Secrets | Modal Secret vault (`openai-key`) |
+| Backend | FastAPI (static files + OpenAI proxy + Telegram contact + Telegram AI webhook) |
+| AI Brain | OpenAI GPT-4o — website chat widget + Telegram bot replies |
+| Analytics | Google Analytics 4 (`G-0CJHM3JXHS`) |
+| Telegram Bot | @MaterAITraining_bot — AI replies + contact form notifications |
+| Secrets | Modal Secret vault (`openai-key`, `telegram-bot`) |
 | Version Control | GitHub |
 
 ---
 
-## Architecture
+## Architecture — Full Data Flow
 
 ```
-Browser
-  └── index.html + css/style.css + js/app.js
-        └── Canvas frame animation (frames/ directory)
-        └── GSAP scroll-driven sections
-        └── Lenis smooth scroll
-        └── AI chat widget → POST /api/chat
-                                  └── FastAPI (modal_app.py)
-                                        └── OpenAI API (server-side, key never exposed)
+┌─────────────────────────────────────────────────────────────────┐
+│  DESKTOP BROWSER                                                │
+│                                                                 │
+│  index.html + css/style.css?v=8 + js/app.js?v=15               │
+│    ├── Canvas: 121 JPEG frames lazy-loaded (25 ahead / 5 back)  │
+│    ├── GSAP ScrollTrigger — 25+ scroll-driven sections          │
+│    ├── Lenis smooth scroll — desktop only                       │
+│    └── Google Analytics 4 (G-0CJHM3JXHS) — passive tracking    │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  MOBILE BROWSER                                                 │
+│                                                                 │
+│  index.html + css/style.css?v=8 + js/app.js?v=15               │
+│    ├── Canvas: HIDDEN — no frame downloads (saves ~10MB)        │
+│    ├── Layout: natural CSS flow (position:relative sections)    │
+│    ├── Scroll: native + IntersectionObserver for stat countup   │
+│    ├── Ambient glow + cyan grid background (CSS only)           │
+│    └── Google Analytics 4 (G-0CJHM3JXHS)                       │
+└─────────────────────────────────────────────────────────────────┘
+
+Both browsers:
+  ├── AI Chat Widget → POST /api/chat
+  │     └── FastAPI (modal_app.py)
+  │           └── OpenAI GPT-4o → AI reply → browser
+  │
+  └── Contact Form → POST /api/contact
+        └── FastAPI (modal_app.py)
+              └── Telegram sendMessage → @MaterAITraining_bot → owner (chat 2010982723)
+
+┌─────────────────────────────────────────────────────────────────┐
+│  TELEGRAM USERS                                                 │
+│                                                                 │
+│  User messages @MaterAITraining_bot                             │
+│    └── Telegram → POST /api/telegram-webhook                    │
+│          └── FastAPI (modal_app.py)                             │
+│                ├── Rate limit: 10 msg/min per user              │
+│                ├── OpenAI GPT-4o (same AI Brain system prompt)  │
+│                └── Telegram sendMessage → AI reply → user       │
+└─────────────────────────────────────────────────────────────────┘
+
+Modal serverless infra:
+  modal_app.py → FastAPI ASGI → itsolutions-mm--main-web.modal.run
+  Secrets: openai-key (OPENAI_API_KEY), telegram-bot (BOT_TOKEN + CHAT_ID)
 ```
 
 ---
 
 ## Completed Work
 
-- [x] Scroll-driven 3D canvas animation (video frames rendered on canvas)
+### Frontend
+- [x] Scroll-driven 3D canvas animation (121 JPEG frames on canvas)
 - [x] GSAP ScrollTrigger section choreography (25+ sections, varied animations)
-- [x] Lenis smooth scroll with nav anchor fix (`lenis.scrollTo()`)
-- [x] Fixed Contact/Tools section overlap (3000vh container, repositioned sections)
-- [x] AI chat widget (GPT-3.5-turbo, server-side proxy)
-- [x] Removed client-side `.env` fetch — API key fully secured
-- [x] XSS prevention (`escapeHtml()` on all dynamic innerHTML)
-- [x] Modal deployment (FastAPI ASGI, static files baked into image)
-- [x] Modal secret vault for OpenAI key
-- [x] GitHub repo initialized and pushed
-- [x] Contact section updated with full profile (MR. KYAW ZIN TUN)
-- [x] `.gitignore` protecting `.env` and secrets
+- [x] Lenis smooth scroll with nav anchor fix — desktop only
+- [x] Lazy-load canvas frames: initial 20 frames, then 25-ahead / 5-behind window
+- [x] Burmese / English language toggle (localStorage persistence)
+- [x] OG meta tags + SVG favicon + meta description
+- [x] Google Analytics 4 (`G-0CJHM3JXHS`) — tracks all visitors
+- [x] Testimonials section, Cloud Native section (`#cloud-section`)
+
+### Mobile
+- [x] Canvas hidden, Lenis disabled, frame downloads skipped (saves ~10MB)
+- [x] Sections converted to natural CSS flow (no GSAP absolute positioning)
+- [x] Duplicate/overlapping sections fixed — each shows once in order
+- [x] Stat countup via IntersectionObserver (no ScrollTrigger needed)
+- [x] Hamburger nav, full-width sections, ambient glow + grid background
+- [x] `ScrollTrigger.update` on native scroll + `refresh()` after dynamic load
+
+### Backend (modal_app.py)
+- [x] FastAPI ASGI on Modal serverless — static files baked into image
+- [x] `/api/chat` — OpenAI GPT-4o proxy, rate limited 20 req/IP/60s
+- [x] `/api/contact` — contact form → Telegram notification to owner
+- [x] `/api/telegram-webhook` — GPT-4o AI Brain replies to @MaterAITraining_bot users
+- [x] Telegram webhook registered: `setWebhook` → `/api/telegram-webhook`
+- [x] Rate limiting on Telegram webhook: 10 msg/min per user chat_id
+- [x] Modal secret vault: `openai-key`, `telegram-bot`
+- [x] XSS prevention, no API keys exposed to browser
+
+### AI Brain
+- [x] GPT-4o system prompt: IT Solutions MM identity, services, FAQ rules
+- [x] Website chat widget: history in localStorage (30 msg), typing indicator, clear button
+- [x] Telegram bot: same AI Brain, auto-replies to user messages
+- [x] Off-topic questions declined in one sentence (cost control)
+- [x] Max 2-3 sentences per reply (cost control)
 
 ---
 
@@ -64,8 +124,16 @@ modal token set --token-id <id> --token-secret <secret>
 # Create / rotate OpenAI secret
 modal secret create openai-key OPENAI_API_KEY="sk-..." --force
 
-# Deploy
+# Create / rotate Telegram bot secret
+modal secret create telegram-bot \
+  TELEGRAM_BOT_TOKEN="<bot_token>" \
+  TELEGRAM_CHAT_ID="2010982723" --force
+
+# Deploy site + backend
 modal deploy modal_app.py
+
+# Re-register Telegram webhook after deploy (if bot token rotated)
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://itsolutions-mm--main-web.modal.run/api/telegram-webhook"
 
 # Push to GitHub
 git add -A && git commit -m "message" && git push origin main
@@ -73,36 +141,17 @@ git add -A && git commit -m "message" && git push origin main
 
 ---
 
-## Next Enhancements
+## Telegram Bot Info
 
-### Priority 1 — Content & UX
-- [ ] **Mobile responsive layout** — current site is desktop-only; add breakpoints for tablet/phone
-- [ ] **Contact form** — replace mailto button with a real form (sends email via n8n or Make webhook)
-- [ ] **WhatsApp / Telegram button** — quick contact for Myanmar audience
-- [ ] **Burmese language toggle** — EN / MM switcher for local clients
-
-### Priority 2 — AI Brain Upgrade
-- [ ] **System prompt** — give the AI Brain context about IT Solutions MM services, pricing, and FAQs so it answers like a real consultant
-- [ ] **Chat history persistence** — store conversation in `localStorage` so it survives page refresh
-- [ ] **Typing indicator** — animated "..." while waiting for OpenAI response
-- [ ] **Upgrade to GPT-4o** — better answers for technical questions
-
-### Priority 3 — Sections & Services
-- [ ] **Cloud section** — currently nav link goes nowhere; add AWS/GCP/Azure service cards
-- [ ] **Pricing page / modal** — training program pricing cards with enroll buttons
-- [ ] **Portfolio / case studies** — real client results as scroll sections
-- [ ] **Testimonials section** — social proof from AI Automation Society members
-
-### Priority 4 — Performance & SEO
-- [ ] **Lazy-load frames** — only load canvas frames when user starts scrolling (reduces initial load)
-- [ ] **OG meta tags** — proper title, description, and preview image for link sharing
-- [ ] **Favicon** — custom favicon matching IT Solutions MM brand
-- [ ] **Google Analytics / Plausible** — track visitors and section engagement
-
-### Priority 5 — Security & Ops
-- [ ] **Remove `/api/debug-env`** — already done; keep it out
-- [ ] **Rate limiting on `/api/chat`** — prevent API cost abuse (add per-IP limit in FastAPI)
-- [ ] **OpenAI key rotation reminder** — rotate every 90 days, never share in chat
+| Field | Value |
+|-------|-------|
+| Bot name | MasterAi.bot |
+| Username | @MaterAITraining_bot |
+| Bot ID | 8614942238 |
+| Owner chat ID | 2010982723 |
+| Secret name | `telegram-bot` |
+| Webhook URL | `https://itsolutions-mm--main-web.modal.run/api/telegram-webhook` |
+| Purpose | AI replies to users + contact form notifications to owner |
 
 ---
 
@@ -110,25 +159,45 @@ git add -A && git commit -m "message" && git push origin main
 
 ```
 3D Website/
-├── index.html          # Main SPA entry point
+├── index.html              # Main SPA entry point
 ├── css/
-│   └── style.css       # All styles + CSS variables
+│   └── style.css?v=8       # All styles + mobile flow overrides
+├── data/
+│   ├── services.json           # AI training + network services
+│   ├── ai_learning_hub_dataset.json  # Free courses
+│   ├── AI Training Tools.json  # Tools list
+│   ├── portfolio.json          # Case studies (update with real client results)
 ├── js/
-│   └── app.js          # GSAP, Lenis, canvas, chat widget
-├── frames/             # Video-to-canvas PNG frames
-├── data/               # JSON data (courses, tools, training, services)
-├── modal_app.py        # Modal deployment + FastAPI backend
-├── WORKFLOW.md         # This file
+│   └── app.js?v=16         # GSAP, Lenis, lazy frames, chat widget, portfolio
+├── frames/                 # 121 JPEG frames (canvas animation)
+├── data/                   # JSON (courses, tools, training, services, ai-brain)
+│   └── ai-brain/           # FAQ, courses, installation, troubleshooting JSON
+├── modal_app.py            # Modal + FastAPI: static + 3 API endpoints
+├── WORKFLOW.md             # This file
 ├── .gitignore
-└── .env                # Local dev only — NEVER committed
+└── .env                    # Local dev only — NEVER committed
 ```
+
+---
+
+## Next Enhancements
+
+### Priority 3 — Sections & Services
+- [ ] **Pricing page / modal** — training program pricing cards with enroll buttons
+- [x] ~~Portfolio / case studies~~ — DONE (`data/portfolio.json`, rendered at 88% scroll)
+
+### Priority 5 — Security & Ops
+- [x] ~~OpenAI key rotation tracking~~ — DONE (`OPENAI_KEY_ROTATED_ON` in `modal_app.py`, logs days remaining on every deploy)
+- [x] ~~Telegram bot token rotation~~ — DOCUMENTED (BotFather → revoke → `modal secret create --force` → re-register webhook)
 
 ---
 
 ## Key Rules
 
-1. **Never share API keys in chat** — always use `modal secret create` from terminal
+1. **Never share API keys or bot tokens in chat** — always use `modal secret create` from terminal
 2. **Rotate OpenAI key** after any accidental exposure
-3. **Never commit `.env`** — it is in `.gitignore`
-4. **Test locally** before deploying: open `index.html` directly in browser
+3. **Rotate Telegram bot token** via @BotFather if accidentally shared — old token dies immediately; re-register webhook after rotation
+4. **Never commit `.env`** — it is in `.gitignore`
 5. **Version-bust assets** after changes: increment `?v=N` on CSS/JS script tags in `index.html`
+6. **Current versions:** `css/style.css?v=8`, `js/app.js?v=16`
+7. **Telegram webhook** must be re-registered after bot token rotation
