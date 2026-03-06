@@ -1157,11 +1157,6 @@ canvas {
   .service-card-label { font-size: 0.55rem; }
   .service-card-name { font-size: 1rem !important; }
 
-  /* Hide secondary CTA (YouTube playlist, 2nd button) on mobile */
-  .service-card > div[style*="display: flex"] > a:nth-child(2) {
-    display: none !important;
-  }
-
   /* Free course category binder — tighten */
   .service-category-binder {
     margin-top: 1rem !important;
