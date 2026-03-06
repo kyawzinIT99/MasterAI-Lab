@@ -31,7 +31,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │  DESKTOP BROWSER                                                │
 │                                                                 │
-│  index.html + css/style.css?v=8 + js/app.js?v=15               │
+│  index.html + css/style.css?v=8 + js/app.js?v=17               │
 │    ├── Canvas: 121 JPEG frames lazy-loaded (25 ahead / 5 back)  │
 │    ├── GSAP ScrollTrigger — 25+ scroll-driven sections          │
 │    ├── Lenis smooth scroll — desktop only                       │
@@ -41,7 +41,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │  MOBILE BROWSER                                                 │
 │                                                                 │
-│  index.html + css/style.css?v=8 + js/app.js?v=15               │
+│  index.html + css/style.css?v=8 + js/app.js?v=17               │
 │    ├── Canvas: HIDDEN — no frame downloads (saves ~10MB)        │
 │    ├── Layout: natural CSS flow (position:relative sections)    │
 │    ├── Scroll: native + IntersectionObserver for stat countup   │
@@ -71,7 +71,7 @@ Both browsers:
 
 Modal serverless infra:
   modal_app.py → FastAPI ASGI → itsolutions-mm--main-web.modal.run
-  Secrets: openai-key (OPENAI_API_KEY), telegram-bot (BOT_TOKEN + CHAT_ID)
+  Secrets: openai-key (OPENAI_API_KEY), telegram-bot (BOT_TOKEN + CHAT_ID + WEBHOOK_SECRET)
 ```
 
 ---
@@ -87,6 +87,8 @@ Modal serverless infra:
 - [x] OG meta tags + SVG favicon + meta description
 - [x] Google Analytics 4 (`G-0CJHM3JXHS`) — tracks all visitors
 - [x] Testimonials section, Cloud Native section (`#cloud-section`)
+- [x] 5 testimonials total — 2 foreign company endorsements (Singapore, Bangkok) with "100% recommended"
+- [x] Training Tools section redesigned as compact 2-column grid (name + difficulty + download link only)
 
 ### Mobile
 - [x] Canvas hidden, Lenis disabled, frame downloads skipped (saves ~10MB)
@@ -105,6 +107,10 @@ Modal serverless infra:
 - [x] Rate limiting on Telegram webhook: 10 msg/min per user chat_id
 - [x] Modal secret vault: `openai-key`, `telegram-bot`
 - [x] XSS prevention, no API keys exposed to browser
+- [x] `/api/chat` — model injection blocked: model locked to `gpt-4o`, `max_tokens` hard-capped at 300
+- [x] `/api/contact` — rate limited: 5 submissions/IP/10min to prevent spam floods
+- [x] `/api/telegram-webhook` — `X-Telegram-Bot-Api-Secret-Token` header verified (fake calls silently rejected)
+- [x] Telegram webhook re-registered with `secret_token` parameter
 
 ### AI Brain
 - [x] GPT-4o system prompt: IT Solutions MM identity, services, FAQ rules
@@ -124,16 +130,17 @@ modal token set --token-id <id> --token-secret <secret>
 # Create / rotate OpenAI secret
 modal secret create openai-key OPENAI_API_KEY="sk-..." --force
 
-# Create / rotate Telegram bot secret
+# Create / rotate Telegram bot secret (include webhook secret)
 modal secret create telegram-bot \
   TELEGRAM_BOT_TOKEN="<bot_token>" \
-  TELEGRAM_CHAT_ID="2010982723" --force
+  TELEGRAM_CHAT_ID="2010982723" \
+  TELEGRAM_WEBHOOK_SECRET="<webhook_secret>" --force
 
 # Deploy site + backend
 modal deploy modal_app.py
 
-# Re-register Telegram webhook after deploy (if bot token rotated)
-curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://itsolutions-mm--main-web.modal.run/api/telegram-webhook"
+# Re-register Telegram webhook after deploy (always include secret_token)
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://itsolutions-mm--main-web.modal.run/api/telegram-webhook&secret_token=<webhook_secret>"
 
 # Push to GitHub
 git add -A && git commit -m "message" && git push origin main
@@ -168,7 +175,7 @@ git add -A && git commit -m "message" && git push origin main
 │   ├── AI Training Tools.json  # Tools list
 │   ├── portfolio.json          # Case studies (update with real client results)
 ├── js/
-│   └── app.js?v=16         # GSAP, Lenis, lazy frames, chat widget, portfolio
+│   └── app.js?v=17         # GSAP, Lenis, lazy frames, chat widget, portfolio
 ├── frames/                 # 121 JPEG frames (canvas animation)
 ├── data/                   # JSON (courses, tools, training, services, ai-brain)
 │   └── ai-brain/           # FAQ, courses, installation, troubleshooting JSON
@@ -199,5 +206,7 @@ git add -A && git commit -m "message" && git push origin main
 3. **Rotate Telegram bot token** via @BotFather if accidentally shared — old token dies immediately; re-register webhook after rotation
 4. **Never commit `.env`** — it is in `.gitignore`
 5. **Version-bust assets** after changes: increment `?v=N` on CSS/JS script tags in `index.html`
-6. **Current versions:** `css/style.css?v=8`, `js/app.js?v=16`
-7. **Telegram webhook** must be re-registered after bot token rotation
+6. **Current versions:** `css/style.css?v=8`, `js/app.js?v=17`
+7. **Telegram webhook** must be re-registered after bot token rotation — always include `secret_token` param
+8. **Concurrent users** — Modal auto-scales (100 req/container), static assets unlimited, OpenAI quota is the only real cap
+9. **Security hardened** — model injection blocked, contact spam limited, webhook secret verified
