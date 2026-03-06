@@ -1133,8 +1133,45 @@ canvas {
   /* Mobile nav links */
   .mobile-nav-link { font-size: 1.5rem; }
 
-  /* Topic pills: wrap cleanly */
-  .service-card-topics { gap: 0.3rem; }
+  /* Topic pills: wrap cleanly, smaller */
+  .service-card-topics {
+    gap: 0.3rem;
+    max-height: 3.2rem;
+    overflow: hidden;
+  }
+  .topic-pill {
+    font-size: 0.5rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* Truncate card descriptions to 2 lines */
+  .service-card-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.82rem;
+  }
+
+  /* Card label smaller */
+  .service-card-label { font-size: 0.55rem; }
+  .service-card-name { font-size: 1rem !important; }
+
+  /* Hide secondary CTA (YouTube playlist, 2nd button) on mobile */
+  .service-card > div[style*="display: flex"] > a:nth-child(2) {
+    display: none !important;
+  }
+
+  /* Free course category binder — tighten */
+  .service-category-binder {
+    margin-top: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .service-category-binder h3 { font-size: 1rem !important; }
+  .service-category-binder p { font-size: 0.75rem !important; }
+
+  /* Group header — tighten on mobile */
+  .service-group-title { font-size: clamp(1.6rem, 7vw, 2.5rem); }
 
   /* Testimonials: full width */
   .testimonials { gap: 1.2rem; }
