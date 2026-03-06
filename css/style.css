@@ -875,3 +875,223 @@ canvas {
     flex-direction: column;
   }
 }
+
+/* =============================================
+   ENHANCEMENTS: Nav Controls, Mobile, Lang, Chat
+   ============================================= */
+
+/* Nav Controls (lang toggle + hamburger) */
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.lang-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 0, 0.35);
+  color: #00ff00;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  mix-blend-mode: normal;
+}
+
+.lang-btn:hover,
+.lang-btn.active-mm {
+  background: rgba(0, 255, 0, 0.12);
+  border-color: #00ff00;
+}
+
+/* Hamburger Button */
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  flex-direction: column;
+  gap: 5px;
+  mix-blend-mode: normal;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.open span:nth-child(2) { opacity: 0; }
+.hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile Nav Overlay */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.97);
+  backdrop-filter: blur(20px);
+  z-index: 98;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.mobile-nav.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.mobile-nav-link {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: color 0.3s ease;
+}
+
+.mobile-nav-link:hover { color: #00ffff; }
+
+/* Contact Form */
+.contact-form {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  max-width: 380px;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.form-input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  padding: 0.65rem 1rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.3s ease;
+  border-radius: 2px;
+}
+
+.form-input:focus { border-color: rgba(0, 255, 255, 0.5); }
+.form-input::placeholder { color: var(--text-muted); }
+
+.form-textarea {
+  resize: vertical;
+  min-height: 75px;
+}
+
+/* Typing Indicator */
+.typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  animation: typingBounce 1.2s infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Chat clear history button */
+.chat-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+  align-self: flex-end;
+}
+.chat-clear-btn:hover { color: #ff4444; }
+
+/* Testimonials */
+.testimonials {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.testimonial {
+  border-left: 2px solid rgba(0, 255, 255, 0.25);
+  padding-left: 1.2rem;
+}
+
+.testimonial-text {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--text-on-dark);
+  font-style: italic;
+  margin-bottom: 0.4rem;
+}
+
+.testimonial-author {
+  font-size: 0.6rem;
+  color: #00ffff;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Enhanced Mobile Breakpoints */
+@media (max-width: 768px) {
+  .nav-links { display: none !important; }
+  .hamburger-btn { display: flex !important; }
+  .mobile-nav { display: flex; }
+
+  .hero-heading { font-size: clamp(2.5rem, 10vw, 5.5rem); }
+  .section-heading { font-size: clamp(1.8rem, 8vw, 4rem); }
+
+  #ai-chat-window {
+    width: calc(100vw - 20px);
+    right: -10px;
+    height: 70vh;
+  }
+
+  .form-row { flex-direction: column; }
+
+  .contact-form { max-width: 100%; }
+
+  .mobile-nav-link { font-size: 1.5rem; }
+}

@@ -8,6 +8,20 @@ Setup: add your OpenAI key as a Modal secret once:
 
 import modal
 from pathlib import Path
+from collections import defaultdict
+from datetime import datetime, timedelta
+
+# In-memory rate limiter: 20 requests per IP per 60 seconds
+_rate_store: dict = defaultdict(list)
+
+def _check_rate_limit(ip: str, limit: int = 20, window: int = 60) -> bool:
+    now = datetime.utcnow()
+    cutoff = now - timedelta(seconds=window)
+    _rate_store[ip] = [t for t in _rate_store[ip] if t > cutoff]
+    if len(_rate_store[ip]) >= limit:
+        return False
+    _rate_store[ip].append(now)
+    return True
 
 app = modal.App("main")
 
@@ -48,6 +62,9 @@ def web():
     # --- OpenAI proxy: keeps the key server-side, never exposed to browsers ---
     @api.post("/api/chat")
     async def chat_proxy(request: Request):
+        ip = request.client.host if request.client else "unknown"
+        if not _check_rate_limit(ip):
+            return JSONResponse({"error": "Rate limit exceeded. Please wait a moment."}, status_code=429)
         body = await request.json()
         openai_key = os.environ.get("OPENAI_API_KEY", "")
         if not openai_key:

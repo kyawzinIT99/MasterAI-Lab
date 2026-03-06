@@ -10,20 +10,72 @@ document.addEventListener("DOMContentLoaded", () => {
   gsap.ticker.lagSmoothing(0);
 
   // Nav links: use lenis.scrollTo() so transforms and absolute positioning are handled correctly.
-  // Plain anchor hrefs misfire on position:absolute elements with translateY(-50%).
-  document.querySelectorAll('.nav-links a').forEach(link => {
+  document.querySelectorAll('.nav-links a, .mobile-nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
       const href = link.getAttribute('href');
       if (!href || href === '#') return;
       const target = document.querySelector(href);
       if (!target) return;
       e.preventDefault();
+      // Close mobile nav if open
+      document.getElementById('hamburger').classList.remove('open');
+      document.getElementById('mobile-nav').classList.remove('open');
       lenis.scrollTo(target, { offset: 0, duration: 1.4, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
     });
   });
 
-  // 2. Preload Frames
+  // Hamburger menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobile-nav');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+  });
+
+  // Language Toggle (EN / Burmese)
+  let currentLang = localStorage.getItem('preferred_lang') || 'en';
+  const langBtn = document.getElementById('lang-toggle');
+
+  function applyLang(lang) {
+    currentLang = lang;
+    langBtn.textContent = lang === 'en' ? 'MM' : 'EN';
+    langBtn.classList.toggle('active-mm', lang === 'mm');
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const val = el.dataset[lang] || el.dataset['en'];
+      if (!val) return;
+      if (el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'SPAN' || el.tagName === 'P' || el.tagName === 'H1' || el.tagName === 'H2') {
+        el.textContent = val;
+      }
+    });
+    // Placeholder translations for form inputs
+    document.querySelectorAll('[data-en-placeholder]').forEach(el => {
+      const key = lang === 'mm' ? 'mmPlaceholder' : 'enPlaceholder';
+      el.placeholder = el.dataset[key] || el.dataset['enPlaceholder'];
+    });
+    localStorage.setItem('preferred_lang', lang);
+  }
+
+  langBtn.addEventListener('click', () => applyLang(currentLang === 'en' ? 'mm' : 'en'));
+  if (currentLang === 'mm') applyLang('mm');
+
+  // Contact form — submit via mailto
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(contactForm);
+      const name = fd.get('name') || '';
+      const email = fd.get('email') || '';
+      const message = fd.get('message') || '';
+      const subject = encodeURIComponent(`Inquiry from ${name}`);
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      window.open(`mailto:itsolutions.mm@gmail.com?subject=${subject}&body=${body}`, '_self');
+    });
+  }
+
+  // 2. Preload Frames — start rendering after INITIAL_LOAD, continue rest in background
   const FRAME_COUNT = 121;
+  const INITIAL_LOAD = 40; // start site after first 40 frames — faster initial load
   const frames = [];
   let loadedFrames = 0;
   let isLoaded = false;
@@ -39,16 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const p = Math.floor((loadedFrames / FRAME_COUNT) * 100);
       loaderText.innerText = p + '%';
       loaderBar.style.width = p + '%';
-      if (loadedFrames === FRAME_COUNT && !isLoaded) {
+      // Start after INITIAL_LOAD frames; rest keep loading in background
+      if (loadedFrames === INITIAL_LOAD && !isLoaded) {
         isLoaded = true;
         initRender();
       }
     };
 
     img.onerror = () => {
-      console.error("Failed to load frame: " + num);
-      loadedFrames++; // count it anyway to prevent infinite hang
-      if (loadedFrames === FRAME_COUNT && !isLoaded) {
+      loadedFrames++;
+      if (loadedFrames === INITIAL_LOAD && !isLoaded) {
         isLoaded = true;
         initRender();
       }
@@ -489,7 +541,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById('send-btn');
   const chatMessages = document.getElementById('chat-messages');
 
-  let aiGlobalContext = "You are MR.KYAW ZIN, an AI automation expert who teaches AI, n8n, Python, and cloud networking on the Antigravity AI platform. Keep answers educational and NO LONGER than 2-3 sentences. Always answer using the FACTUAL DATA provided below. CRITICAL: If a user asks about anything completely unrelated to AI, coding, or the platform (e.g. politics, cooking, sports), decline to answer in EXACTLY ONE short sentence (e.g. 'I only assist with AI and automation topics.') to save API tokens.\n\n--- PLATFORM KNOWLEDGE BASE ---\n\n";
+  let aiGlobalContext = `You are the AI Brain of MR. KYAW ZIN TUN — an expert in AI Automation, N8N, Make.com, Python, Cloud (AWS/GCP/Azure/Modal), and Network Engineering based in Myanmar.
+
+IDENTITY: You represent IT Solutions MM and the AI Automation Society (https://www.skool.com/ai-automation-society). Contact: itsolutions.mm@gmail.com.
+
+SERVICES OFFERED:
+- AI Automation Training (N8N, Make.com, Zapier, Agentic AI, RAG)
+- Cloud Architecture (AWS, GCP, Azure, Modal serverless)
+- Network Engineering (BGP, OSPF, SD-WAN, Zero Trust, CCNA-level)
+- AI Consulting for businesses in Myanmar and Southeast Asia
+
+RULES:
+1. Keep answers to 2-3 sentences maximum to save API cost.
+2. Always recommend itsolutions.mm@gmail.com for detailed inquiries or training enrollment.
+3. If asked about pricing, say "Contact itsolutions.mm@gmail.com for a custom quote."
+4. If asked ANYTHING unrelated to AI, tech, coding, automation, or cloud — decline in exactly one sentence: "I only assist with AI and automation topics."
+5. Be friendly, confident, and professional.
+
+--- PLATFORM KNOWLEDGE BASE ---
+
+`;
 
   // Pre-fetch local datasets to feed into AI Brain
   Promise.all([
@@ -514,11 +585,51 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("AI Brain local context loaded successfully.");
   }).catch(err => console.error("Failed to load AI brain datasets:", err));
 
+  // Add clear history button to chat header
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'chat-clear-btn';
+  clearBtn.title = 'Clear chat history';
+  clearBtn.textContent = 'Clear';
+  closeChat.parentNode.insertBefore(clearBtn, closeChat);
+
+  // Chat history — save/restore from localStorage
+  function saveMsgToHistory(text, sender) {
+    const history = JSON.parse(localStorage.getItem('chat_history') || '[]');
+    history.push({ text, sender, ts: Date.now() });
+    if (history.length > 30) history.splice(0, history.length - 30);
+    localStorage.setItem('chat_history', JSON.stringify(history));
+  }
+
+  function loadChatHistory() {
+    const history = JSON.parse(localStorage.getItem('chat_history') || '[]');
+    history.forEach(msg => addMessage(msg.text, msg.sender, false));
+    if (history.length > 0) {
+      const divider = document.createElement('div');
+      divider.style.cssText = 'font-size:0.55rem;color:rgba(255,255,255,0.2);text-align:center;text-transform:uppercase;letter-spacing:0.1em;padding:4px 0;';
+      divider.textContent = '— previous session —';
+      chatMessages.insertBefore(divider, chatMessages.firstChild);
+    }
+  }
+
+  clearBtn.addEventListener('click', () => {
+    localStorage.removeItem('chat_history');
+    chatMessages.innerHTML = `
+      <div class="message ai-message">
+        <div class="msg-avatar">MR</div>
+        <div class="msg-bubble">Chat cleared. How can I help you with AI and automation?</div>
+      </div>`;
+  });
+
   // Toggle Chat
   chatToggle.addEventListener('click', () => {
     chatWindow.classList.toggle('hidden');
     if (!chatWindow.classList.contains('hidden')) {
       chatInput.focus();
+      // Load history on first open
+      if (!chatWindow.dataset.historyLoaded) {
+        loadChatHistory();
+        chatWindow.dataset.historyLoaded = '1';
+      }
     }
   });
 
@@ -535,13 +646,13 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, '&#039;');
   }
 
-  function addMessage(text, sender) {
+  // save=true by default; pass false when restoring history to avoid re-saving
+  function addMessage(text, sender, save = true) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}-message`;
     const avatarTxt = sender === 'ai' ? 'MR' : 'U';
     let displayTxt;
     if (sender === 'ai') {
-      // Escape first, then apply safe markdown-to-HTML transforms
       const safe = escapeHtml(text);
       displayTxt = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       displayTxt = displayTxt.replace(/```([^`]*)```/gs, '<pre><code>$1</code></pre>');
@@ -554,6 +665,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     chatMessages.appendChild(msgDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (save) saveMsgToHistory(text, sender);
     return msgDiv;
   }
 
@@ -564,7 +676,12 @@ document.addEventListener("DOMContentLoaded", () => {
     addMessage(text, 'user');
     chatInput.value = '';
 
-    const aiMsgElem = addMessage('...', 'ai');
+    // Animated typing indicator instead of "..."
+    const aiMsgElem = document.createElement('div');
+    aiMsgElem.className = 'message ai-message';
+    aiMsgElem.innerHTML = `<div class="msg-avatar">MR</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    chatMessages.appendChild(aiMsgElem);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
     const bubble = aiMsgElem.querySelector('.msg-bubble');
 
     // --- 1. Check Local Cache First ---
@@ -583,7 +700,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [
             { role: 'system', content: aiGlobalContext },
             { role: 'user', content: text }

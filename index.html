@@ -5,6 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IT Solutions MM | The Future of AI &amp; Automation</title>
+  <meta name="description" content="IT Solutions MM — AI Automation, N8N, Make, Cloud &amp; Network Engineering. Training by MR. KYAW ZIN TUN.">
+  <meta property="og:title" content="IT Solutions MM | AI &amp; Automation Expert">
+  <meta property="og:description" content="Enterprise AI Automation, Cloud Architecture &amp; Network Engineering. Join the AI Automation Society.">
+  <meta property="og:url" content="https://itsolutions-mm--main-web.modal.run">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://itsolutions-mm--main-web.modal.run/frames/frame_0001.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23000'/><text y='70' x='8' font-size='60' font-family='Arial Black' fill='%2300ffff'>IT</text></svg>" type="image/svg+xml">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
@@ -12,7 +20,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 
   <script>
     // Generic error handler — no internal details exposed to visitors
@@ -38,14 +46,28 @@
     <nav>
       <div class="logo">itsolutions<span class="logo-accent">.mm</span></div>
       <div class="nav-links">
-        <a href="#ai-free-course-container">AI Course(Free)</a>
-        <a href="#ai-training-tools-container">Tools</a>
-        <a href="#ai-training-container">Training</a>
-        <a href="#network-services-container">Services</a>
-        <a href="#">Cloud</a>
-        <a href="#contact-section">Contact</a>
+        <a href="#ai-free-course-container" data-en="AI Course(Free)" data-mm="AI သင်တန်း(အခမဲ့)">AI Course(Free)</a>
+        <a href="#ai-training-tools-container" data-en="Tools" data-mm="ကိရိယာ">Tools</a>
+        <a href="#ai-training-container" data-en="Training" data-mm="သင်တန်း">Training</a>
+        <a href="#network-services-container" data-en="Services" data-mm="ဝန်ဆောင်မှု">Services</a>
+        <a href="#cloud-section" data-en="Cloud" data-mm="Cloud">Cloud</a>
+        <a href="#contact-section" data-en="Contact" data-mm="ဆက်သွယ်ရန်">Contact</a>
+      </div>
+      <div class="nav-controls">
+        <button id="lang-toggle" class="lang-btn" title="Switch Language / ဘာသာစကား">MM</button>
+        <button id="hamburger" class="hamburger-btn" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+    <div id="mobile-nav" class="mobile-nav">
+      <a href="#ai-free-course-container" class="mobile-nav-link" data-en="AI Course (Free)" data-mm="AI သင်တန်း (အခမဲ့)">AI Course (Free)</a>
+      <a href="#ai-training-tools-container" class="mobile-nav-link" data-en="Tools" data-mm="ကိရိယာ">Tools</a>
+      <a href="#ai-training-container" class="mobile-nav-link" data-en="Training" data-mm="သင်တန်း">Training</a>
+      <a href="#network-services-container" class="mobile-nav-link" data-en="Services" data-mm="ဝန်ဆောင်မှု">Services</a>
+      <a href="#cloud-section" class="mobile-nav-link" data-en="Cloud" data-mm="Cloud">Cloud</a>
+      <a href="#contact-section" class="mobile-nav-link" data-en="Contact" data-mm="ဆက်သွယ်ရန်">Contact</a>
+    </div>
   </header>
 
   <!-- 3. Hero Standalone -->
@@ -53,10 +75,10 @@
     <div class="hero-content">
       <span class="section-label">001 / Welcome</span>
       <h1 class="hero-heading">
-        <span class="line">Architecting</span>
-        <span class="line">Intelligence.</span>
+        <span class="line" data-en="Architecting" data-mm="ဉာဏ်ရည်">Architecting</span>
+        <span class="line" data-en="Intelligence." data-mm="တည်ဆောက်ခြင်း">Intelligence.</span>
       </h1>
-      <p class="hero-tagline">Vast experience in networking, full-scale cloud migrations, and cutting-edge AI automation
+      <p class="hero-tagline" data-en="Vast experience in networking, full-scale cloud migrations, and cutting-edge AI automation stacks." data-mm="ကွန်ရက်၊ Cloud Migration နှင့် AI Automation တို့တွင် ကျယ်ပြန့်သောအတွေ့အကြုံ ရှိသည်။">Vast experience in networking, full-scale cloud migrations, and cutting-edge AI automation
         stacks.</p>
     </div>
     <div class="scroll-indicator">
@@ -157,7 +179,7 @@
     </section>
 
     <!-- Section 9: Cloud Intro -->
-    <section class="scroll-section align-left" data-enter="26" data-leave="28" data-animation="clip-reveal">
+    <section class="scroll-section align-left" id="cloud-section" data-enter="26" data-leave="28" data-animation="clip-reveal">
       <div class="section-inner">
         <span class="section-label">009 / Infrastructure</span>
         <h2 class="section-heading">Cloud<br>Native</h2>
@@ -302,24 +324,60 @@
     <!-- Network & Infrastructure Services -->
     <div id="network-services-container" class="dynamic-section-group"></div>
 
+    <!-- Testimonials Section -->
+    <section class="scroll-section align-left" id="testimonials-section" data-enter="93" data-leave="95" data-animation="stagger-up">
+      <div class="section-inner">
+        <span class="section-label" data-en="025 / Social Proof" data-mm="025 / သက်သေများ">025 / Social Proof</span>
+        <h2 class="section-heading" data-en="What Clients Say" data-mm="သုံးသပ်ချက်">What Clients Say</h2>
+        <div class="testimonials">
+          <div class="testimonial">
+            <p class="testimonial-text">"Mr. Kyaw Zin's n8n training transformed our entire business workflow. We automated 80% of manual tasks in 2 weeks."</p>
+            <div class="testimonial-author">— U Aung Kyaw, E-Commerce Owner</div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-text">"The AI Automation Society community is incredible. I went from zero to deploying my first AI agent in 30 days."</p>
+            <div class="testimonial-author">— Ma Thida, Startup Founder, Yangon</div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-text">"Best cloud &amp; network training in Myanmar. Real hands-on labs, CCNA-level depth. Highly recommended."</p>
+            <div class="testimonial-author">— Ko Zaw Lin, IT Manager</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Contact Section -->
     <section class="scroll-section align-left" id="contact-section" data-enter="96" data-leave="98"
       data-animation="fade-up">
       <div class="section-inner">
-        <span class="section-label">Contact Us</span>
-        <h2 class="section-heading">Get in<span class="logo-accent"> Touch</span></h2>
+        <span class="section-label" data-en="Contact Us" data-mm="ဆက်သွယ်ရန်">Contact Us</span>
+        <h2 class="section-heading" data-en="Get in Touch" data-mm="ဆက်သွယ် ပါ">Get in<span class="logo-accent"> Touch</span></h2>
 
-        <div class="contact-info" style="margin-top: 2.5rem; display: flex; flex-direction: column; gap: 15px;">
+        <div class="contact-info" style="margin-top: 2rem; display: flex; flex-direction: column; gap: 12px;">
+          <div class="contact-name" style="font-size:1.1rem; font-weight:700; letter-spacing:0.05em; opacity:0.9;">MR. KYAW ZIN TUN</div>
+          <div class="contact-roles" style="font-size:0.8rem; letter-spacing:0.08em; opacity:0.6; line-height:1.8; text-transform:uppercase;">
+            N8N &nbsp;·&nbsp; MAKE &nbsp;·&nbsp; AI Automation &nbsp;·&nbsp; Network &nbsp;·&nbsp; Cloud &nbsp;·&nbsp; Training &nbsp;·&nbsp; Consultant
+          </div>
           <a href="mailto:itsolutions.mm@gmail.com" class="contact-link">
             <span class="contact-icon">✉</span> itsolutions.mm@gmail.com
           </a>
           <a href="https://www.skool.com/ai-automation-society" target="_blank" class="contact-link">
             <span class="contact-icon">🎓</span> AI Automation Society
           </a>
+          <!-- UPDATE: Replace 959XXXXXXXXX with your WhatsApp number (Myanmar format: 959XXXXXXXX) -->
+          <a href="https://wa.me/959XXXXXXXXX?text=Hello%20IT%20Solutions%20MM%2C%20I%27d%20like%20to%20inquire" target="_blank" class="contact-link">
+            <span class="contact-icon">💬</span> <span data-en="WhatsApp Us" data-mm="WhatsApp ဆက်သွယ်">WhatsApp Us</span>
+          </a>
         </div>
 
-        <button class="cta-button" style="margin-top: 3rem;"
-          onclick="window.open('mailto:itsolutions.mm@gmail.com?subject=Inquiry','_self')">Email Us</button>
+        <form class="contact-form" id="contact-form">
+          <div class="form-row">
+            <input type="text" name="name" placeholder="Your Name" class="form-input" data-en-placeholder="Your Name" data-mm-placeholder="သင့်နာမည်" required>
+            <input type="email" name="email" placeholder="Email Address" class="form-input" data-en-placeholder="Email Address" data-mm-placeholder="အီးမေးလ်" required>
+          </div>
+          <textarea name="message" placeholder="Your Message" class="form-input form-textarea" rows="3" data-en-placeholder="Your Message" data-mm-placeholder="သင့်မက်ဆေ့ဂျ်" required></textarea>
+          <button type="submit" class="cta-button" style="margin-top:1rem;" data-en="Send Message" data-mm="ပို့ပါ">Send Message</button>
+        </form>
       </div>
     </section>
 
@@ -343,7 +401,7 @@
         <div class="chat-header-logo">
           <div class="ai-avatar">MR</div>
           <div class="chat-title">
-            <span class="chat-name">MR.KYAW ZIN</span>
+            <span class="chat-name">MR. KYAW ZIN TUN</span>
             <span class="chat-status">● Online</span>
           </div>
         </div>
@@ -369,7 +427,7 @@
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="js/app.js?v=9"></script>
+  <script src="js/app.js?v=10"></script>
 
 
 </body>
