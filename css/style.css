@@ -835,44 +835,15 @@ canvas {
   border-radius: 2px;
 }
 
+/* Base mobile overrides (layout) — visual polish in the enhanced block below */
 @media (max-width: 768px) {
   .hero-standalone {
     width: 100%;
     padding-right: 5vw;
   }
 
-  .canvas-wrap {
-    left: 0;
-    width: 100vw;
-    opacity: 0.3;
-  }
-
   .canvas-wrap::before {
     display: none;
-  }
-
-  .scroll-section,
-  .dynamic-section-group {
-    width: 100%;
-  }
-
-  .align-left,
-  .align-right {
-    padding-left: 8vw;
-    padding-right: 8vw;
-  }
-
-  .section-inner {
-    max-width: 100% !important;
-  }
-
-  .stats-grid {
-    flex-direction: column;
-    gap: 3rem;
-  }
-
-  .service-card-header {
-    flex-direction: column;
   }
 }
 
@@ -1080,18 +1051,92 @@ canvas {
   .hamburger-btn { display: flex !important; }
   .mobile-nav { display: flex; }
 
-  .hero-heading { font-size: clamp(2.5rem, 10vw, 5.5rem); }
-  .section-heading { font-size: clamp(1.8rem, 8vw, 4rem); }
+  /* Hide canvas entirely on mobile — text is unreadable over video */
+  .canvas-wrap {
+    display: none !important;
+  }
 
+  /* Dark background so text is clean and readable */
+  body {
+    background: #000;
+  }
+
+  /* Section text: add subtle dark backing for readability */
+  .section-inner {
+    background: rgba(0, 0, 0, 0.5);
+    border-left: 2px solid rgba(0, 255, 255, 0.15);
+    padding: 1.5rem 1.2rem !important;
+    border-radius: 2px;
+  }
+
+  /* Bigger, cleaner font sizes */
+  .hero-heading { font-size: clamp(2.8rem, 11vw, 5rem); }
+  .section-heading { font-size: clamp(2rem, 9vw, 3.5rem); }
+  .section-body { font-size: 0.95rem; line-height: 1.8; }
+  .hero-tagline { font-size: 0.95rem; line-height: 1.7; }
+
+  /* Hero: full width, clean padding */
+  .hero-standalone {
+    width: 100%;
+    padding: 0 6vw;
+  }
+
+  /* Sections: full width */
+  .scroll-section,
+  .dynamic-section-group {
+    width: 100%;
+  }
+
+  .align-left,
+  .align-right {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .section-inner {
+    max-width: 100% !important;
+  }
+
+  /* Service cards: cleaner on mobile */
+  .service-card {
+    padding: 1.5rem 6vw;
+  }
+
+  .service-card-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .service-card-price {
+    font-size: 1.4rem;
+  }
+
+  /* Stats: stack vertically */
+  .stats-grid {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .stat-number { font-size: 2.8rem; }
+
+  /* Chat widget: full width on mobile */
   #ai-chat-window {
     width: calc(100vw - 20px);
     right: -10px;
     height: 70vh;
   }
 
+  /* Contact form */
   .form-row { flex-direction: column; }
-
   .contact-form { max-width: 100%; }
 
+  /* Mobile nav links */
   .mobile-nav-link { font-size: 1.5rem; }
+
+  /* Topic pills: wrap cleanly */
+  .service-card-topics { gap: 0.3rem; }
+
+  /* Testimonials: full width */
+  .testimonials { gap: 1.2rem; }
+  .testimonial-text { font-size: 0.85rem; }
 }
