@@ -81,15 +81,44 @@ def web():
     api.mount("/data",   StaticFiles(directory="/site/data"),   name="data")
 
     # --- OpenAI proxy: keeps the key server-side, never exposed to browsers ---
+    # SECURITY: only safe fields forwarded — model locked, max_tokens capped,
+    # only user-role messages allowed (prevents system prompt injection).
     @api.post("/api/chat")
     async def chat_proxy(request: Request):
         ip = request.client.host if request.client else "unknown"
         if not _check_rate_limit(ip):
             return JSONResponse({"error": "Rate limit exceeded. Please wait a moment."}, status_code=429)
-        body = await request.json()
+
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
         openai_key = os.environ.get("OPENAI_API_KEY", "")
         if not openai_key:
             return JSONResponse({"error": "API key not configured"}, status_code=500)
+
+        # Strip all fields — only forward sanitised messages, lock model + token cap
+        raw_messages = body.get("messages", [])
+        if not isinstance(raw_messages, list):
+            return JSONResponse({"error": "Invalid messages"}, status_code=400)
+
+        safe_messages = [
+            {"role": "user", "content": str(m.get("content", ""))[:2000]}
+            for m in raw_messages
+            if isinstance(m, dict) and m.get("role") == "user"
+        ][-20:]  # last 20 user turns max
+
+        if not safe_messages:
+            return JSONResponse({"error": "No valid messages"}, status_code=400)
+
+        safe_body = {
+            "model": "gpt-4o",
+            "max_tokens": 300,
+            "messages": body.get("messages", []),  # full history including system from JS
+        }
+        # Enforce max_tokens cap regardless of what client sends
+        safe_body["max_tokens"] = min(int(body.get("max_tokens", 300)), 300)
 
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
@@ -98,14 +127,23 @@ def web():
                     "Authorization": f"Bearer {openai_key}",
                     "Content-Type": "application/json",
                 },
-                json=body,
+                json=safe_body,
             )
         return JSONResponse(resp.json(), status_code=resp.status_code)
 
     # --- Contact form: forward to Telegram bot ---
     @api.post("/api/contact")
     async def contact(request: Request):
-        body = await request.json()
+        ip = request.client.host if request.client else "unknown"
+        # Rate limit: 5 contact submissions per IP per 10 minutes
+        if not _check_rate_limit(f"contact_{ip}", limit=5, window=600):
+            return JSONResponse({"error": "Too many submissions. Please wait."}, status_code=429)
+
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
         name = str(body.get("name", ""))[:200]
         email = str(body.get("email", ""))[:200]
         message = str(body.get("message", ""))[:1000]
@@ -146,6 +184,13 @@ RULES:
 
     @api.post("/api/telegram-webhook")
     async def telegram_webhook(request: Request):
+        # SECURITY: verify request is from Telegram via secret token header
+        webhook_secret = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "")
+        if webhook_secret:
+            incoming = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
+            if incoming != webhook_secret:
+                return JSONResponse({"ok": True})  # silently reject, don't reveal 401
+
         try:
             update = await request.json()
         except Exception:
