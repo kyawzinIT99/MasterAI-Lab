@@ -20,7 +20,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=8">
+  <link rel="stylesheet" href="css/style.css?v=9">
 
   <script>
     // Generic error handler — no internal details exposed to visitors
@@ -62,6 +62,7 @@
         <a href="#network-services-container" data-en="Services" data-mm="ဝန်ဆောင်မှု">Services</a>
         <a href="#cloud-section" data-en="Cloud" data-mm="Cloud">Cloud</a>
         <a href="#contact-section" data-en="Contact" data-mm="ဆက်သွယ်ရန်">Contact</a>
+        <a href="#" onclick="openLearningHub();return false;" style="background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.25);border-radius:3px;padding:0.3rem 0.75rem;font-size:0.7rem;letter-spacing:0.08em;" data-en="Learning Hub" data-mm="Learning Hub">Learning Hub</a>
       </div>
       <div class="nav-controls">
         <button id="lang-toggle" class="lang-btn" title="Switch Language / ဘာသာစကား">MM</button>
@@ -78,6 +79,7 @@
       <a href="#network-services-container" class="mobile-nav-link" data-en="Services" data-mm="ဝန်ဆောင်မှု">Services</a>
       <a href="#cloud-section" class="mobile-nav-link" data-en="Cloud" data-mm="Cloud">Cloud</a>
       <a href="#contact-section" class="mobile-nav-link" data-en="Contact" data-mm="ဆက်သွယ်ရန်">Contact</a>
+      <a href="#" onclick="openLearningHub();document.getElementById('hamburger').classList.remove('open');document.getElementById('mobile-nav').classList.remove('open');return false;" class="mobile-nav-link" data-en="Learning Hub" data-mm="Learning Hub">Learning Hub</a>
     </div>
   </header>
 
@@ -457,32 +459,143 @@
     </button>
   </div>
 
-  <!-- Certificate PDF generator -->
-  <div id="cert-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
-    <div style="background:#0a0a0f;border:1px solid rgba(0,255,255,0.2);border-radius:8px;padding:2rem 2.5rem;width:90%;max-width:420px;position:relative;">
-      <button onclick="document.getElementById('cert-modal').style.display='none'" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.2rem;cursor:pointer;">✕</button>
-      <div style="font-size:0.6rem;color:#00ffff;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.5rem;">Certificate Generator</div>
-      <h3 style="font-family:var(--font-display);font-size:1.4rem;color:#fff;margin:0 0 1.5rem;">Download Certificate</h3>
-      <div style="display:flex;flex-direction:column;gap:0.8rem;">
-        <input id="cert-name" type="text" placeholder="Your Full Name" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.6rem 0.8rem;color:#fff;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;">
-        <select id="cert-course" style="background:#0a0a0f;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.6rem 0.8rem;color:#fff;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;">
-          <option value="">Select Course</option>
-          <option>N8N AI Automation Masterclass</option>
-          <option>Make.com Automation Professional</option>
-          <option>Agentic AI & RAG Systems</option>
-          <option>Cloud Architecture (AWS/GCP/Azure)</option>
-          <option>Network Engineering (CCNA Level)</option>
-          <option>AI Consulting Fundamentals</option>
-        </select>
-        <button onclick="generateCertificate()" style="background:linear-gradient(135deg,#00ffff20,#00ffff10);border:1px solid #00ffff;color:#00ffff;padding:0.7rem;border-radius:4px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;">Download PDF ↓</button>
+  <!-- Learning Hub Modal -->
+  <div id="hub-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem;">
+    <div style="background:linear-gradient(135deg,#080812,#0a0a1a);border:1px solid rgba(0,255,255,0.15);border-radius:8px;width:100%;max-width:780px;position:relative;margin:auto;">
+
+      <!-- Header -->
+      <div style="padding:1.8rem 2rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:0.55rem;color:#00cccc;text-transform:uppercase;letter-spacing:0.2em;margin-bottom:0.3rem;">IT Solutions MM</div>
+          <h2 style="font-family:var(--font-display);font-size:1.5rem;color:#fff;margin:0;">Learning Hub</h2>
+        </div>
+        <button onclick="closeHub()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);width:32px;height:32px;border-radius:4px;font-size:1rem;cursor:pointer;line-height:1;">&#10005;</button>
       </div>
+
+      <!-- Step: Course Selection -->
+      <div id="hub-step-courses" style="padding:1.8rem 2rem;">
+        <p style="font-size:0.75rem;color:rgba(200,200,230,0.5);margin-bottom:1.5rem;letter-spacing:0.05em;">Select a course to begin your learning journey. Complete modules (75%) + quiz (25%) to earn your certificate.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.9rem;">
+          <button class="hub-course-card" onclick="selectHubCourse('n8n')">
+            <div class="hub-cc-icon">&#8734;</div>
+            <div class="hub-cc-title">N8N Automation</div>
+            <div class="hub-cc-sub">Masterclass</div>
+          </button>
+          <button class="hub-course-card" onclick="selectHubCourse('makecom')">
+            <div class="hub-cc-icon">&#9650;</div>
+            <div class="hub-cc-title">Make.com</div>
+            <div class="hub-cc-sub">Automation Professional</div>
+          </button>
+          <button class="hub-course-card" onclick="selectHubCourse('agentic')">
+            <div class="hub-cc-icon">&#9632;</div>
+            <div class="hub-cc-title">Agentic AI &amp; RAG</div>
+            <div class="hub-cc-sub">Systems</div>
+          </button>
+          <button class="hub-course-card" onclick="selectHubCourse('cloud')">
+            <div class="hub-cc-icon">&#9729;</div>
+            <div class="hub-cc-title">Cloud Architecture</div>
+            <div class="hub-cc-sub">AWS / GCP / Azure</div>
+          </button>
+          <button class="hub-course-card" onclick="selectHubCourse('network')">
+            <div class="hub-cc-icon">&#9472;</div>
+            <div class="hub-cc-title">Network Engineering</div>
+            <div class="hub-cc-sub">CCNA Level</div>
+          </button>
+          <button class="hub-course-card" onclick="selectHubCourse('consulting')">
+            <div class="hub-cc-icon">&#9670;</div>
+            <div class="hub-cc-title">AI Consulting</div>
+            <div class="hub-cc-sub">Fundamentals</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step: Module Checklist -->
+      <div id="hub-step-learn" style="display:none;padding:1.8rem 2rem;">
+        <button onclick="_hubShowStep('courses')" style="background:none;border:none;color:rgba(0,255,255,0.5);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;padding:0;margin-bottom:1.2rem;">&#8592; Back to Courses</button>
+        <h3 id="hub-course-title" style="font-family:var(--font-display);font-size:1.2rem;color:#fff;margin:0 0 0.3rem;"></h3>
+
+        <!-- Progress bar -->
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+          <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+            <div id="hub-learn-bar" style="height:100%;background:linear-gradient(90deg,#00cccc,#00ffff);border-radius:2px;width:0%;transition:width 0.4s ease;"></div>
+          </div>
+          <span id="hub-learn-pct" style="font-family:var(--font-display);font-size:0.85rem;color:#00ffff;min-width:2.5rem;text-align:right;">0%</span>
+        </div>
+
+        <p style="font-size:0.7rem;color:rgba(200,200,230,0.4);margin-bottom:1rem;letter-spacing:0.04em;">Check off each module as you complete it. Reach 70% to unlock the quiz.</p>
+
+        <div id="hub-module-list" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.8rem;"></div>
+
+        <button id="hub-quiz-start-btn" onclick="startHubQuiz()" disabled style="width:100%;padding:0.85rem;background:linear-gradient(135deg,rgba(0,255,255,0.12),rgba(0,255,255,0.06));border:1px solid rgba(0,255,255,0.3);color:#00ffff;font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border-radius:4px;cursor:pointer;opacity:0.35;transition:opacity 0.3s;">Start Quiz &#8594;</button>
+      </div>
+
+      <!-- Step: Quiz -->
+      <div id="hub-step-quiz" style="display:none;padding:1.8rem 2rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+          <span id="hub-q-num" style="font-size:0.65rem;color:rgba(0,255,255,0.6);text-transform:uppercase;letter-spacing:0.12em;"></span>
+        </div>
+
+        <!-- Quiz progress bar -->
+        <div style="height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;margin-bottom:1.8rem;">
+          <div id="hub-q-bar" style="height:100%;background:#00ffff;border-radius:2px;width:0%;transition:width 0.5s ease;"></div>
+        </div>
+
+        <p id="hub-q-text" style="font-size:1.05rem;color:#fff;line-height:1.6;margin-bottom:1.5rem;min-height:3rem;"></p>
+        <div id="hub-q-options" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+      </div>
+
+      <!-- Step: Results -->
+      <div id="hub-step-results" style="display:none;padding:1.8rem 2rem;">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <div style="font-family:var(--font-display);font-size:3.5rem;color:#00ffff;font-weight:700;" id="hub-res-score">--</div>
+          <div style="font-size:0.65rem;color:rgba(200,200,230,0.5);text-transform:uppercase;letter-spacing:0.15em;margin-top:0.3rem;">Final Score</div>
+        </div>
+
+        <div style="display:flex;justify-content:center;gap:3rem;margin-bottom:1.5rem;">
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-display);font-size:1.4rem;color:#fff;" id="hub-res-learning">--%</div>
+            <div style="font-size:0.6rem;color:rgba(200,200,230,0.4);text-transform:uppercase;letter-spacing:0.12em;margin-top:0.2rem;">Learning (75%)</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-display);font-size:1.4rem;color:#fff;" id="hub-res-quiz">--%</div>
+            <div style="font-size:0.6rem;color:rgba(200,200,230,0.4);text-transform:uppercase;letter-spacing:0.12em;margin-top:0.2rem;">Quiz (25%)</div>
+          </div>
+        </div>
+
+        <p id="hub-res-course" style="text-align:center;font-size:0.85rem;color:rgba(200,200,230,0.5);margin-bottom:0.8rem;"></p>
+        <p id="hub-res-status" style="text-align:center;font-size:0.85rem;margin-bottom:1.5rem;line-height:1.5;"></p>
+
+        <!-- Certificate section — shown only on pass -->
+        <div id="hub-cert-section" style="display:none;border-top:1px solid rgba(255,255,255,0.06);padding-top:1.5rem;">
+          <div style="font-size:0.6rem;color:#00cccc;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:1rem;">Generate Your Certificate</div>
+          <div style="display:flex;flex-direction:column;gap:0.7rem;margin-bottom:1rem;">
+            <input id="hub-cert-name" type="text" placeholder="Your Full Name" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.65rem 0.9rem;color:#fff;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;">
+            <input id="hub-cert-email" type="email" placeholder="Your Email Address" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.65rem 0.9rem;color:#fff;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;">
+          </div>
+          <button id="hub-cert-btn" onclick="generateHubCert()" style="width:100%;padding:0.85rem;background:linear-gradient(135deg,rgba(0,255,255,0.18),rgba(0,255,255,0.08));border:1px solid #00ffff;color:#00ffff;font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border-radius:4px;cursor:pointer;">Download PDF + Get Online Certificate</button>
+
+          <!-- Online cert link — shown after generation -->
+          <div id="hub-link-section" style="display:none;margin-top:1.2rem;padding:1rem;background:rgba(0,255,255,0.04);border:1px solid rgba(0,255,255,0.12);border-radius:4px;">
+            <div style="font-size:0.6rem;color:#00cccc;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.5rem;">Online Certificate URL</div>
+            <a id="hub-online-link" href="#" target="_blank" style="font-size:0.75rem;color:#00ffff;word-break:break-all;text-decoration:underline;"></a>
+            <div style="font-size:0.6rem;color:rgba(200,200,230,0.35);margin-top:0.5rem;">Share this link to verify your certificate. It is permanently accessible.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.8rem;margin-top:1.5rem;">
+          <button onclick="selectHubCourse(hubCurrentCourse||'n8n')" style="flex:1;padding:0.7rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(200,200,230,0.5);font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;">Retake Quiz</button>
+          <button onclick="_hubShowStep('courses')" style="flex:1;padding:0.7rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(200,200,230,0.5);font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;border-radius:4px;cursor:pointer;">Other Courses</button>
+        </div>
+      </div>
+
     </div>
   </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="js/app.js?v=31"></script>
+  <script src="js/app.js?v=32"></script>
 
 
 </body>

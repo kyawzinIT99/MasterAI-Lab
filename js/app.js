@@ -1123,4 +1123,260 @@ RULES:
     if (e.key === 'Enter') handleChatSend();
   });
 
+  // ===== LEARNING HUB =====
+  let hubData = null;
+  let hubCurrentCourse = null;
+  let hubQuizState = {};
+
+  // Load quiz data once
+  fetch('/data/quiz.json')
+    .then(r => r.json())
+    .then(d => { hubData = d.courses; })
+    .catch(() => {});
+
+  window.openLearningHub = function() {
+    const modal = document.getElementById('hub-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    _hubShowStep('courses');
+  };
+
+  window.closeHub = function() {
+    const modal = document.getElementById('hub-modal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  function _hubShowStep(step) {
+    ['courses', 'learn', 'quiz', 'results'].forEach(s => {
+      const el = document.getElementById(`hub-step-${s}`);
+      if (el) el.style.display = 'none';
+    });
+    const el = document.getElementById(`hub-step-${step}`);
+    if (el) el.style.display = 'block';
+  }
+
+  window.selectHubCourse = function(courseKey) {
+    if (!hubData || !hubData[courseKey]) return;
+    hubCurrentCourse = courseKey;
+    const course = hubData[courseKey];
+
+    const saved = JSON.parse(localStorage.getItem(`hub_prog_${courseKey}`) || '[]');
+    const moduleHTML = course.modules.map((m, i) => `
+      <label class="hub-mod-item${saved.includes(i) ? ' checked' : ''}">
+        <input type="checkbox" ${saved.includes(i) ? 'checked' : ''} onchange="hubToggleMod(${i},this.checked)">
+        <span class="hub-check-box"></span>
+        <span class="hub-mod-label">${m}</span>
+      </label>`).join('');
+
+    document.getElementById('hub-course-title').textContent = course.title;
+    document.getElementById('hub-module-list').innerHTML = moduleHTML;
+    _hubUpdateProgress(courseKey);
+    _hubShowStep('learn');
+  };
+
+  window.hubToggleMod = function(idx, checked) {
+    if (!hubCurrentCourse) return;
+    const key = `hub_prog_${hubCurrentCourse}`;
+    let saved = JSON.parse(localStorage.getItem(key) || '[]');
+    if (checked && !saved.includes(idx)) saved.push(idx);
+    if (!checked) saved = saved.filter(i => i !== idx);
+    localStorage.setItem(key, JSON.stringify(saved));
+    _hubUpdateProgress(hubCurrentCourse);
+  };
+
+  function _hubUpdateProgress(courseKey) {
+    if (!hubData) return;
+    const total = hubData[courseKey].modules.length;
+    const saved = JSON.parse(localStorage.getItem(`hub_prog_${courseKey}`) || '[]');
+    const pct   = Math.round((saved.length / total) * 100);
+
+    const pctEl   = document.getElementById('hub-learn-pct');
+    const barEl   = document.getElementById('hub-learn-bar');
+    const quizBtn = document.getElementById('hub-quiz-start-btn');
+
+    if (pctEl) pctEl.textContent  = pct + '%';
+    if (barEl) barEl.style.width  = pct + '%';
+
+    if (quizBtn) {
+      const locked = pct < 70;
+      quizBtn.disabled      = locked;
+      quizBtn.style.opacity = locked ? '0.35' : '1';
+      quizBtn.style.cursor  = locked ? 'not-allowed' : 'pointer';
+      quizBtn.title = locked ? 'Complete at least 70% of modules to unlock the quiz' : 'Start the quiz';
+    }
+  }
+
+  window.startHubQuiz = function() {
+    if (!hubData || !hubCurrentCourse) return;
+    hubQuizState = {
+      currentQ:  0,
+      answers:   [],
+      questions: hubData[hubCurrentCourse].questions
+    };
+    _hubRenderQuestion();
+    _hubShowStep('quiz');
+  };
+
+  function _hubRenderQuestion() {
+    const { currentQ, questions } = hubQuizState;
+    if (currentQ >= questions.length) { _hubFinishQuiz(); return; }
+
+    const q = questions[currentQ];
+    const optHTML = q.options.map((opt, i) =>
+      `<button class="hub-opt-btn" onclick="hubSelectAnswer(${i})">${opt}</button>`
+    ).join('');
+
+    const qnum  = document.getElementById('hub-q-num');
+    const qtext = document.getElementById('hub-q-text');
+    const qopts = document.getElementById('hub-q-options');
+    const qbar  = document.getElementById('hub-q-bar');
+
+    if (qnum)  qnum.textContent  = `Question ${currentQ + 1} of ${questions.length}`;
+    if (qtext) qtext.textContent = q.question;
+    if (qopts) qopts.innerHTML   = optHTML;
+    if (qbar)  qbar.style.width  = `${(currentQ / questions.length) * 100}%`;
+  }
+
+  window.hubSelectAnswer = function(idx) {
+    const { currentQ, questions } = hubQuizState;
+    const q = questions[currentQ];
+    hubQuizState.answers.push({ selected: idx, correct: q.correct });
+
+    document.querySelectorAll('.hub-opt-btn').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.correct)                 btn.classList.add('hub-opt-correct');
+      if (i === idx && idx !== q.correct)  btn.classList.add('hub-opt-wrong');
+    });
+
+    setTimeout(() => {
+      hubQuizState.currentQ++;
+      _hubRenderQuestion();
+    }, 750);
+  };
+
+  function _hubFinishQuiz() {
+    const { answers, questions } = hubQuizState;
+    const correct     = answers.filter(a => a.selected === a.correct).length;
+    const quizPct     = Math.round((correct / questions.length) * 100);
+    const course      = hubData[hubCurrentCourse];
+    const saved       = JSON.parse(localStorage.getItem(`hub_prog_${hubCurrentCourse}`) || '[]');
+    const learningPct = Math.round((saved.length / course.modules.length) * 100);
+    const finalScore  = Math.round((learningPct * 0.75) + (quizPct * 0.25));
+    const passed      = finalScore >= 70;
+
+    document.getElementById('hub-res-score').textContent    = finalScore + '%';
+    document.getElementById('hub-res-learning').textContent = learningPct + '%';
+    document.getElementById('hub-res-quiz').textContent     = quizPct + '%';
+    document.getElementById('hub-res-course').textContent   = course.title;
+
+    const statusEl = document.getElementById('hub-res-status');
+    if (statusEl) {
+      statusEl.textContent = passed
+        ? 'Congratulations! You passed. Your certificate is ready below.'
+        : `Keep going — you need 70% to pass. Current score: ${finalScore}%. Retake the quiz anytime.`;
+      statusEl.style.color = passed ? '#00ffff' : '#ff8c42';
+    }
+
+    const certSection = document.getElementById('hub-cert-section');
+    if (certSection) certSection.style.display = passed ? 'block' : 'none';
+
+    window._hubCertPayload = {
+      learningPct, quizPct, finalScore,
+      course: course.title, courseKey: hubCurrentCourse
+    };
+    _hubShowStep('results');
+  }
+
+  window.generateHubCert = async function() {
+    const nameEl  = document.getElementById('hub-cert-name');
+    const emailEl = document.getElementById('hub-cert-email');
+    const btn     = document.getElementById('hub-cert-btn');
+    const name    = nameEl  ? nameEl.value.trim()  : '';
+    const email   = emailEl ? emailEl.value.trim() : '';
+
+    if (!name)                          { alert('Please enter your full name.'); return; }
+    if (!email || !email.includes('@')) { alert('Please enter a valid email.');  return; }
+
+    const d = window._hubCertPayload;
+    if (!d) return;
+
+    if (btn) { btn.textContent = 'Generating\u2026'; btn.disabled = true; }
+
+    // 1. PDF download via jsPDF
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const W = 297, H = 210;
+
+      doc.setFillColor(6, 6, 15); doc.rect(0, 0, W, H, 'F');
+      doc.setDrawColor(0, 255, 255); doc.setLineWidth(0.5); doc.rect(8, 8, W-16, H-16);
+      doc.setLineWidth(0.2); doc.rect(11, 11, W-22, H-22);
+
+      doc.setTextColor(0, 200, 200); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+      doc.text('IT SOLUTIONS MM  \xB7  AI AUTOMATION SOCIETY', W/2, 30, { align: 'center' });
+
+      doc.setTextColor(255, 255, 255); doc.setFontSize(28); doc.setFont('helvetica', 'bold');
+      doc.text('CERTIFICATE OF COMPLETION', W/2, 60, { align: 'center' });
+
+      doc.setDrawColor(0, 255, 255); doc.setLineWidth(0.3); doc.line(60, 67, W-60, 67);
+
+      doc.setTextColor(180, 180, 200); doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+      doc.text('This is to certify that', W/2, 85, { align: 'center' });
+
+      doc.setTextColor(0, 255, 255); doc.setFontSize(26); doc.setFont('helvetica', 'bold');
+      doc.text(name, W/2, 105, { align: 'center' });
+      const nw = doc.getTextWidth(name);
+      doc.setDrawColor(0, 255, 255); doc.setLineWidth(0.2);
+      doc.line((W-nw)/2, 108, (W+nw)/2, 108);
+
+      doc.setTextColor(180, 180, 200); doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+      doc.text('has successfully completed', W/2, 122, { align: 'center' });
+
+      doc.setTextColor(255, 255, 255); doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+      doc.text(d.course, W/2, 136, { align: 'center' });
+
+      doc.setTextColor(0, 200, 200); doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.text(`Score: ${d.finalScore}%  (Learning: ${d.learningPct}%  |  Quiz: ${d.quizPct}%)`, W/2, 150, { align: 'center' });
+
+      const ds = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      doc.setTextColor(120, 120, 150); doc.setFontSize(9);
+      doc.text(`Issued: ${ds}`, W/2, 162, { align: 'center' });
+
+      doc.setDrawColor(100, 100, 130); doc.setLineWidth(0.2); doc.line(W/2-35, 178, W/2+35, 178);
+      doc.setTextColor(100, 100, 130); doc.setFontSize(8);
+      doc.text('MR. KYAW ZIN TUN', W/2, 183, { align: 'center' });
+      doc.text('Founder \xB7 IT Solutions MM', W/2, 188, { align: 'center' });
+
+      doc.setTextColor(60, 60, 80); doc.setFontSize(7);
+      doc.text('itsolutions.mm@gmail.com  \xB7  t.me/MaterAITraining_bot  \xB7  wa.me/66949567820', W/2, 198, { align: 'center' });
+
+      doc.save(`Certificate_${name.replace(/\s+/g, '_')}_${d.courseKey}.pdf`);
+    } catch(e) { console.error('PDF error:', e); }
+
+    // 2. Online digital certificate via backend
+    try {
+      const resp = await fetch('/api/certificate/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name, email,
+          course:         d.course,
+          course_key:     d.courseKey,
+          score:          d.finalScore,
+          learning_score: d.learningPct,
+          quiz_score:     d.quizPct
+        })
+      });
+      const result = await resp.json();
+      if (result.cert_url) {
+        const linkEl      = document.getElementById('hub-online-link');
+        const linkSection = document.getElementById('hub-link-section');
+        if (linkEl)      { linkEl.href = result.cert_url; linkEl.textContent = result.cert_url; }
+        if (linkSection) linkSection.style.display = 'block';
+      }
+    } catch(e) { console.error('Cert API error:', e); }
+
+    if (btn) btn.textContent = '\u2713 Certificate Generated!';
+  };
+
 });

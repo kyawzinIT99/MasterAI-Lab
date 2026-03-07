@@ -277,7 +277,7 @@ def web():
     import os
     import httpx
     from fastapi import FastAPI, Request
-    from fastapi.responses import FileResponse, JSONResponse
+    from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
     from fastapi.staticfiles import StaticFiles
 
     api = FastAPI()
@@ -364,6 +364,7 @@ def web():
 
     # --- Contact form: forward to Telegram bot ---
     COUNT_PATH = "/feed/student_count.json"
+    CERT_PATH  = "/feed/certificates.json"
 
     @api.get("/api/student-count")
     async def student_count():
@@ -525,6 +526,169 @@ RULES:
         if baked.exists():
             return JSONResponse(json.loads(baked.read_text()))
         return JSONResponse({"updates": [], "sources": []})
+
+    # --- Certificate generation: auto-triggered when score >= 70% ---
+    @api.post("/api/certificate/generate")
+    async def certificate_generate(request: Request):
+        import json, uuid as uuid_lib, re
+        from pathlib import Path
+        ip = request.client.host if request.client else "unknown"
+        if not _check_rate_limit(f"cert_{ip}", limit=5, window=300):
+            return JSONResponse({"error": "Too many requests."}, status_code=429)
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+        name         = str(body.get("name", "")).strip()[:200]
+        email        = str(body.get("email", "")).strip()[:200]
+        course       = str(body.get("course", "")).strip()[:200]
+        course_key   = str(body.get("course_key", "")).strip()[:50]
+        score        = float(body.get("score", 0))
+        learning_pct = float(body.get("learning_score", 0))
+        quiz_pct     = float(body.get("quiz_score", 0))
+
+        if not name or not course:
+            return JSONResponse({"error": "Name and course are required."}, status_code=400)
+        if score < 70:
+            return JSONResponse({"error": "Score must be >= 70% to earn a certificate."}, status_code=400)
+
+        cert_id = str(uuid_lib.uuid4())
+        cert_data = {
+            "id":             cert_id,
+            "name":           name,
+            "email":          email,
+            "course":         course,
+            "course_key":     course_key,
+            "score":          round(score, 1),
+            "learning_score": round(learning_pct, 1),
+            "quiz_score":     round(quiz_pct, 1),
+            "date":           datetime.utcnow().strftime("%Y-%m-%d"),
+            "issued_at":      datetime.utcnow().isoformat(),
+        }
+
+        cf = Path(CERT_PATH)
+        cf.parent.mkdir(parents=True, exist_ok=True)
+        certs = json.loads(cf.read_text()) if cf.exists() else {}
+        certs[cert_id] = cert_data
+        cf.write_text(json.dumps(certs, indent=2))
+        feed_vol.commit()
+
+        cert_url = f"https://itsolutions-mm--main-web.modal.run/certificate/{cert_id}"
+        return JSONResponse({"ok": True, "cert_id": cert_id, "cert_url": cert_url})
+
+    # --- Online digital certificate viewer ---
+    @api.get("/certificate/{cert_id}")
+    async def certificate_view(cert_id: str):
+        import json, re
+        from pathlib import Path
+
+        if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', cert_id):
+            return HTMLResponse("<h1>Invalid certificate ID</h1>", status_code=400)
+
+        cf = Path(CERT_PATH)
+        if not cf.exists():
+            return HTMLResponse("<h1>Certificate not found</h1>", status_code=404)
+        certs = json.loads(cf.read_text())
+        cert = certs.get(cert_id)
+        if not cert:
+            return HTMLResponse("<h1>Certificate not found</h1>", status_code=404)
+
+        try:
+            date_fmt = datetime.strptime(cert["date"], "%Y-%m-%d").strftime("%B %d, %Y")
+        except Exception:
+            date_fmt = cert.get("date", "")
+
+        n   = cert["name"]
+        crs = cert["course"]
+        sc  = cert["score"]
+        ls  = cert["learning_score"]
+        qs  = cert["quiz_score"]
+        cid = cert_id[:8].upper()
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Certificate — {n} | IT Solutions MM</title>
+<meta property="og:title" content="Certificate of Completion — {n}">
+<meta property="og:description" content="{n} completed {crs} with {sc}% at IT Solutions MM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{background:#06060f;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Crimson Text',serif;padding:2rem}}
+.cert{{background:linear-gradient(135deg,#080815 0%,#0a0a18 50%,#060610 100%);border:1px solid rgba(0,255,255,0.2);border-radius:4px;padding:4rem;position:relative;box-shadow:0 0 80px rgba(0,200,200,0.07),inset 0 0 60px rgba(0,0,0,0.4);max-width:860px;width:100%}}
+.cert::before{{content:'';position:absolute;inset:12px;border:1px solid rgba(0,255,255,0.07);border-radius:2px;pointer-events:none}}
+.corner{{position:absolute;width:36px;height:36px;border-color:rgba(0,255,255,0.35);border-style:solid}}
+.tl{{top:22px;left:22px;border-width:2px 0 0 2px}}
+.tr{{top:22px;right:22px;border-width:2px 2px 0 0}}
+.bl{{bottom:22px;left:22px;border-width:0 0 2px 2px}}
+.br{{bottom:22px;right:22px;border-width:0 2px 2px 0}}
+.org{{text-align:center;font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.3em;color:#00cccc;text-transform:uppercase;margin-bottom:2.5rem}}
+.title{{text-align:center;font-family:'Cinzel',serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:.08em;line-height:1.2}}
+.divider{{width:100px;height:1px;background:linear-gradient(90deg,transparent,#00ffff,transparent);margin:1.5rem auto}}
+.certify{{text-align:center;font-size:1.1rem;color:rgba(200,200,230,.7);font-style:italic;margin-bottom:.8rem}}
+.name{{text-align:center;font-family:'Cinzel',serif;font-size:2.6rem;font-weight:600;color:#00ffff;letter-spacing:.04em;margin:.4rem 0 .8rem;text-shadow:0 0 30px rgba(0,255,255,.25)}}
+.name-line{{width:280px;height:1px;background:rgba(0,255,255,.18);margin:0 auto 1.5rem}}
+.completed{{text-align:center;font-size:1.05rem;color:rgba(200,200,230,.65);font-style:italic;margin-bottom:.4rem}}
+.course{{text-align:center;font-family:'Cinzel',serif;font-size:1.2rem;color:#fff;font-weight:600;letter-spacing:.05em;margin-bottom:2rem}}
+.scores{{display:flex;justify-content:center;gap:3rem;margin-bottom:2.5rem}}
+.sc-item{{text-align:center}}
+.sc-val{{font-family:'Cinzel',serif;font-size:1.7rem;color:#00ffff;font-weight:600}}
+.sc-label{{font-size:.65rem;color:rgba(150,150,180,.7);text-transform:uppercase;letter-spacing:.15em;margin-top:.2rem}}
+.footer{{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid rgba(255,255,255,.05);padding-top:1.5rem;margin-top:.5rem}}
+.sig{{text-align:center}}
+.sig-line{{width:150px;height:1px;background:rgba(255,255,255,.12);margin:0 auto .4rem}}
+.sig-name{{font-family:'Cinzel',serif;font-size:.7rem;color:rgba(200,200,230,.55);letter-spacing:.08em}}
+.sig-title{{font-size:.6rem;color:rgba(150,150,180,.45);text-transform:uppercase;letter-spacing:.1em;margin-top:.12rem}}
+.meta{{text-align:right}}
+.date-val{{font-family:'Cinzel',serif;font-size:.75rem;color:rgba(200,200,230,.5);letter-spacing:.06em}}
+.badge{{font-size:.58rem;color:#00cccc;letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem}}
+.cert-id{{font-size:.5rem;color:rgba(100,100,130,.45);letter-spacing:.08em;font-family:monospace;margin-top:.3rem}}
+.actions{{text-align:center;margin-top:2rem}}
+.btn{{display:inline-block;padding:.7rem 2rem;background:transparent;border:1px solid rgba(0,255,255,.3);color:#00cccc;font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .3s;text-decoration:none}}
+.btn:hover{{background:rgba(0,255,255,.08);border-color:rgba(0,255,255,.6)}}
+@media print{{body{{background:#fff}}.cert{{background:#fff;border-color:#ccc;box-shadow:none}}.corner{{border-color:#999}}.name,.sc-val,.org,.divider,.badge{{color:#000}}.title,.course,.sig-name,.date-val,.cert-id,.sig-title,.sc-label,.certify,.completed{{color:#333}}.actions{{display:none}}}}
+</style>
+</head>
+<body>
+<div class="cert">
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="org">IT Solutions MM &middot; AI Automation Society &middot; Myanmar</div>
+  <div class="title">Certificate of Completion</div>
+  <div class="divider"></div>
+  <div class="certify">This is to certify that</div>
+  <div class="name">{n}</div>
+  <div class="name-line"></div>
+  <div class="completed">has successfully completed</div>
+  <div class="course">{crs}</div>
+  <div class="scores">
+    <div class="sc-item"><div class="sc-val">{sc}%</div><div class="sc-label">Final Score</div></div>
+    <div class="sc-item"><div class="sc-val">{ls}%</div><div class="sc-label">Learning</div></div>
+    <div class="sc-item"><div class="sc-val">{qs}%</div><div class="sc-label">Quiz</div></div>
+  </div>
+  <div class="footer">
+    <div class="sig">
+      <div class="sig-line"></div>
+      <div class="sig-name">MR. KYAW ZIN TUN</div>
+      <div class="sig-title">Founder &middot; IT Solutions MM</div>
+    </div>
+    <div class="meta">
+      <div class="date-val">Issued: {date_fmt}</div>
+      <div class="badge">&#10003; Verified Certificate</div>
+      <div class="cert-id">ID: {cid}</div>
+    </div>
+  </div>
+</div>
+<div class="actions">
+  <button class="btn" onclick="window.print()">Print / Save as PDF</button>
+</div>
+</body>
+</html>"""
+        return HTMLResponse(html)
 
     # --- SPA fallback: serve index.html for all other routes ---
     @api.get("/")

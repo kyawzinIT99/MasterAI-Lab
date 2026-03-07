@@ -1,0 +1,394 @@
+{
+  "courses": {
+    "n8n": {
+      "title": "N8N AI Automation Masterclass",
+      "modules": [
+        "Introduction to N8N & Workflow Automation",
+        "Installing N8N (Local & Cloud)",
+        "Understanding Nodes & Connections",
+        "HTTP Request & REST API Nodes",
+        "Webhook Triggers & External Integrations",
+        "Conditional Logic (IF Node & Switch)",
+        "Loops, Split in Batches & Merge",
+        "Error Handling & Retry Logic",
+        "Building a Real-World Automation Project",
+        "Deploying N8N to Production"
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is N8N primarily used for?",
+          "options": ["Database management", "Workflow automation", "Video editing", "Web hosting"],
+          "correct": 1
+        },
+        {
+          "id": 2,
+          "question": "Which trigger type starts a workflow when an external system sends data?",
+          "options": ["Schedule trigger", "Manual trigger", "Webhook trigger", "Cron trigger"],
+          "correct": 2
+        },
+        {
+          "id": 3,
+          "question": "What data format do most N8N nodes use?",
+          "options": ["XML", "CSV", "JSON", "YAML"],
+          "correct": 2
+        },
+        {
+          "id": 4,
+          "question": "What is a 'node' in N8N?",
+          "options": ["A server", "A single step or action in a workflow", "A database table", "A user account"],
+          "correct": 1
+        },
+        {
+          "id": 5,
+          "question": "Which node is used to make HTTP API calls in N8N?",
+          "options": ["API Node", "HTTP Request Node", "REST Node", "Fetch Node"],
+          "correct": 1
+        },
+        {
+          "id": 6,
+          "question": "What does the IF node do in N8N?",
+          "options": ["Sends emails", "Routes data based on conditions", "Stores data", "Loops through items"],
+          "correct": 1
+        },
+        {
+          "id": 7,
+          "question": "How do you handle errors gracefully in N8N workflows?",
+          "options": ["Delete the workflow", "Use the Error Trigger node", "Ignore all errors", "Restart N8N"],
+          "correct": 1
+        },
+        {
+          "id": 8,
+          "question": "What does 'Split in Batches' node do?",
+          "options": ["Splits the screen", "Processes large data sets in smaller chunks", "Deletes data", "Merges workflows"],
+          "correct": 1
+        }
+      ]
+    },
+    "makecom": {
+      "title": "Make.com Automation Professional",
+      "modules": [
+        "Introduction to Make.com",
+        "Building Your First Scenario",
+        "Understanding Modules & Apps",
+        "Data Mapping & Variables",
+        "Routers, Filters & Conditions",
+        "Error Handling & Rollback",
+        "Webhooks & Custom API Calls",
+        "Google Sheets & Drive Integration",
+        "Building Multi-Step Automations",
+        "Scheduling & Deployment"
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is Make.com's basic building block called?",
+          "options": ["Node", "Module", "Block", "Step"],
+          "correct": 1
+        },
+        {
+          "id": 2,
+          "question": "What is a 'scenario' in Make.com?",
+          "options": ["A bug report", "An automated workflow", "A user profile", "A payment plan"],
+          "correct": 1
+        },
+        {
+          "id": 3,
+          "question": "What does the Router module do?",
+          "options": ["Connects to the internet", "Routes data to different paths based on conditions", "Sends emails", "Stores data"],
+          "correct": 1
+        },
+        {
+          "id": 4,
+          "question": "What is 'data mapping' in Make.com?",
+          "options": ["Creating maps", "Connecting output from one module to input of another", "Deleting data", "Backing up files"],
+          "correct": 1
+        },
+        {
+          "id": 5,
+          "question": "How often can Make.com scenarios be triggered?",
+          "options": ["Only manually", "Only daily", "On a schedule or triggered by webhooks", "Only weekly"],
+          "correct": 2
+        },
+        {
+          "id": 6,
+          "question": "What does a filter do in Make.com?",
+          "options": ["Removes modules", "Only allows data to pass if conditions are met", "Speeds up the scenario", "Duplicates data"],
+          "correct": 1
+        },
+        {
+          "id": 7,
+          "question": "What is an 'iterator' in Make.com?",
+          "options": ["A billing tool", "Processes each item in an array one by one", "A login system", "A module type"],
+          "correct": 1
+        },
+        {
+          "id": 8,
+          "question": "What happens during 'rollback' in Make.com error handling?",
+          "options": ["The scenario runs again", "Completed operations are undone to keep data consistent", "All data is deleted", "Make.com restarts"],
+          "correct": 1
+        }
+      ]
+    },
+    "agentic": {
+      "title": "Agentic AI & RAG Systems",
+      "modules": [
+        "Introduction to Agentic AI",
+        "Understanding AI Agents & Tools",
+        "LangChain & LlamaIndex Fundamentals",
+        "Retrieval-Augmented Generation (RAG)",
+        "Vector Databases (Pinecone, Chroma)",
+        "Building a RAG Pipeline",
+        "Multi-Agent Orchestration",
+        "Memory & Context Management",
+        "Deploying AI Agents to Production",
+        "Evaluating & Monitoring Agents"
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is RAG (Retrieval-Augmented Generation)?",
+          "options": ["A gaming technique", "Combining LLMs with external knowledge retrieval", "A database type", "A programming language"],
+          "correct": 1
+        },
+        {
+          "id": 2,
+          "question": "What is a vector database used for in AI systems?",
+          "options": ["Storing images", "Storing and searching high-dimensional embeddings", "Running SQL queries", "Hosting websites"],
+          "correct": 1
+        },
+        {
+          "id": 3,
+          "question": "What makes an AI system 'agentic'?",
+          "options": ["It is very fast", "It can plan, use tools, and take actions autonomously", "It uses large models", "It runs offline"],
+          "correct": 1
+        },
+        {
+          "id": 4,
+          "question": "What is LangChain primarily used for?",
+          "options": ["Blockchain development", "Building LLM-powered applications and chains", "Database management", "Network security"],
+          "correct": 1
+        },
+        {
+          "id": 5,
+          "question": "What is an 'embedding' in the context of RAG?",
+          "options": ["A video format", "A numerical vector representation of text", "A type of database", "A Python library"],
+          "correct": 1
+        },
+        {
+          "id": 6,
+          "question": "What is the main advantage of RAG over fine-tuning?",
+          "options": ["It is cheaper to train", "It allows real-time knowledge updates without retraining", "It uses less memory", "It works offline"],
+          "correct": 1
+        },
+        {
+          "id": 7,
+          "question": "What does 'context window' mean in LLMs?",
+          "options": ["The app window size", "The maximum amount of text an LLM can process at once", "A UI element", "A caching mechanism"],
+          "correct": 1
+        },
+        {
+          "id": 8,
+          "question": "What is multi-agent orchestration?",
+          "options": ["Running multiple apps", "Coordinating multiple AI agents to solve complex tasks together", "Managing servers", "A database pattern"],
+          "correct": 1
+        }
+      ]
+    },
+    "cloud": {
+      "title": "Cloud Architecture (AWS/GCP/Azure)",
+      "modules": [
+        "Cloud Computing Fundamentals",
+        "AWS Core Services (EC2, S3, IAM)",
+        "Lambda & Serverless Architecture",
+        "API Gateway & Microservices",
+        "Google Cloud Platform Overview",
+        "Azure Fundamentals & AD",
+        "Modal Serverless Deployment",
+        "Cost Optimization Strategies",
+        "Security & Compliance in Cloud",
+        "CI/CD & DevOps on Cloud"
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question": "What does AWS stand for?",
+          "options": ["Automated Web Services", "Amazon Web Services", "Advanced Web Systems", "Azure Web Services"],
+          "correct": 1
+        },
+        {
+          "id": 2,
+          "question": "What is serverless computing?",
+          "options": ["Computing without any servers", "Computing where you don't manage or provision servers", "Offline computing", "Free cloud computing"],
+          "correct": 1
+        },
+        {
+          "id": 3,
+          "question": "What is IAM in AWS?",
+          "options": ["Internet Access Module", "Identity and Access Management", "Internal API Manager", "Image Asset Management"],
+          "correct": 1
+        },
+        {
+          "id": 4,
+          "question": "What does 'auto-scaling' mean in cloud architecture?",
+          "options": ["Scaling images automatically", "Automatically adjusting resources based on demand", "Manual resource allocation", "Reducing server size"],
+          "correct": 1
+        },
+        {
+          "id": 5,
+          "question": "What is a CDN (Content Delivery Network) used for?",
+          "options": ["Managing databases", "Delivering content faster by serving from geographically closer servers", "Sending emails", "Running AI models"],
+          "correct": 1
+        },
+        {
+          "id": 6,
+          "question": "Which cloud service model gives you the most control?",
+          "options": ["SaaS", "PaaS", "IaaS", "FaaS"],
+          "correct": 2
+        },
+        {
+          "id": 7,
+          "question": "What is AWS Lambda?",
+          "options": ["A database service", "A serverless function execution service", "A CDN service", "A storage service"],
+          "correct": 1
+        },
+        {
+          "id": 8,
+          "question": "What is the purpose of an API Gateway in cloud architecture?",
+          "options": ["Store files", "Act as entry point for APIs, handling auth, rate limiting, and routing", "Run databases", "Monitor servers"],
+          "correct": 1
+        }
+      ]
+    },
+    "network": {
+      "title": "Network Engineering (CCNA Level)",
+      "modules": [
+        "OSI Model & TCP/IP Fundamentals",
+        "IP Addressing & Subnetting",
+        "VLANs & Layer 2 Switching",
+        "Routing Protocols (OSPF & BGP)",
+        "Firewalls & Access Control Lists",
+        "SD-WAN Concepts",
+        "Zero Trust Security Model",
+        "Network Monitoring & Troubleshooting",
+        "Wireless Networking",
+        "CCNA Exam Preparation"
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question": "What does BGP stand for?",
+          "options": ["Border Gateway Protocol", "Basic Gateway Protocol", "Binary Group Protocol", "Bridge Gateway Protocol"],
+          "correct": 0
+        },
+        {
+          "id": 2,
+          "question": "What is OSPF used for?",
+          "options": ["File sharing", "Email routing", "Interior gateway routing protocol", "Security"],
+          "correct": 2
+        },
+        {
+          "id": 3,
+          "question": "What is a VLAN?",
+          "options": ["Virtual Local Area Network", "Very Large Area Network", "Virtual LAN Authentication", "Variable Length Area Network"],
+          "correct": 0
+        },
+        {
+          "id": 4,
+          "question": "What does Zero Trust security mean?",
+          "options": ["Trusting all internal users", "Never trust, always verify — every user and device must be authenticated", "Trusting external users only", "No security at all"],
+          "correct": 1
+        },
+        {
+          "id": 5,
+          "question": "What does subnetting allow you to do?",
+          "options": ["Speed up internet", "Divide a large network into smaller, manageable sub-networks", "Connect to WiFi", "Block websites"],
+          "correct": 1
+        },
+        {
+          "id": 6,
+          "question": "What layer of the OSI model do switches primarily operate at?",
+          "options": ["Layer 1", "Layer 2", "Layer 3", "Layer 4"],
+          "correct": 1
+        },
+        {
+          "id": 7,
+          "question": "What is SD-WAN?",
+          "options": ["Software-Defined Wide Area Network", "Secure Data Wireless Area Network", "Standard Domain WAN", "Structured Data WAN"],
+          "correct": 0
+        },
+        {
+          "id": 8,
+          "question": "What does an ACL (Access Control List) do?",
+          "options": ["Speeds up network", "Controls which traffic is allowed or denied in a network", "Assigns IP addresses", "Monitors bandwidth"],
+          "correct": 1
+        }
+      ]
+    },
+    "consulting": {
+      "title": "AI Consulting Fundamentals",
+      "modules": [
+        "Understanding AI Business Value",
+        "AI Readiness Assessment",
+        "Identifying Automation Opportunities",
+        "Building an AI Roadmap",
+        "ROI Calculation for AI Projects",
+        "Change Management & Adoption",
+        "AI Ethics & Responsible AI",
+        "Vendor Selection & Tool Evaluation",
+        "Presenting AI Solutions to Stakeholders",
+        "Building Long-Term AI Strategy"
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is the first step in an AI consulting engagement?",
+          "options": ["Buy AI tools immediately", "Conduct an AI readiness assessment", "Hire data scientists", "Build a custom model"],
+          "correct": 1
+        },
+        {
+          "id": 2,
+          "question": "What does ROI stand for in AI projects?",
+          "options": ["Rate of Intelligence", "Return on Investment", "Risk of Implementation", "Reach of Innovation"],
+          "correct": 1
+        },
+        {
+          "id": 3,
+          "question": "Which processes are best candidates for AI automation?",
+          "options": ["Creative brainstorming only", "Repetitive, rule-based, high-volume tasks", "One-time strategic decisions", "Physical tasks only"],
+          "correct": 1
+        },
+        {
+          "id": 4,
+          "question": "What is 'change management' in AI adoption?",
+          "options": ["Changing AI models", "Managing people, processes and culture during AI transformation", "Changing vendors", "Updating software"],
+          "correct": 1
+        },
+        {
+          "id": 5,
+          "question": "What is responsible AI?",
+          "options": ["AI that responds quickly", "Developing AI that is ethical, fair, transparent, and accountable", "AI with no errors", "AI that saves money"],
+          "correct": 1
+        },
+        {
+          "id": 6,
+          "question": "What should an AI roadmap include?",
+          "options": ["Only technical specs", "Vision, milestones, resource requirements, and success metrics", "A list of tools", "Marketing plans only"],
+          "correct": 1
+        },
+        {
+          "id": 7,
+          "question": "What is a key factor when evaluating AI vendors?",
+          "options": ["Brand logo", "Integration capability, support, pricing, and data security", "Office location", "Number of employees"],
+          "correct": 1
+        },
+        {
+          "id": 8,
+          "question": "How should AI solutions be presented to non-technical stakeholders?",
+          "options": ["With heavy technical jargon", "Focus on business outcomes, ROI, and risk mitigation", "Only show code", "Avoid showing results"],
+          "correct": 1
+        }
+      ]
+    }
+  }
+}
