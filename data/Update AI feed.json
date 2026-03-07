@@ -1,0 +1,151 @@
+{
+  "system": {
+    "name": "AI Industry Intelligence Feed",
+    "version": "1.0",
+    "auto_update": true,
+    "update_interval_hours": 6,
+    "max_records": 30,
+    "auto_delete_old": true
+  },
+
+  "sources": [
+    {
+      "company": "OpenAI",
+      "type": "AI Research",
+      "official_site": "https://openai.com",
+      "news_feed": "https://openai.com/blog",
+      "api_docs": "https://platform.openai.com/docs",
+      "scrape_enabled": true
+    },
+    {
+      "company": "Anthropic",
+      "type": "AI Safety Research",
+      "official_site": "https://www.anthropic.com",
+      "news_feed": "https://www.anthropic.com/news",
+      "api_docs": "https://docs.anthropic.com",
+      "scrape_enabled": true
+    },
+    {
+      "company": "Google DeepMind",
+      "type": "AI Research",
+      "official_site": "https://deepmind.google",
+      "news_feed": "https://deepmind.google/discover/blog",
+      "scrape_enabled": true
+    },
+    {
+      "company": "Meta AI",
+      "type": "AI Research",
+      "official_site": "https://ai.meta.com",
+      "news_feed": "https://ai.meta.com/blog",
+      "scrape_enabled": true
+    },
+    {
+      "company": "xAI",
+      "type": "AI Research",
+      "official_site": "https://x.ai",
+      "news_feed": "https://x.ai/blog",
+      "scrape_enabled": true
+    },
+    {
+      "company": "Mistral AI",
+      "type": "AI Models",
+      "official_site": "https://mistral.ai",
+      "news_feed": "https://mistral.ai/news",
+      "scrape_enabled": true
+    },
+    {
+      "company": "Stability AI",
+      "type": "Generative AI",
+      "official_site": "https://stability.ai",
+      "news_feed": "https://stability.ai/blog",
+      "scrape_enabled": true
+    },
+    {
+      "company": "HuggingFace",
+      "type": "AI Infrastructure",
+      "official_site": "https://huggingface.co",
+      "news_feed": "https://huggingface.co/blog",
+      "scrape_enabled": true
+    },
+    {
+      "company": "NVIDIA AI",
+      "type": "AI Hardware",
+      "official_site": "https://nvidia.com/ai",
+      "news_feed": "https://blogs.nvidia.com/blog/category/deep-learning",
+      "scrape_enabled": true
+    }
+  ],
+
+  "updates": [
+    {
+      "company": "Anthropic",
+      "model": "Claude AI",
+      "category": "AI Assistant",
+      "release_type": "Update",
+      "title": "Claude reasoning improvements",
+      "digest": "Anthropic enhances Claude models with stronger reasoning capability and improved context understanding.",
+      "official_link": "https://www.anthropic.com/news",
+      "date": "2026-03-05"
+    },
+    {
+      "company": "OpenAI",
+      "model": "GPT Platform",
+      "category": "AI API",
+      "release_type": "Platform Update",
+      "title": "Developer platform improvements",
+      "digest": "OpenAI introduces updates to developer APIs and automation workflows for faster AI integration.",
+      "official_link": "https://openai.com/blog",
+      "date": "2026-03-03"
+    },
+    {
+      "company": "Google DeepMind",
+      "model": "Gemini",
+      "category": "AI Model",
+      "release_type": "Model Update",
+      "title": "Gemini model improvements",
+      "digest": "Google improves Gemini performance in multimodal reasoning and long-context analysis.",
+      "official_link": "https://deepmind.google/discover/blog",
+      "date": "2026-03-02"
+    },
+    {
+      "company": "Meta AI",
+      "model": "LLaMA",
+      "category": "Open AI Models",
+      "release_type": "Research Update",
+      "title": "LLaMA ecosystem expansion",
+      "digest": "Meta expands the LLaMA open model ecosystem with new training improvements.",
+      "official_link": "https://ai.meta.com/blog",
+      "date": "2026-03-01"
+    }
+  ],
+
+  "scraper_config": {
+    "method": "scheduled_scraping",
+    "tools_supported": [
+      "Firecrawl",
+      "Apify",
+      "BeautifulSoup",
+      "Playwright"
+    ],
+    "schedule_cron": "0 */6 * * *",
+    "max_articles_per_source": 3
+  },
+
+  "automation_logic": {
+    "steps": [
+      "Run scheduler",
+      "Fetch AI company news pages",
+      "Extract latest announcements",
+      "Convert to JSON record",
+      "Insert at top of updates array",
+      "Remove oldest records if exceeding max_records",
+      "Save updated JSON"
+    ]
+  },
+
+  "frontend_usage": {
+    "endpoint": "/data/ai_industry_feed.json",
+    "display_limit": 10,
+    "auto_refresh_minutes": 60
+  }
+}
