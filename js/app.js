@@ -682,6 +682,14 @@ document.addEventListener("DOMContentLoaded", () => {
       <div style="padding:0.5rem 5vw 1rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
         <span style="font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-right:0.3rem;">Sources:</span>
         ${(data.sources || []).map(s => `<span style="font-size:0.58rem;color:var(--text-muted);border:1px solid rgba(255,255,255,0.08);padding:0.1rem 0.45rem;border-radius:2px;">${s.company}</span>`).join('')}
+      </div>
+      <div style="padding:0.8rem 5vw 1.5rem;border-top:1px solid rgba(255,255,255,0.05);">
+        <div style="font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">📬 Get weekly digest by email — every Monday</div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input id="pulse-email" type="email" placeholder="your@email.com" style="flex:1;min-width:160px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:3px;padding:0.45rem 0.7rem;color:#fff;font-size:0.78rem;outline:none;">
+          <button onclick="pulseSubscribe()" style="background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.4);color:#00ffff;padding:0.45rem 1rem;border-radius:3px;font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;white-space:nowrap;">Subscribe ↗</button>
+        </div>
+        <div id="pulse-sub-msg" style="font-size:0.62rem;margin-top:0.4rem;min-height:1em;"></div>
       </div>`;
 
     container.innerHTML = html;
@@ -700,6 +708,36 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.style.background = active ? 'rgba(0,255,255,0.1)' : 'transparent';
       btn.style.color = active ? '#00ffff' : 'var(--text-muted)';
     });
+  };
+
+  // AI Pulse email subscription
+  window.pulseSubscribe = async function() {
+    const input = document.getElementById('pulse-email');
+    const msg   = document.getElementById('pulse-sub-msg');
+    if (!input || !msg) return;
+    const email = input.value.trim();
+    if (!email) { msg.style.color = '#ff6b6b'; msg.textContent = 'Please enter your email.'; return; }
+    msg.style.color = 'var(--text-muted)';
+    msg.textContent = 'Subscribing...';
+    try {
+      const r = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const d = await r.json();
+      if (d.ok) {
+        msg.style.color = '#00ffff';
+        msg.textContent = '✓ Subscribed! You\'ll receive the digest every Monday.';
+        input.value = '';
+      } else {
+        msg.style.color = '#ff6b6b';
+        msg.textContent = d.error || 'Something went wrong.';
+      }
+    } catch {
+      msg.style.color = '#ff6b6b';
+      msg.textContent = 'Network error. Try again.';
+    }
   };
 
   // Certificate PDF Generator — uses jsPDF (loaded from CDN)

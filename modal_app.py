@@ -47,8 +47,9 @@ SITE_ROOT = Path(__file__).parent
 
 # ── Persistent Volume for live AI feed ────────────────────────────────────────
 feed_vol = modal.Volume.from_name("ai-feed-vol", create_if_missing=True)
-FEED_PATH = "/feed/ai_industry_feed.json"
-FEED_MAX  = 30
+FEED_PATH  = "/feed/ai_industry_feed.json"
+SUBS_PATH  = "/feed/subscribers.json"
+FEED_MAX   = 30
 
 # Sources to scrape every 6 hours
 _FEED_SOURCES = [
@@ -166,6 +167,89 @@ def scrape_ai_feed():
     else:
         print("[AI Feed] No new updates this cycle.")
 
+# ── Weekly email digest: every Monday 08:00 UTC, zero human effort ───────────
+@app.function(
+    image=scraper_image,
+    schedule=modal.Cron("0 8 * * 1"),
+    volumes={"/feed": feed_vol},
+    secrets=[modal.Secret.from_name("gmail")],
+    timeout=120,
+)
+def send_weekly_digest():
+    import os, json, smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from pathlib import Path
+
+    gmail_from = os.environ["GMAIL_FROM"]
+    gmail_pass = os.environ["GMAIL_APP_PASSWORD"]
+
+    # Load subscribers
+    subs_file = Path(SUBS_PATH)
+    if not subs_file.exists():
+        print("[Digest] No subscribers yet.")
+        return
+    subscribers = json.loads(subs_file.read_text())
+    if not subscribers:
+        print("[Digest] Subscriber list empty.")
+        return
+
+    # Load latest feed
+    feed_file = Path(FEED_PATH)
+    if not feed_file.exists():
+        print("[Digest] No feed data.")
+        return
+    feed = json.loads(feed_file.read_text())
+    updates = feed.get("updates", [])[:10]
+    if not updates:
+        print("[Digest] Feed has no updates.")
+        return
+
+    # Build HTML email
+    rows = ""
+    for item in updates:
+        rows += f"""
+        <tr>
+          <td style="padding:12px 0;border-bottom:1px solid #1a1a2e;">
+            <span style="font-size:10px;color:#00cccc;text-transform:uppercase;letter-spacing:1px;">{item['company']} · {item.get('release_type','Update')}</span><br>
+            <a href="{item['official_link']}" style="font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">{item['title']}</a><br>
+            <span style="font-size:13px;color:#888;line-height:1.5;">{item.get('digest','')}</span><br>
+            <span style="font-size:11px;color:#555;">{item.get('date','')}</span>
+          </td>
+        </tr>"""
+
+    html = f"""
+    <html><body style="margin:0;padding:0;background:#06060f;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;padding:20px;">
+      <tr><td style="padding:30px 0 20px;border-bottom:2px solid #00ffff;">
+        <span style="font-size:10px;color:#00ffff;letter-spacing:3px;text-transform:uppercase;">IT Solutions MM · AI Automation Society</span><br>
+        <span style="font-size:24px;font-weight:bold;color:#ffffff;">AI Pulse Weekly Digest</span><br>
+        <span style="font-size:12px;color:#555;">Top AI industry updates this week</span>
+      </td></tr>
+      {rows}
+      <tr><td style="padding:24px 0;font-size:11px;color:#444;border-top:1px solid #1a1a2e;">
+        IT Solutions MM · itsolutions.mm@gmail.com<br>
+        <a href="https://itsolutions-mm--main-web.modal.run" style="color:#00cccc;">Visit Website</a>
+        · <a href="https://t.me/MaterAITraining_bot" style="color:#00cccc;">Telegram Bot</a>
+      </td></tr>
+    </table></body></html>"""
+
+    sent = 0
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(gmail_from, gmail_pass)
+        for email in subscribers:
+            try:
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = "🤖 AI Pulse Weekly — IT Solutions MM"
+                msg["From"] = f"IT Solutions MM <{gmail_from}>"
+                msg["To"] = email
+                msg.attach(MIMEText(html, "html"))
+                smtp.sendmail(gmail_from, email, msg.as_string())
+                sent += 1
+            except Exception as e:
+                print(f"[Digest] Failed {email}: {e}")
+    print(f"[Digest] Sent to {sent}/{len(subscribers)} subscribers.")
+
 # ── Web image (static site + API) ─────────────────────────────────────────────
 image = (
     modal.Image.debian_slim()
@@ -184,6 +268,7 @@ image = (
     secrets=[
         modal.Secret.from_name("openai-key"),
         modal.Secret.from_name("telegram-bot"),
+        modal.Secret.from_name("gmail"),
     ],
 )
 @modal.concurrent(max_inputs=100)
@@ -253,6 +338,29 @@ def web():
                 json=safe_body,
             )
         return JSONResponse(resp.json(), status_code=resp.status_code)
+
+    # --- Email digest subscription ---
+    @api.post("/api/subscribe")
+    async def subscribe(request: Request):
+        import json, re
+        from pathlib import Path
+        ip = request.client.host if request.client else "unknown"
+        if not _check_rate_limit(f"sub_{ip}", limit=3, window=300):
+            return JSONResponse({"error": "Too many requests."}, status_code=429)
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+        email = str(body.get("email", "")).strip()[:200]
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+            return JSONResponse({"error": "Invalid email."}, status_code=400)
+        sf = Path(SUBS_PATH)
+        subs = json.loads(sf.read_text()) if sf.exists() else []
+        if email not in subs:
+            subs.append(email)
+            sf.write_text(json.dumps(subs))
+            feed_vol.commit()
+        return JSONResponse({"ok": True})
 
     # --- Contact form: forward to Telegram bot ---
     COUNT_PATH = "/feed/student_count.json"
