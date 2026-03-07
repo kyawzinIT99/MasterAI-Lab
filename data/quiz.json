@@ -29,7 +29,7 @@
         },
         {
           "id": 3,
-          "question": "What data format do most N8N nodes use?",
+          "question": "What data format do most N8N nodes use internally?",
           "options": ["XML", "CSV", "JSON", "YAML"],
           "correct": 2
         },
@@ -61,6 +61,48 @@
           "id": 8,
           "question": "What does 'Split in Batches' node do?",
           "options": ["Splits the screen", "Processes large data sets in smaller chunks", "Deletes data", "Merges workflows"],
+          "correct": 1
+        },
+        {
+          "id": 9,
+          "question": "What is the correct N8N expression syntax to access a JSON field from the previous node?",
+          "options": ["$data.fieldName", "{{ $json.fieldName }}", "[node.output.field]", "get('fieldName')"],
+          "correct": 1
+        },
+        {
+          "id": 10,
+          "question": "What does the 'Merge' node do in N8N?",
+          "options": ["Deletes duplicate records", "Combines data streams from multiple branches into one", "Sends merged emails", "Creates a database merge"],
+          "correct": 1
+        },
+        {
+          "id": 11,
+          "question": "Where are API credentials (API keys, OAuth tokens) stored securely in N8N?",
+          "options": ["Inside each node configuration", "In the Credentials section, encrypted", "In a .env file on disk", "In the browser localStorage"],
+          "correct": 1
+        },
+        {
+          "id": 12,
+          "question": "What is the 'Code' node in N8N used for?",
+          "options": ["Displaying code snippets", "Writing and executing custom JavaScript logic inside a workflow", "Connecting to GitHub", "Formatting JSON output"],
+          "correct": 1
+        },
+        {
+          "id": 13,
+          "question": "Which N8N node would you use to pause execution until a specific time?",
+          "options": ["Delay Node", "Wait Node", "Timer Node", "Pause Node"],
+          "correct": 1
+        },
+        {
+          "id": 14,
+          "question": "What is the main advantage of self-hosted N8N over N8N Cloud?",
+          "options": ["More integrations available", "Full data privacy and control over infrastructure", "Faster execution speed", "Free forever with no limits"],
+          "correct": 1
+        },
+        {
+          "id": 15,
+          "question": "In N8N, what does 'pinning' data to a node allow you to do?",
+          "options": ["Lock the node from editing", "Test the workflow using fixed sample data without re-triggering", "Share the node publicly", "Copy the node to another workflow"],
           "correct": 1
         }
       ]
@@ -127,6 +169,48 @@
           "question": "What happens during 'rollback' in Make.com error handling?",
           "options": ["The scenario runs again", "Completed operations are undone to keep data consistent", "All data is deleted", "Make.com restarts"],
           "correct": 1
+        },
+        {
+          "id": 9,
+          "question": "What is a 'bundle' in Make.com?",
+          "options": ["A paid plan", "A single unit of data processed by a module in one execution", "A group of scenarios", "A folder of modules"],
+          "correct": 1
+        },
+        {
+          "id": 10,
+          "question": "How does Make.com count 'operations' for billing purposes?",
+          "options": ["Per scenario created", "Each module execution counts as one operation", "Per webhook received", "Per hour of runtime"],
+          "correct": 1
+        },
+        {
+          "id": 11,
+          "question": "What does 'instant trigger' mean in Make.com?",
+          "options": ["Trigger runs at midnight", "Scenario starts immediately when a webhook event fires", "Trigger only works manually", "Trigger runs every second"],
+          "correct": 1
+        },
+        {
+          "id": 12,
+          "question": "What is a Make.com 'Data Store' used for?",
+          "options": ["Storing scenario logs", "A built-in database to persist and retrieve data across scenario runs", "Storing account settings", "A file system for images"],
+          "correct": 1
+        },
+        {
+          "id": 13,
+          "question": "What does the 'Aggregator' module do in Make.com?",
+          "options": ["Counts scenario runs", "Combines multiple bundles from an iterator into a single bundle", "Aggregates billing", "Merges two scenarios"],
+          "correct": 1
+        },
+        {
+          "id": 14,
+          "question": "What is the 'Set Variable' module used for in Make.com?",
+          "options": ["Changing account settings", "Storing a value in memory to reuse later in the same scenario", "Setting webhooks", "Renaming modules"],
+          "correct": 1
+        },
+        {
+          "id": 15,
+          "question": "What does Make.com's 'HTTP' module allow you to do?",
+          "options": ["Host a website", "Make custom API requests to any URL not covered by built-in apps", "Monitor HTTP traffic", "Block HTTP requests"],
+          "correct": 1
         }
       ]
     },
@@ -192,6 +276,48 @@
           "question": "What is multi-agent orchestration?",
           "options": ["Running multiple apps", "Coordinating multiple AI agents to solve complex tasks together", "Managing servers", "A database pattern"],
           "correct": 1
+        },
+        {
+          "id": 9,
+          "question": "What is 'chunking' in a RAG pipeline?",
+          "options": ["Splitting model weights", "Breaking source documents into smaller pieces before embedding", "Compressing vector databases", "Batching API requests"],
+          "correct": 1
+        },
+        {
+          "id": 10,
+          "question": "In a ReAct agent pattern, what does 'ReAct' stand for?",
+          "options": ["Responsive Actions", "Reasoning and Acting — the agent thinks step by step then acts", "Real-time Actions", "Recursive Action Trees"],
+          "correct": 1
+        },
+        {
+          "id": 11,
+          "question": "What is 'hallucination' in the context of LLMs?",
+          "options": ["A visual rendering bug", "When the model generates confident but factually incorrect information", "Slow response time", "A training data issue only"],
+          "correct": 1
+        },
+        {
+          "id": 12,
+          "question": "What is 'temperature' in LLM inference settings?",
+          "options": ["The server's CPU heat level", "A parameter controlling randomness — low=deterministic, high=creative", "The time to respond", "The number of tokens generated"],
+          "correct": 1
+        },
+        {
+          "id": 13,
+          "question": "What is semantic search?",
+          "options": ["Searching by exact keyword match", "Searching based on meaning and conceptual similarity using embeddings", "Searching file metadata", "Searching code syntax"],
+          "correct": 1
+        },
+        {
+          "id": 14,
+          "question": "What is LlamaIndex primarily designed for?",
+          "options": ["Training llama models", "Connecting LLMs to external data sources and building RAG applications", "Visualising neural networks", "Managing vector hardware"],
+          "correct": 1
+        },
+        {
+          "id": 15,
+          "question": "What is 'model drift' and why does it matter for deployed AI agents?",
+          "options": ["The model moving between servers", "Performance degradation over time as real-world data patterns change from training data", "GPU memory overflow", "API version mismatch"],
+          "correct": 1
         }
       ]
     },
@@ -242,7 +368,7 @@
         },
         {
           "id": 6,
-          "question": "Which cloud service model gives you the most control?",
+          "question": "Which cloud service model gives you the most infrastructure control?",
           "options": ["SaaS", "PaaS", "IaaS", "FaaS"],
           "correct": 2
         },
@@ -256,6 +382,48 @@
           "id": 8,
           "question": "What is the purpose of an API Gateway in cloud architecture?",
           "options": ["Store files", "Act as entry point for APIs, handling auth, rate limiting, and routing", "Run databases", "Monitor servers"],
+          "correct": 1
+        },
+        {
+          "id": 9,
+          "question": "What is an AWS VPC?",
+          "options": ["Virtual Payment Cluster", "Virtual Private Cloud — an isolated network environment in AWS", "Video Processing Center", "Verified Public Connection"],
+          "correct": 1
+        },
+        {
+          "id": 10,
+          "question": "What does S3 stand for in AWS, and what is it used for?",
+          "options": ["Simple Server Storage — running VMs", "Simple Storage Service — scalable object/file storage", "Secure Server System — database hosting", "Scalable Service Stack — microservices"],
+          "correct": 1
+        },
+        {
+          "id": 11,
+          "question": "What is the difference between horizontal and vertical scaling?",
+          "options": ["Horizontal = faster CPU, Vertical = more RAM", "Horizontal = add more instances, Vertical = increase single instance size", "They are the same thing", "Horizontal = cloud, Vertical = on-premise"],
+          "correct": 1
+        },
+        {
+          "id": 12,
+          "question": "What is a 'cold start' in serverless functions?",
+          "options": ["Deploying functions in cold regions", "The startup delay when a function is invoked after being idle", "Running functions without internet", "Caching function results"],
+          "correct": 1
+        },
+        {
+          "id": 13,
+          "question": "What is the cloud 'shared responsibility model'?",
+          "options": ["Customers share costs with the provider", "Provider secures infrastructure; customer is responsible for data, app, and access", "Both share equal security duties for all layers", "Provider handles everything including customer data"],
+          "correct": 1
+        },
+        {
+          "id": 14,
+          "question": "What is Kubernetes used for?",
+          "options": ["Writing Python scripts", "Orchestrating and managing containerised applications at scale", "Monitoring network traffic", "Running SQL databases"],
+          "correct": 1
+        },
+        {
+          "id": 15,
+          "question": "What is a CI/CD pipeline in cloud DevOps?",
+          "options": ["A network cable type", "Continuous Integration / Continuous Delivery — automating build, test, and deployment", "A container format", "A cost management tool"],
           "correct": 1
         }
       ]
@@ -284,7 +452,7 @@
         {
           "id": 2,
           "question": "What is OSPF used for?",
-          "options": ["File sharing", "Email routing", "Interior gateway routing protocol", "Security"],
+          "options": ["File sharing", "Email routing", "Interior gateway routing protocol for IP networks", "Security"],
           "correct": 2
         },
         {
@@ -321,6 +489,48 @@
           "id": 8,
           "question": "What does an ACL (Access Control List) do?",
           "options": ["Speeds up network", "Controls which traffic is allowed or denied in a network", "Assigns IP addresses", "Monitors bandwidth"],
+          "correct": 1
+        },
+        {
+          "id": 9,
+          "question": "What is NAT (Network Address Translation)?",
+          "options": ["A routing protocol", "Maps private IP addresses to a public IP for internet communication", "A type of firewall", "A wireless standard"],
+          "correct": 1
+        },
+        {
+          "id": 10,
+          "question": "What does CIDR notation '/24' mean for an IP subnet?",
+          "options": ["24 hosts allowed", "24 bits used for the network, leaving 8 bits for hosts (256 addresses)", "24 VLANs configured", "24 Mbps bandwidth"],
+          "correct": 1
+        },
+        {
+          "id": 11,
+          "question": "What is ARP (Address Resolution Protocol) used for?",
+          "options": ["Resolving domain names to IPs", "Mapping IP addresses to MAC addresses on a local network", "Assigning IP addresses dynamically", "Encrypting network traffic"],
+          "correct": 1
+        },
+        {
+          "id": 12,
+          "question": "What is a 'trunk port' in network switching?",
+          "options": ["The main uplink port only", "A port configured to carry traffic for multiple VLANs simultaneously", "The management port", "A port that blocks all traffic"],
+          "correct": 1
+        },
+        {
+          "id": 13,
+          "question": "What is the key difference between TCP and UDP?",
+          "options": ["TCP is wireless, UDP is wired", "TCP is reliable with error checking; UDP is fast with no guaranteed delivery", "UDP is newer than TCP", "They are identical protocols"],
+          "correct": 1
+        },
+        {
+          "id": 14,
+          "question": "What does DHCP do in a network?",
+          "options": ["Encrypts data", "Automatically assigns IP addresses, subnet masks, and gateway info to devices", "Routes traffic between subnets", "Monitors network health"],
+          "correct": 1
+        },
+        {
+          "id": 15,
+          "question": "What is a 'default route' (0.0.0.0/0) used for?",
+          "options": ["Blocking all traffic", "The route of last resort — used when no specific route matches the destination", "Connecting to VPN", "Assigning IPs"],
           "correct": 1
         }
       ]
@@ -386,6 +596,48 @@
           "id": 8,
           "question": "How should AI solutions be presented to non-technical stakeholders?",
           "options": ["With heavy technical jargon", "Focus on business outcomes, ROI, and risk mitigation", "Only show code", "Avoid showing results"],
+          "correct": 1
+        },
+        {
+          "id": 9,
+          "question": "What is a 'Proof of Concept' (POC) in AI consulting?",
+          "options": ["A legal document", "A small-scale test to validate whether an AI solution is viable before full investment", "A marketing pitch", "A vendor contract"],
+          "correct": 1
+        },
+        {
+          "id": 10,
+          "question": "What is 'shadow AI' in an enterprise context?",
+          "options": ["AI that works invisibly", "Employees using AI tools without IT or management approval or oversight", "AI trained on dark data", "A competitor's AI system"],
+          "correct": 1
+        },
+        {
+          "id": 11,
+          "question": "What is 'data governance' in AI projects?",
+          "options": ["Paying for data storage", "Policies and processes ensuring data quality, security, access control, and compliance", "Deleting old data", "Migrating databases"],
+          "correct": 1
+        },
+        {
+          "id": 12,
+          "question": "What KPI best measures success of an AI automation project?",
+          "options": ["Number of AI tools purchased", "Time saved, error rate reduction, cost per transaction, and throughput", "Lines of code written", "Size of training dataset"],
+          "correct": 1
+        },
+        {
+          "id": 13,
+          "question": "What is the 'build vs buy' decision in AI consulting?",
+          "options": ["Whether to buy hardware", "Choosing between developing custom AI internally or purchasing an existing vendor solution", "Whether to hire consultants", "Cloud vs on-premise decision"],
+          "correct": 1
+        },
+        {
+          "id": 14,
+          "question": "What is 'model drift' and why does a consultant need to address it?",
+          "options": ["Moving models between servers", "When an AI model's accuracy degrades over time as real data patterns shift from training data", "Budget overrun on AI projects", "A model switching between vendors"],
+          "correct": 1
+        },
+        {
+          "id": 15,
+          "question": "What does an AI readiness assessment evaluate?",
+          "options": ["Which AI tools to buy immediately", "Data quality, infrastructure maturity, team skills, and cultural readiness for AI adoption", "Competitor AI capabilities", "Number of employees available"],
           "correct": 1
         }
       ]

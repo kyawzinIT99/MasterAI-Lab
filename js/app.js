@@ -1208,10 +1208,16 @@ RULES:
 
   window.startHubQuiz = function() {
     if (!hubData || !hubCurrentCourse) return;
+    // Shuffle full bank (15 questions) and pick 10 — different every attempt
+    const allQ = hubData[hubCurrentCourse].questions.slice();
+    for (let i = allQ.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allQ[i], allQ[j]] = [allQ[j], allQ[i]];
+    }
     hubQuizState = {
       currentQ:  0,
       answers:   [],
-      questions: hubData[hubCurrentCourse].questions
+      questions: allQ.slice(0, 10)   // 10 random questions each session
     };
     _hubRenderQuestion();
     _hubShowStep('quiz');
