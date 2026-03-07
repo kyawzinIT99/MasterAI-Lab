@@ -20,7 +20,7 @@
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=9">
+  <link rel="stylesheet" href="css/style.css?v=10">
 
   <script>
     // Generic error handler — no internal details exposed to visitors
@@ -459,6 +459,34 @@
     </button>
   </div>
 
+  <!-- Video Player Modal — sits above Learning Hub (z-index:9999) -->
+  <div id="hub-video-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.96);align-items:center;justify-content:center;flex-direction:column;padding:1.5rem;">
+    <div style="width:100%;max-width:900px;">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <span id="hub-video-title" style="font-family:var(--font-display);font-size:1rem;color:#fff;font-weight:600;flex:1;padding-right:1rem;"></span>
+        <button onclick="closeHubVideo()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);width:32px;height:32px;border-radius:4px;font-size:1rem;cursor:pointer;flex-shrink:0;">&#10005;</button>
+      </div>
+
+      <!-- YouTube iframe -->
+      <div style="position:relative;padding-bottom:56.25%;background:#000;border-radius:6px;overflow:hidden;">
+        <iframe id="hub-video-iframe" src="" allow="autoplay;encrypted-media" allowfullscreen
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"></iframe>
+        <!-- No-video placeholder -->
+        <div id="hub-no-video" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:#080812;">
+          <div style="font-size:2.5rem;opacity:0.3;">&#9654;</div>
+          <p style="font-size:0.8rem;color:rgba(200,200,230,0.4);text-align:center;max-width:300px;">Video coming soon. You can still mark this module as watched to track your progress.</p>
+        </div>
+      </div>
+
+      <!-- Mark as Watched button -->
+      <div style="margin-top:1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+        <p style="font-size:0.7rem;color:rgba(200,200,230,0.35);letter-spacing:0.04em;">Watch the video, then mark it complete to track your progress.</p>
+        <button onclick="markModuleWatched()" style="flex-shrink:0;padding:0.65rem 1.5rem;background:linear-gradient(135deg,rgba(0,255,255,0.15),rgba(0,255,255,0.06));border:1px solid rgba(0,255,255,0.4);color:#00ffff;font-family:var(--font-display);font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border-radius:4px;cursor:pointer;">&#10003; Mark as Watched</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Learning Hub Modal -->
   <div id="hub-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:2rem 1rem;">
     <div style="background:linear-gradient(135deg,#080812,#0a0a1a);border:1px solid rgba(0,255,255,0.15);border-radius:8px;width:100%;max-width:780px;position:relative;margin:auto;">
@@ -595,7 +623,7 @@
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="js/app.js?v=33"></script>
+  <script src="js/app.js?v=34"></script>
 
 
 </body>

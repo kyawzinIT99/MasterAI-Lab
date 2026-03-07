@@ -1327,6 +1327,30 @@ canvas {
   font-size: 0.8rem;
   color: rgba(220,220,240,0.75);
   line-height: 1.4;
+  flex: 1;
+}
+.hub-watch-btn {
+  flex-shrink: 0;
+  padding: 0.35rem 0.85rem;
+  background: transparent;
+  border: 1px solid rgba(0,255,255,0.25);
+  border-radius: 3px;
+  color: rgba(0,200,200,0.8);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.hub-watch-btn:hover {
+  border-color: rgba(0,255,255,0.6);
+  background: rgba(0,255,255,0.06);
+  color: #00ffff;
+}
+.hub-watch-btn.watched {
+  border-color: rgba(0,255,255,0.2);
+  color: rgba(0,200,200,0.45);
+  cursor: default;
 }
 
 /* Quiz option buttons */

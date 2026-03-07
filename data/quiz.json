@@ -3,16 +3,16 @@
     "n8n": {
       "title": "N8N AI Automation Masterclass",
       "modules": [
-        "Introduction to N8N & Workflow Automation",
-        "Installing N8N (Local & Cloud)",
-        "Understanding Nodes & Connections",
-        "HTTP Request & REST API Nodes",
-        "Webhook Triggers & External Integrations",
-        "Conditional Logic (IF Node & Switch)",
-        "Loops, Split in Batches & Merge",
-        "Error Handling & Retry Logic",
-        "Building a Real-World Automation Project",
-        "Deploying N8N to Production"
+        {"title": "Introduction to N8N & Workflow Automation",   "video_url": ""},
+        {"title": "Installing N8N (Local & Cloud)",              "video_url": ""},
+        {"title": "Understanding Nodes & Connections",           "video_url": ""},
+        {"title": "HTTP Request & REST API Nodes",               "video_url": ""},
+        {"title": "Webhook Triggers & External Integrations",    "video_url": ""},
+        {"title": "Conditional Logic (IF Node & Switch)",        "video_url": ""},
+        {"title": "Loops, Split in Batches & Merge",             "video_url": ""},
+        {"title": "Error Handling & Retry Logic",                "video_url": ""},
+        {"title": "Building a Real-World Automation Project",    "video_url": ""},
+        {"title": "Deploying N8N to Production",                 "video_url": ""}
       ],
       "questions": [
         {
@@ -110,16 +110,16 @@
     "makecom": {
       "title": "Make.com Automation Professional",
       "modules": [
-        "Introduction to Make.com",
-        "Building Your First Scenario",
-        "Understanding Modules & Apps",
-        "Data Mapping & Variables",
-        "Routers, Filters & Conditions",
-        "Error Handling & Rollback",
-        "Webhooks & Custom API Calls",
-        "Google Sheets & Drive Integration",
-        "Building Multi-Step Automations",
-        "Scheduling & Deployment"
+        {"title": "Introduction to Make.com",           "video_url": ""},
+        {"title": "Building Your First Scenario",       "video_url": ""},
+        {"title": "Understanding Modules & Apps",       "video_url": ""},
+        {"title": "Data Mapping & Variables",           "video_url": ""},
+        {"title": "Routers, Filters & Conditions",      "video_url": ""},
+        {"title": "Error Handling & Rollback",          "video_url": ""},
+        {"title": "Webhooks & Custom API Calls",        "video_url": ""},
+        {"title": "Google Sheets & Drive Integration",  "video_url": ""},
+        {"title": "Building Multi-Step Automations",    "video_url": ""},
+        {"title": "Scheduling & Deployment",            "video_url": ""}
       ],
       "questions": [
         {
@@ -217,16 +217,16 @@
     "agentic": {
       "title": "Agentic AI & RAG Systems",
       "modules": [
-        "Introduction to Agentic AI",
-        "Understanding AI Agents & Tools",
-        "LangChain & LlamaIndex Fundamentals",
-        "Retrieval-Augmented Generation (RAG)",
-        "Vector Databases (Pinecone, Chroma)",
-        "Building a RAG Pipeline",
-        "Multi-Agent Orchestration",
-        "Memory & Context Management",
-        "Deploying AI Agents to Production",
-        "Evaluating & Monitoring Agents"
+        {"title": "Introduction to Agentic AI",                 "video_url": ""},
+        {"title": "Understanding AI Agents & Tools",            "video_url": ""},
+        {"title": "LangChain & LlamaIndex Fundamentals",        "video_url": ""},
+        {"title": "Retrieval-Augmented Generation (RAG)",       "video_url": ""},
+        {"title": "Vector Databases (Pinecone, Chroma)",        "video_url": ""},
+        {"title": "Building a RAG Pipeline",                    "video_url": ""},
+        {"title": "Multi-Agent Orchestration",                  "video_url": ""},
+        {"title": "Memory & Context Management",                "video_url": ""},
+        {"title": "Deploying AI Agents to Production",          "video_url": ""},
+        {"title": "Evaluating & Monitoring Agents",             "video_url": ""}
       ],
       "questions": [
         {
@@ -324,16 +324,16 @@
     "cloud": {
       "title": "Cloud Architecture (AWS/GCP/Azure)",
       "modules": [
-        "Cloud Computing Fundamentals",
-        "AWS Core Services (EC2, S3, IAM)",
-        "Lambda & Serverless Architecture",
-        "API Gateway & Microservices",
-        "Google Cloud Platform Overview",
-        "Azure Fundamentals & AD",
-        "Modal Serverless Deployment",
-        "Cost Optimization Strategies",
-        "Security & Compliance in Cloud",
-        "CI/CD & DevOps on Cloud"
+        {"title": "Cloud Computing Fundamentals",       "video_url": ""},
+        {"title": "AWS Core Services (EC2, S3, IAM)",   "video_url": ""},
+        {"title": "Lambda & Serverless Architecture",   "video_url": ""},
+        {"title": "API Gateway & Microservices",        "video_url": ""},
+        {"title": "Google Cloud Platform Overview",     "video_url": ""},
+        {"title": "Azure Fundamentals & AD",            "video_url": ""},
+        {"title": "Modal Serverless Deployment",        "video_url": ""},
+        {"title": "Cost Optimization Strategies",       "video_url": ""},
+        {"title": "Security & Compliance in Cloud",     "video_url": ""},
+        {"title": "CI/CD & DevOps on Cloud",            "video_url": ""}
       ],
       "questions": [
         {
@@ -431,16 +431,16 @@
     "network": {
       "title": "Network Engineering (CCNA Level)",
       "modules": [
-        "OSI Model & TCP/IP Fundamentals",
-        "IP Addressing & Subnetting",
-        "VLANs & Layer 2 Switching",
-        "Routing Protocols (OSPF & BGP)",
-        "Firewalls & Access Control Lists",
-        "SD-WAN Concepts",
-        "Zero Trust Security Model",
-        "Network Monitoring & Troubleshooting",
-        "Wireless Networking",
-        "CCNA Exam Preparation"
+        {"title": "OSI Model & TCP/IP Fundamentals",        "video_url": ""},
+        {"title": "IP Addressing & Subnetting",             "video_url": ""},
+        {"title": "VLANs & Layer 2 Switching",              "video_url": ""},
+        {"title": "Routing Protocols (OSPF & BGP)",         "video_url": ""},
+        {"title": "Firewalls & Access Control Lists",       "video_url": ""},
+        {"title": "SD-WAN Concepts",                        "video_url": ""},
+        {"title": "Zero Trust Security Model",              "video_url": ""},
+        {"title": "Network Monitoring & Troubleshooting",   "video_url": ""},
+        {"title": "Wireless Networking",                    "video_url": ""},
+        {"title": "CCNA Exam Preparation",                  "video_url": ""}
       ],
       "questions": [
         {
@@ -538,16 +538,16 @@
     "consulting": {
       "title": "AI Consulting Fundamentals",
       "modules": [
-        "Understanding AI Business Value",
-        "AI Readiness Assessment",
-        "Identifying Automation Opportunities",
-        "Building an AI Roadmap",
-        "ROI Calculation for AI Projects",
-        "Change Management & Adoption",
-        "AI Ethics & Responsible AI",
-        "Vendor Selection & Tool Evaluation",
-        "Presenting AI Solutions to Stakeholders",
-        "Building Long-Term AI Strategy"
+        {"title": "Understanding AI Business Value",            "video_url": ""},
+        {"title": "AI Readiness Assessment",                    "video_url": ""},
+        {"title": "Identifying Automation Opportunities",       "video_url": ""},
+        {"title": "Building an AI Roadmap",                     "video_url": ""},
+        {"title": "ROI Calculation for AI Projects",            "video_url": ""},
+        {"title": "Change Management & Adoption",               "video_url": ""},
+        {"title": "AI Ethics & Responsible AI",                 "video_url": ""},
+        {"title": "Vendor Selection & Tool Evaluation",         "video_url": ""},
+        {"title": "Presenting AI Solutions to Stakeholders",    "video_url": ""},
+        {"title": "Building Long-Term AI Strategy",             "video_url": ""}
       ],
       "questions": [
         {

@@ -1155,18 +1155,29 @@ RULES:
     if (el) el.style.display = 'block';
   }
 
+  let _hubVideoIdx = null;   // which module is being watched
+
   window.selectHubCourse = function(courseKey) {
     if (!hubData || !hubData[courseKey]) return;
     hubCurrentCourse = courseKey;
     const course = hubData[courseKey];
 
     const saved = JSON.parse(localStorage.getItem(`hub_prog_${courseKey}`) || '[]');
-    const moduleHTML = course.modules.map((m, i) => `
-      <label class="hub-mod-item${saved.includes(i) ? ' checked' : ''}">
-        <input type="checkbox" ${saved.includes(i) ? 'checked' : ''} onchange="hubToggleMod(${i},this.checked)">
-        <span class="hub-check-box"></span>
-        <span class="hub-mod-label">${m}</span>
-      </label>`).join('');
+    const moduleHTML = course.modules.map((m, i) => {
+      const title    = typeof m === 'string' ? m : m.title;
+      const videoUrl = typeof m === 'string' ? '' : (m.video_url || '');
+      const watched  = saved.includes(i);
+      const safetitle = title.replace(/'/g, "\\'");
+      return `
+        <div class="hub-mod-item${watched ? ' checked' : ''}" data-idx="${i}">
+          <span class="hub-check-box"></span>
+          <span class="hub-mod-label">${title}</span>
+          <button class="hub-watch-btn${watched ? ' watched' : ''}"
+                  onclick="openHubVideo(${i},'${videoUrl}','${safetitle}')">
+            ${watched ? '&#10003; Watched' : '&#9654; Watch'}
+          </button>
+        </div>`;
+    }).join('');
 
     document.getElementById('hub-course-title').textContent = course.title;
     document.getElementById('hub-module-list').innerHTML = moduleHTML;
@@ -1174,14 +1185,54 @@ RULES:
     _hubShowStep('learn');
   };
 
-  window.hubToggleMod = function(idx, checked) {
-    if (!hubCurrentCourse) return;
-    const key = `hub_prog_${hubCurrentCourse}`;
-    let saved = JSON.parse(localStorage.getItem(key) || '[]');
-    if (checked && !saved.includes(idx)) saved.push(idx);
-    if (!checked) saved = saved.filter(i => i !== idx);
+  // Open the video modal for a module
+  window.openHubVideo = function(idx, videoUrl, title) {
+    _hubVideoIdx = idx;
+    const modal   = document.getElementById('hub-video-modal');
+    const iframe  = document.getElementById('hub-video-iframe');
+    const noVideo = document.getElementById('hub-no-video');
+    const titleEl = document.getElementById('hub-video-title');
+
+    if (titleEl) titleEl.textContent = title;
+
+    if (videoUrl) {
+      // Append ?rel=0&modestbranding=1&enablejsapi=1 for clean embed
+      const src = videoUrl.includes('?') ? videoUrl + '&rel=0' : videoUrl + '?rel=0&modestbranding=1';
+      if (iframe)  { iframe.src = src; iframe.style.display = 'block'; }
+      if (noVideo) noVideo.style.display = 'none';
+    } else {
+      if (iframe)  { iframe.src = ''; iframe.style.display = 'none'; }
+      if (noVideo) noVideo.style.display = 'flex';
+    }
+
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.closeHubVideo = function() {
+    const modal  = document.getElementById('hub-video-modal');
+    const iframe = document.getElementById('hub-video-iframe');
+    if (iframe) iframe.src = '';   // stops video playback
+    if (modal)  modal.style.display = 'none';
+  };
+
+  // Mark current video's module as watched
+  window.markModuleWatched = function() {
+    if (_hubVideoIdx === null || !hubCurrentCourse) return;
+    const key  = `hub_prog_${hubCurrentCourse}`;
+    let saved  = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!saved.includes(_hubVideoIdx)) saved.push(_hubVideoIdx);
     localStorage.setItem(key, JSON.stringify(saved));
+
+    // Update the row in the list
+    const row = document.querySelector(`.hub-mod-item[data-idx="${_hubVideoIdx}"]`);
+    if (row) {
+      row.classList.add('checked');
+      const btn = row.querySelector('.hub-watch-btn');
+      if (btn) { btn.classList.add('watched'); btn.innerHTML = '&#10003; Watched'; }
+    }
+
     _hubUpdateProgress(hubCurrentCourse);
+    closeHubVideo();
   };
 
   function _hubUpdateProgress(courseKey) {
