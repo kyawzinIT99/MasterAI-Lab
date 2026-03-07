@@ -52,9 +52,11 @@ SITE_ROOT = Path(__file__).parent
 
 # ── Persistent Volume for live AI feed ────────────────────────────────────────
 feed_vol = modal.Volume.from_name("ai-feed-vol", create_if_missing=True)
-FEED_PATH  = "/feed/ai_industry_feed.json"
-SUBS_PATH  = "/feed/subscribers.json"
-FEED_MAX   = 30
+FEED_PATH        = "/feed/ai_industry_feed.json"
+SUBS_PATH        = "/feed/subscribers.json"
+QUIZ_CACHE_PATH  = "/feed/quiz_cache.json"   # shared question pool, generated once per course
+FEED_MAX         = 30
+QUIZ_CACHE_DAYS  = 7   # regenerate questions after this many days
 
 # Sources to scrape every 6 hours
 _FEED_SOURCES = [
@@ -531,7 +533,7 @@ STRICT RULES:
 
     @api.post("/api/quiz/questions")
     async def quiz_questions(request: Request):
-        import json, re
+        import json, random
         ip = request.client.host if request.client else "unknown"
         if not _check_rate_limit(f"quiz_{ip}", limit=5, window=3600):
             return JSONResponse({"error": "Too many quiz attempts. Try again later."}, status_code=429)
@@ -544,28 +546,48 @@ STRICT RULES:
         if course_key not in _COURSE_TOPICS:
             return JSONResponse({"error": "Invalid course"}, status_code=400)
 
+        # ── 1. Serve from Volume cache (generated once, shared across all users) ──
+        cache_file = Path(QUIZ_CACHE_PATH)
+        if cache_file.exists():
+            try:
+                cache = json.loads(cache_file.read_text())
+                entry = cache.get(course_key, {})
+                pool  = entry.get("questions", [])
+                if len(pool) >= 10:
+                    # Check cache age — regenerate after QUIZ_CACHE_DAYS
+                    generated_at = datetime.fromisoformat(entry.get("generated_at", "2000-01-01"))
+                    age_days = (datetime.utcnow() - generated_at).days
+                    if age_days < QUIZ_CACHE_DAYS:
+                        shuffled = random.sample(pool, 10)
+                        print(f"[Quiz Cache] HIT {course_key} (age {age_days}d) — served to {ip}")
+                        return JSONResponse({"questions": shuffled})
+                    print(f"[Quiz Cache] EXPIRED {course_key} (age {age_days}d) — regenerating")
+            except Exception as e:
+                print(f"[Quiz Cache] Read error: {e}")
+
+        # ── 2. Cache miss / expired — generate 15 questions via GPT-4o, store once ──
         openai_key = os.environ.get("OPENAI_API_KEY", "")
         if not openai_key:
             return JSONResponse({"error": "Not configured"}, status_code=500)
 
         topic = _COURSE_TOPICS[course_key]
         prompt = (
-            f"Generate exactly 10 multiple-choice quiz questions about: {topic}.\n\n"
+            f"Generate exactly 15 multiple-choice quiz questions about: {topic}.\n\n"
             "Requirements:\n"
             "- Intermediate to advanced difficulty — scenario-based, practical, NOT pure definition recall\n"
             "- Each question has exactly 4 options\n"
             "- Exactly one correct answer per question\n"
-            "- Questions must be unique and vary in topic coverage\n"
+            "- Questions must be unique and cover different sub-topics\n"
             "- Return ONLY a JSON array, no markdown, no extra text:\n"
             '[{"question":"...","options":["A","B","C","D"],"correct":0},...]\n'
             "correct is the 0-based index of the correct answer."
         )
         try:
-            async with httpx.AsyncClient(timeout=45) as client:
+            async with httpx.AsyncClient(timeout=60) as client:
                 resp = await client.post(
                     "https://api.openai.com/v1/chat/completions",
                     headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
-                    json={"model": "gpt-4o", "max_tokens": 2000, "temperature": 0.8,
+                    json={"model": "gpt-4o", "max_tokens": 3000, "temperature": 0.8,
                           "messages": [{"role": "user", "content": prompt}]},
                 )
             raw = resp.json()["choices"][0]["message"]["content"].strip()
@@ -573,18 +595,38 @@ STRICT RULES:
                 raw = raw.split("```")[1].strip()
                 if raw.startswith("json"): raw = raw[4:].strip()
             questions = json.loads(raw)
-            # Validate structure
             if not isinstance(questions, list) or len(questions) < 5:
                 raise ValueError("Bad response")
             clean = []
-            for q in questions[:10]:
+            for q in questions[:15]:
                 if isinstance(q.get("options"), list) and len(q["options"]) == 4 and isinstance(q.get("correct"), int):
                     clean.append({"question": str(q["question"])[:300],
                                   "options": [str(o)[:150] for o in q["options"]],
                                   "correct": max(0, min(3, q["correct"]))})
             if len(clean) < 5:
                 raise ValueError("Too few valid questions")
-            return JSONResponse({"questions": clean})
+
+            # Save pool to Volume — all future users served from here, no more GPT calls
+            cache_file.parent.mkdir(parents=True, exist_ok=True)
+            cache = {}
+            if cache_file.exists():
+                try:
+                    cache = json.loads(cache_file.read_text())
+                except Exception:
+                    cache = {}
+            cache[course_key] = {
+                "questions":    clean,
+                "generated_at": datetime.utcnow().isoformat(),
+                "count":        len(clean),
+            }
+            cache_file.write_text(json.dumps(cache, indent=2))
+            feed_vol.commit()
+            print(f"[Quiz Cache] GENERATED + CACHED {len(clean)} questions for {course_key}")
+
+            # Return 10 random from the new pool
+            shuffled = random.sample(clean, min(10, len(clean)))
+            return JSONResponse({"questions": shuffled})
+
         except Exception as e:
             print(f"[Quiz Gen] Failed for {course_key}: {e}")
             return JSONResponse({"error": "generation_failed"}, status_code=500)
