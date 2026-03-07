@@ -513,6 +513,24 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = html;
   }
 
+  // Maps free-course topic keywords → Learning Hub course keys
+  const _hubCourseMap = {
+    n8n:        ['n8n', 'n 8 n', 'workflow automation'],
+    makecom:    ['make.com', 'make com', 'integromat', 'make '],
+    agentic:    ['agentic', 'rag', 'llm', 'langchain', 'agent', 'gpt', 'openai', 'chatgpt', 'chatbot', 'nlp', 'generative', 'machine learning', 'deep learning', 'neural'],
+    cloud:      ['aws', 'gcp', 'azure', 'cloud', 'serverless', 'docker', 'kubernetes'],
+    network:    ['network', 'ccna', 'routing', 'switching', 'cisco', 'sd-wan', 'firewall'],
+    consulting: ['consulting', 'business ai', 'strategy', 'ai impact', 'ai for everyone'],
+  };
+
+  function _matchHubCourse(course) {
+    const haystack = (course.title + ' ' + (course.topics || []).join(' ')).toLowerCase();
+    for (const [key, keywords] of Object.entries(_hubCourseMap)) {
+      if (keywords.some(kw => haystack.includes(kw))) return key;
+    }
+    return 'agentic'; // default to Agentic AI as the closest general AI course
+  }
+
   function renderFreeCoursesSection(data, containerId, alignPercent) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -522,6 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="service-group-header">
         <div class="service-group-subtitle">Free Education</div>
         <h2 class="service-group-title">AI Course (Free)</h2>
+        <p style="font-size:0.75rem;color:rgba(0,255,255,0.55);margin-top:0.5rem;letter-spacing:0.04em;">Watch the free courses below, then test your knowledge and earn a certificate in the <button onclick="openLearningHub()" style="background:none;border:none;color:#00ffff;font-size:0.75rem;text-decoration:underline;cursor:pointer;padding:0;">Learning Hub &#8599;</button></p>
       </div>
     `;
 
@@ -533,6 +552,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
       pathObj.courses.forEach(course => {
+        const hubKey = _matchHubCourse(course);
         html += `
           <div class="service-card visible">
             <div class="service-card-header">
@@ -547,9 +567,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="service-card-topics" style="margin-top:1rem;">
               ${course.topics.map(t => `<span class="topic-pill">${t}</span>`).join('')}
             </div>
-            <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+            <div style="margin-top: 1rem; display: flex; gap: 0.8rem; flex-wrap:wrap;">
               <a href="${course.course_url}" target="_blank" class="service-card-cta" style="border-color:#00ff00; color:#00ff00;">Course Link ↗</a>
-              ${course.video_url ? `<a href="${course.video_url}" target="_blank" class="service-card-cta" style="border-color:#ffaa00; color:#ffaa00;">YouTube Playlist ↗</a>` : ''}
+              ${course.video_url ? `<a href="${course.video_url}" target="_blank" class="service-card-cta" style="border-color:#ffaa00; color:#ffaa00;">YouTube ↗</a>` : ''}
+              <button onclick="openLearningHub('${hubKey}')" class="service-card-cta" style="border-color:#00cccc; color:#00cccc; background:rgba(0,204,204,0.06); cursor:pointer;">Practice &amp; Get Cert &#8599;</button>
             </div>
           </div>
         `;
@@ -1128,28 +1149,39 @@ RULES:
   let hubCurrentCourse = null;
   let hubQuizState = {};
 
+  // Block wheel events from reaching Lenis when hub modal inner box is scrolled
+  const _hubInner = document.querySelector('#hub-modal > div');
+  if (_hubInner) {
+    _hubInner.addEventListener('wheel', e => e.stopPropagation(), { passive: true });
+  }
+
   // Load quiz data once
   fetch('/data/quiz.json')
     .then(r => r.json())
     .then(d => { hubData = d.courses; })
     .catch(() => {});
 
-  window.openLearningHub = function() {
+  window.openLearningHub = function(courseKey) {
     const modal = document.getElementById('hub-modal');
     if (!modal) return;
-    // Pause Lenis so wheel events reach the modal's native overflow-y scroll
+    // Stop Lenis so wheel events go to the modal's inner scrollable box
     if (lenis) lenis.stop();
     document.body.style.overflow = 'hidden';
     modal.style.display = 'flex';
-    modal.scrollTop = 0;
+    // Find inner scrollable box and reset its scroll, not the modal overlay
+    const inner = modal.querySelector('div');
+    if (inner) inner.scrollTop = 0;
     _hubShowStep('courses');
     _hubShowResumeBanner();
+    // If a specific course was requested (e.g. from free course card), go straight there
+    if (courseKey && hubData && hubData[courseKey]) {
+      selectHubCourse(courseKey);
+    }
   };
 
   window.closeHub = function() {
     const modal = document.getElementById('hub-modal');
     if (modal) modal.style.display = 'none';
-    // Restore Lenis / page scroll
     if (lenis) lenis.start();
     document.body.style.overflow = '';
   };
