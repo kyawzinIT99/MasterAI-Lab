@@ -384,64 +384,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render Free Courses at ~76%
       renderFreeCoursesSection(freeData, 'ai-free-course-container', 76);
 
-      // Render AI Pulse at ~83% — between Free Courses and Tools
-      const pulseRes = await fetch('/api/ai-feed');
-      const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 83);
-
-      // Auto-refresh AI Pulse every 60 minutes
-      const refreshMs = 60 * 60 * 1000;
-      setInterval(async () => {
-        try {
-          const r = await fetch('/api/ai-feed?t=' + Date.now());
-          const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 83);
-        } catch (e) {}
-      }, refreshMs);
-
       const toolsRes = await fetch('data/AI%20Training%20Tools.json');
       const toolsData = await toolsRes.json();
 
-      // Render Training Tools at ~90%
-      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 90);
+      // Render Training Tools at ~85%
+      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
 
-      // Render Portfolio at ~92%
+      // Render Portfolio at ~90%
       const portfolioRes = await fetch('data/portfolio.json');
       const portfolioData = await portfolioRes.json();
-      renderPortfolioSection(portfolioData, 'portfolio-container', 92);
-
-      // --- Scroll-driven opacity for dynamic sections (prevents overlap) ---
-      if (!isMobile) {
-        const sc = document.getElementById('scroll-container');
-        const fades = [
-          { id: 'ai-free-course-container',    enter: 73, leave: 81 },
-          { id: 'ai-pulse-container',           enter: 81, leave: 88 },
-          { id: 'ai-training-tools-container',  enter: 88, leave: 94 },
-          { id: 'portfolio-container',          enter: 91, leave: 97 },
-        ];
-        const fr = 1.5; // fade range in %
-        fades.forEach(({ id, enter, leave }) => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.style.opacity = '0';
-          ScrollTrigger.create({
-            trigger: sc,
-            start: "top top", end: "bottom bottom",
-            onUpdate: (self) => {
-              const p = self.progress * 100;
-              let op = 0;
-              if (p >= enter && p <= leave) {
-                op = 1;
-              } else if (p > enter - fr && p < enter) {
-                op = (p - (enter - fr)) / fr;
-              } else if (p > leave && p < leave + fr) {
-                op = 1 - (p - leave) / fr;
-              }
-              el.style.opacity = op;
-            }
-          });
-        });
-      }
+      renderPortfolioSection(portfolioData, 'portfolio-container', 90);
 
       // Setup reveal animations
       setupCardReveal();
@@ -639,74 +591,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     });
-
-    container.innerHTML = html;
-  }
-
-  function renderAIPulseSection(data, containerId, scrollPct) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!isMobile) {
-      container.style.top = `${scrollPct}%`;
-      container.style.transform = 'translateY(-50%)';
-    }
-
-    const updates = (data.updates || []).slice(0, (data.frontend_usage && data.frontend_usage.display_limit) || 10);
-    const updatedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Company type → accent color mapping
-    const typeColor = {
-      'AI Research': '#00ffff',
-      'AI Safety Research': '#a78bfa',
-      'AI Models': '#34d399',
-      'Open AI Models': '#34d399',
-      'Generative AI': '#f472b6',
-      'AI Infrastructure': '#fbbf24',
-      'AI Hardware': '#60a5fa',
-      'AI API': '#00ffff',
-      'AI Assistant': '#a78bfa',
-      'AI Model': '#00ffff',
-    };
-
-    let html = `
-      <div class="service-group-header">
-        <div class="service-group-subtitle">027 / Industry Intelligence</div>
-        <h2 class="service-group-title">AI Pulse</h2>
-        <div style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.12em; margin-top:-0.5rem; padding-left:5vw;">
-          Live feed · auto-refreshes every ${(data.frontend_usage && data.frontend_usage.auto_refresh_minutes) || 60}min · last loaded ${updatedAt}
-        </div>
-      </div>
-      <div style="padding:0 5vw 1.5rem;">
-    `;
-
-    updates.forEach(item => {
-      const accentColor = typeColor[item.category] || '#00ffff';
-      html += `
-        <a href="${item.official_link}" target="_blank" style="display:flex; justify-content:space-between; align-items:flex-start; gap:1.5rem; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.05); text-decoration:none;">
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem; flex-wrap:wrap;">
-              <span style="font-size:0.58rem; color:${accentColor}; text-transform:uppercase; letter-spacing:0.15em; border:1px solid ${accentColor}40; padding:0.1rem 0.45rem; border-radius:2px;">${item.company}</span>
-              <span style="font-size:0.58rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em;">${item.release_type}</span>
-            </div>
-            <div style="font-family:var(--font-display); font-size:0.9rem; font-weight:700; color:#fff; line-height:1.2; margin-bottom:0.25rem;">${item.title}</div>
-            <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.5;">${item.digest}</div>
-          </div>
-          <div style="text-align:right; flex-shrink:0; padding-top:0.1rem;">
-            <div style="font-size:0.58rem; color:var(--text-muted); margin-bottom:0.3rem; white-space:nowrap;">${item.date}</div>
-            <span style="font-size:0.62rem; color:${accentColor}; letter-spacing:0.05em;">Read ↗</span>
-          </div>
-        </a>
-      `;
-    });
-
-    html += `
-      </div>
-      <div style="padding:0.5rem 5vw 1rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
-        <span style="font-size:0.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-right:0.3rem;">Sources:</span>
-        ${(data.sources || []).map(s => `<span style="font-size:0.58rem; color:var(--text-muted); border:1px solid rgba(255,255,255,0.08); padding:0.1rem 0.45rem; border-radius:2px;">${s.company}</span>`).join('')}
-      </div>
-    `;
 
     container.innerHTML = html;
   }
