@@ -572,7 +572,7 @@ STRICT RULES:
 
         topic = _COURSE_TOPICS[course_key]
         prompt = (
-            f"Generate exactly 15 multiple-choice quiz questions about: {topic}.\n\n"
+            f"Generate exactly 20 multiple-choice quiz questions about: {topic}.\n\n"
             "Requirements:\n"
             "- Intermediate to advanced difficulty — scenario-based, practical, NOT pure definition recall\n"
             "- Each question has exactly 4 options\n"
@@ -587,7 +587,7 @@ STRICT RULES:
                 resp = await client.post(
                     "https://api.openai.com/v1/chat/completions",
                     headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
-                    json={"model": "gpt-4o", "max_tokens": 3000, "temperature": 0.8,
+                    json={"model": "gpt-4o", "max_tokens": 4000, "temperature": 0.8,
                           "messages": [{"role": "user", "content": prompt}]},
                 )
             raw = resp.json()["choices"][0]["message"]["content"].strip()
@@ -598,7 +598,7 @@ STRICT RULES:
             if not isinstance(questions, list) or len(questions) < 5:
                 raise ValueError("Bad response")
             clean = []
-            for q in questions[:15]:
+            for q in questions[:20]:
                 if isinstance(q.get("options"), list) and len(q["options"]) == 4 and isinstance(q.get("correct"), int):
                     clean.append({"question": str(q["question"])[:300],
                                   "options": [str(o)[:150] for o in q["options"]],
