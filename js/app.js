@@ -384,10 +384,17 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render Free Courses at ~76% scroll
       renderFreeCoursesSection(freeData, 'ai-free-course-container', 76);
 
-      // Render AI Pulse between Free Courses and Tools at ~80%
+      const toolsRes = await fetch('data/AI%20Training%20Tools.json');
+      const toolsData = await toolsRes.json();
+
+      // Render Training Tools at ~84% scroll (first clear zone after Docker section ends at 82%)
+      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 84);
+
+      // Render AI Pulse at ~88% — desktop: after Tools (83–92% is conflict-free zone)
+      // Mobile: HTML order places it between Free Courses and Tools naturally
       const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 80);
+      renderAIPulseSection(pulseData, 'ai-pulse-container', 88);
 
       // Auto-refresh AI Pulse every 60 minutes — picks up new scraper runs
       const refreshMs = 60 * 60 * 1000;
@@ -395,20 +402,14 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 80);
+          renderAIPulseSection(d, 'ai-pulse-container', 88);
         } catch (e) {}
       }, refreshMs);
 
-      const toolsRes = await fetch('data/AI%20Training%20Tools.json');
-      const toolsData = await toolsRes.json();
-
-      // Render Training Tools at ~84% scroll
-      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 84);
-
-      // Render Portfolio / Case Studies at ~90% scroll
+      // Render Portfolio / Case Studies at ~92% scroll
       const portfolioRes = await fetch('data/portfolio.json');
       const portfolioData = await portfolioRes.json();
-      renderPortfolioSection(portfolioData, 'portfolio-container', 90);
+      renderPortfolioSection(portfolioData, 'portfolio-container', 92);
 
       // Setup reveal animations
       setupCardReveal();
