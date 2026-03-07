@@ -76,18 +76,32 @@ Modal serverless infra:
   Secrets: openai-key, telegram-bot (BOT_TOKEN + CHAT_ID + WEBHOOK_SECRET), firecrawl
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  AI PULSE — AUTO SCRAPER (modal cron, zero human effort)        │
+│  AI PULSE — FULLY AUTOMATED (zero human effort)                 │
 │                                                                 │
-│  Every 6 hours → scrape_ai_feed()                              │
-│    ├── Firecrawl REST API → scrapes 8 AI company blogs          │
-│    ├── GPT-4o → extracts title + one-sentence digest            │
-│    ├── Deduplicates by title                                    │
-│    ├── Saves to Modal Volume ai-feed-vol                        │
-│    └── Auto-trims to 30 records (oldest deleted)               │
+│  SCHEDULING — Modal Cron @modal.cron("0 */6 * * *")            │
+│    └── scrape_ai_feed() fires every 6 hours automatically       │
+│         No server to manage, no cron tab, no human trigger      │
 │                                                                 │
-│  Website → GET /api/ai-feed                                     │
-│    └── Serves live JSON from volume, fallback to baked file     │
-│          └── Frontend auto-refreshes every 60 minutes           │
+│  UPDATING — Firecrawl REST API + GPT-4o                        │
+│    ├── Firecrawl scrapes 8 AI company blogs (OpenAI, Anthropic, │
+│    │   Google DeepMind, Meta AI, xAI, Mistral, Stability,       │
+│    │   HuggingFace, NVIDIA)                                     │
+│    ├── GPT-4o extracts: title + one-sentence digest per article │
+│    ├── Deduplicates by title (no repeat entries)                │
+│    └── Saves new records to Modal Volume ai-feed-vol (JSON)     │
+│                                                                 │
+│  DELETING — Auto-trim on every scrape run                       │
+│    └── If total records > 30 → oldest entries deleted first     │
+│         Feed always stays fresh, storage stays bounded          │
+│                                                                 │
+│  SERVING — FastAPI /api/ai-feed                                 │
+│    ├── Reads live JSON from Modal Volume ai-feed-vol            │
+│    ├── Fallback to baked file if volume empty                   │
+│    └── Frontend fetches on load + auto-refreshes every 60 min   │
+│                                                                 │
+│  DISPLAY — Website nav "AI Pulse" link                          │
+│    └── Jumps to section at 92% scroll (conflict-free zone)      │
+│         Shows: company badge · title · digest · date · Read ↗   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -106,8 +120,10 @@ Modal serverless infra:
 - [x] Testimonials section, Cloud Native section (`#cloud-section`)
 - [x] 5 testimonials total — 2 foreign company endorsements (Singapore, Bangkok) with "100% recommended"
 - [x] Training Tools section redesigned as compact 2-column grid (name + difficulty + download link only)
-- [x] AI Pulse section (027 / Industry Intelligence) at 91% scroll — live industry feed
+- [x] AI Pulse section (027 / Industry Intelligence) at 92% scroll — live industry feed, nav link in header
+- [x] AI Pulse nav link added to desktop nav + mobile nav (between AI Course(Free) and Tools)
 - [x] Portfolio / Case Studies at 88% scroll (`data/portfolio.json`)
+- [x] Scroll positions tuned: Portfolio 88%, AI Pulse 92%, Testimonials 95–97%, Contact 97–99% (no conflicts)
 
 ### Mobile
 - [x] Canvas hidden, Lenis disabled, frame downloads skipped (saves ~10MB)
@@ -133,6 +149,7 @@ Modal serverless infra:
 - [x] AI Pulse scraper — `scrape_ai_feed()` cron job every 6h (Firecrawl + GPT-4o)
 - [x] Modal Volume `ai-feed-vol` — persistent feed storage, served via `/api/ai-feed`
 - [x] Auto-delete oldest records when > 30 entries
+- [x] **AI Pulse — fully zero human effort:** scheduling + updating + deleting all automated (see concept below)
 
 ### AI Brain
 - [x] GPT-4o system prompt: IT Solutions MM identity, services, FAQ rules
