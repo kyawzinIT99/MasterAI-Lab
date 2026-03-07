@@ -1168,14 +1168,17 @@ RULES:
       const videoUrl = typeof m === 'string' ? '' : (m.video_url || '');
       const watched  = saved.includes(i);
       const safetitle = title.replace(/'/g, "\\'");
+      const watchBtn = videoUrl
+        ? `<button class="hub-watch-btn${watched ? ' watched' : ''}"
+                  onclick="openHubVideo(${i},'${videoUrl}','${safetitle}')">
+            ${watched ? '&#10003; Watched' : '&#9654; Watch'}
+           </button>`
+        : `<button class="hub-watch-btn" disabled style="opacity:0.3;cursor:default;pointer-events:none;">Coming Soon</button>`;
       return `
         <div class="hub-mod-item${watched ? ' checked' : ''}" data-idx="${i}">
           <span class="hub-check-box"></span>
           <span class="hub-mod-label">${title}</span>
-          <button class="hub-watch-btn${watched ? ' watched' : ''}"
-                  onclick="openHubVideo(${i},'${videoUrl}','${safetitle}')">
-            ${watched ? '&#10003; Watched' : '&#9654; Watch'}
-          </button>
+          ${watchBtn}
         </div>`;
     }).join('');
 
@@ -1195,14 +1198,17 @@ RULES:
 
     if (titleEl) titleEl.textContent = title;
 
+    const markArea = document.getElementById('hub-mark-btn-area');
     if (videoUrl) {
       // Append ?rel=0&modestbranding=1&enablejsapi=1 for clean embed
       const src = videoUrl.includes('?') ? videoUrl + '&rel=0' : videoUrl + '?rel=0&modestbranding=1';
-      if (iframe)  { iframe.src = src; iframe.style.display = 'block'; }
-      if (noVideo) noVideo.style.display = 'none';
+      if (iframe)   { iframe.src = src; iframe.style.display = 'block'; }
+      if (noVideo)  noVideo.style.display = 'none';
+      if (markArea) markArea.style.display = 'flex';
     } else {
-      if (iframe)  { iframe.src = ''; iframe.style.display = 'none'; }
-      if (noVideo) noVideo.style.display = 'flex';
+      if (iframe)   { iframe.src = ''; iframe.style.display = 'none'; }
+      if (noVideo)  noVideo.style.display = 'flex';
+      if (markArea) markArea.style.display = 'none';
     }
 
     if (modal) modal.style.display = 'flex';
