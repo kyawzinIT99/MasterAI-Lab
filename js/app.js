@@ -381,35 +381,67 @@ document.addEventListener("DOMContentLoaded", () => {
       const freeRes = await fetch('data/ai_learning_hub_dataset.json');
       const freeData = await freeRes.json();
 
-      // Render Free Courses at ~76% scroll
+      // Render Free Courses at ~76%
       renderFreeCoursesSection(freeData, 'ai-free-course-container', 76);
 
-      const toolsRes = await fetch('data/AI%20Training%20Tools.json');
-      const toolsData = await toolsRes.json();
-
-      // Render AI Pulse at 80% — between Free Courses (76%) and Tools (85%)
-      // FastAPI/Docker static sections moved to 57-62% to clear this zone
+      // Render AI Pulse at ~83% — between Free Courses and Tools
       const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 80);
+      renderAIPulseSection(pulseData, 'ai-pulse-container', 83);
 
-      // Auto-refresh AI Pulse every 60 minutes — picks up new scraper runs
+      // Auto-refresh AI Pulse every 60 minutes
       const refreshMs = 60 * 60 * 1000;
       setInterval(async () => {
         try {
           const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 80);
+          renderAIPulseSection(d, 'ai-pulse-container', 83);
         } catch (e) {}
       }, refreshMs);
 
-      // Render Training Tools at ~85% scroll
-      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
+      const toolsRes = await fetch('data/AI%20Training%20Tools.json');
+      const toolsData = await toolsRes.json();
 
-      // Render Portfolio / Case Studies at ~92% scroll
+      // Render Training Tools at ~90%
+      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 90);
+
+      // Render Portfolio at ~92%
       const portfolioRes = await fetch('data/portfolio.json');
       const portfolioData = await portfolioRes.json();
       renderPortfolioSection(portfolioData, 'portfolio-container', 92);
+
+      // --- Scroll-driven opacity for dynamic sections (prevents overlap) ---
+      if (!isMobile) {
+        const sc = document.getElementById('scroll-container');
+        const fades = [
+          { id: 'ai-free-course-container',    enter: 73, leave: 81 },
+          { id: 'ai-pulse-container',           enter: 81, leave: 88 },
+          { id: 'ai-training-tools-container',  enter: 88, leave: 94 },
+          { id: 'portfolio-container',          enter: 91, leave: 97 },
+        ];
+        const fr = 1.5; // fade range in %
+        fades.forEach(({ id, enter, leave }) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.opacity = '0';
+          ScrollTrigger.create({
+            trigger: sc,
+            start: "top top", end: "bottom bottom",
+            onUpdate: (self) => {
+              const p = self.progress * 100;
+              let op = 0;
+              if (p >= enter && p <= leave) {
+                op = 1;
+              } else if (p > enter - fr && p < enter) {
+                op = (p - (enter - fr)) / fr;
+              } else if (p > leave && p < leave + fr) {
+                op = 1 - (p - leave) / fr;
+              }
+              el.style.opacity = op;
+            }
+          });
+        });
+      }
 
       // Setup reveal animations
       setupCardReveal();
