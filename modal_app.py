@@ -553,12 +553,12 @@ STRICT RULES:
                 cache = json.loads(cache_file.read_text())
                 entry = cache.get(course_key, {})
                 pool  = entry.get("questions", [])
-                if len(pool) >= 10:
+                if len(pool) >= 15:
                     # Check cache age — regenerate after QUIZ_CACHE_DAYS
                     generated_at = datetime.fromisoformat(entry.get("generated_at", "2000-01-01"))
                     age_days = (datetime.utcnow() - generated_at).days
                     if age_days < QUIZ_CACHE_DAYS:
-                        shuffled = random.sample(pool, 10)
+                        shuffled = random.sample(pool, 15)
                         print(f"[Quiz Cache] HIT {course_key} (age {age_days}d) — served to {ip}")
                         return JSONResponse({"questions": shuffled})
                     print(f"[Quiz Cache] EXPIRED {course_key} (age {age_days}d) — regenerating")
@@ -623,8 +623,8 @@ STRICT RULES:
             feed_vol.commit()
             print(f"[Quiz Cache] GENERATED + CACHED {len(clean)} questions for {course_key}")
 
-            # Return 10 random from the new pool
-            shuffled = random.sample(clean, min(10, len(clean)))
+            # Return 15 random from the new pool
+            shuffled = random.sample(clean, min(15, len(clean)))
             return JSONResponse({"questions": shuffled})
 
         except Exception as e:
