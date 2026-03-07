@@ -553,6 +553,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       pathObj.courses.forEach(course => {
         const hubKey = _matchHubCourse(course);
+        const safeCourseUrl = (course.course_url || '').startsWith('http') ? course.course_url : '#';
+        const safeVideoUrl  = (course.video_url  || '').startsWith('http') ? course.video_url  : '';
         html += `
           <div class="service-card visible">
             <div class="service-card-header">
@@ -568,9 +570,9 @@ document.addEventListener("DOMContentLoaded", () => {
               ${course.topics.map(t => `<span class="topic-pill">${t}</span>`).join('')}
             </div>
             <div style="margin-top: 1rem; display: flex; gap: 0.8rem; flex-wrap:wrap;">
-              <a href="${course.course_url}" target="_blank" class="service-card-cta" style="border-color:#00ff00; color:#00ff00;">Course Link ↗</a>
-              ${course.video_url ? `<a href="${course.video_url}" target="_blank" class="service-card-cta" style="border-color:#ffaa00; color:#ffaa00;">YouTube ↗</a>` : ''}
-              <button onclick="openLearningHub('${hubKey}')" class="service-card-cta" style="border-color:#00cccc; color:#00cccc; background:rgba(0,204,204,0.06); cursor:pointer;">Practice &amp; Get Cert &#8599;</button>
+              <a href="${safeCourseUrl}" target="_blank" class="service-card-cta" style="border-color:#00ff00; color:#00ff00;">Course Link ↗</a>
+              ${safeVideoUrl ? `<a href="${safeVideoUrl}" target="_blank" class="service-card-cta" style="border-color:#ffaa00; color:#ffaa00;">YouTube ↗</a>` : ''}
+              <button onclick="openLearningHub('${hubKey}', true)" class="service-card-cta" style="border-color:#00cccc; color:#00cccc; background:rgba(0,204,204,0.06); cursor:pointer;">Practice &amp; Get Cert &#8599;</button>
             </div>
           </div>
         `;
@@ -681,18 +683,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     allUpdates.forEach(item => {
       const accentColor = typeColor[item.category] || '#00ffff';
+      const safeCompany = escapeHtml(item.company || '');
+      const safeType    = escapeHtml(item.release_type || 'Update');
+      const safeTitle   = escapeHtml(item.title || '');
+      const safeDigest  = escapeHtml(item.digest || '');
+      const safeDate    = escapeHtml(item.date || '');
+      const safeLink    = (item.official_link || '').startsWith('http') ? item.official_link : '#';
       html += `
-        <a href="${item.official_link}" target="_blank" data-company="${item.company}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;">
+        <a href="${safeLink}" target="_blank" data-company="${safeCompany}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;">
           <div style="flex:1;">
             <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;flex-wrap:wrap;">
-              <span style="font-size:0.58rem;color:${accentColor};text-transform:uppercase;letter-spacing:0.15em;border:1px solid ${accentColor}40;padding:0.1rem 0.45rem;border-radius:2px;">${item.company}</span>
-              <span style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">${item.release_type}</span>
+              <span style="font-size:0.58rem;color:${accentColor};text-transform:uppercase;letter-spacing:0.15em;border:1px solid ${accentColor}40;padding:0.1rem 0.45rem;border-radius:2px;">${safeCompany}</span>
+              <span style="font-size:0.58rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">${safeType}</span>
             </div>
-            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:700;color:#fff;line-height:1.2;margin-bottom:0.25rem;">${item.title}</div>
-            <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;">${item.digest}</div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:700;color:#fff;line-height:1.2;margin-bottom:0.25rem;">${safeTitle}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;">${safeDigest}</div>
           </div>
           <div style="text-align:right;flex-shrink:0;padding-top:0.1rem;">
-            <div style="font-size:0.58rem;color:var(--text-muted);margin-bottom:0.3rem;white-space:nowrap;">${item.date}</div>
+            <div style="font-size:0.58rem;color:var(--text-muted);margin-bottom:0.3rem;white-space:nowrap;">${safeDate}</div>
             <span style="font-size:0.62rem;color:${accentColor};letter-spacing:0.05em;">Read ↗</span>
           </div>
         </a>
@@ -911,55 +919,69 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById('send-btn');
   const chatMessages = document.getElementById('chat-messages');
 
-  let aiGlobalContext = `You are the AI Brain of MR. KYAW ZIN TUN — an expert in AI Automation, N8N, Make.com, Python, Cloud (AWS/GCP/Azure/Modal), and Network Engineering based in Myanmar.
+  let aiGlobalContext = `You are the AI assistant of IT Solutions MM, representing MR. KYAW ZIN TUN.
 
-IDENTITY: You represent IT Solutions MM and the AI Automation Society (https://www.skool.com/ai-automation-society).
+IDENTITY: IT Solutions MM provides free AI automation courses and certified training in N8N, Make.com, Agentic AI, Cloud, Network Engineering, and AI Business Consulting — based in Myanmar.
 
-CONTACT METHODS (only share when user asks how to reach us, requests human assistance, asks about enrollment, or asks about pricing):
+CONTACT (share ONLY when user explicitly asks to contact, enroll, or asks about pricing):
 - Telegram: @MaterAITraining_bot
 - WhatsApp: https://wa.me/66949567820
 - Email: itsolutions.mm@gmail.com
 
-SERVICES OFFERED:
-- AI Automation Training (N8N, Make.com, Zapier, Agentic AI, RAG)
-- Cloud Architecture (AWS, GCP, Azure, Modal serverless)
-- Network Engineering (BGP, OSPF, SD-WAN, Zero Trust, CCNA-level)
-- AI Consulting for businesses in Myanmar and Southeast Asia
+STRICT RULES — follow exactly:
+1. ONLY answer using information from the KNOWLEDGE BASE below. Do NOT invent facts, courses, prices, timelines, or features not listed.
+2. If the answer is not in the knowledge base, respond with exactly: "I don't have specific details on that — contact us at @MaterAITraining_bot or itsolutions.mm@gmail.com for help."
+3. Keep every answer to 2-3 sentences maximum. Be direct. No padding.
+4. If asked ANYTHING unrelated to AI, tech, automation, cloud, or network — say exactly: "I only assist with AI and automation topics."
+5. NEVER say you "can" do something the platform doesn't offer. Never make up module content or course schedules.
+6. LANGUAGE: Reply in the same language the user writes. Burmese script → reply in Burmese. English → reply in English.
 
-RULES:
-1. Keep answers to 2-3 sentences maximum to save API cost.
-2. ONLY share contact details (Telegram/WhatsApp/Email) when the user explicitly asks how to contact us, requests human assistance, asks about pricing, or asks to enroll. Do NOT include contact info in every reply.
-3. When sharing contact, list all three: Telegram @MaterAITraining_bot, WhatsApp wa.me/66949567820, and Email itsolutions.mm@gmail.com.
-4. If asked ANYTHING unrelated to AI, tech, coding, automation, or cloud — decline in exactly one sentence: "I only assist with AI and automation topics."
-5. Be friendly, confident, and professional.
-6. LANGUAGE: Detect the user's language automatically. If the user writes in Burmese (Myanmar script), reply entirely in Burmese. If in English, reply in English. Always match the user's language.
-
---- PLATFORM KNOWLEDGE BASE ---
+--- KNOWLEDGE BASE ---
 
 `;
 
-  // Pre-fetch local datasets to feed into AI Brain
+  // Local FAQ store for zero-API-cost matching
+  let _localFaqs = [];
+
+  // Pre-fetch local datasets to feed into AI Brain context + local matcher
   Promise.all([
     fetch('data/ai-brain/faq_dataset.json').then(r => r.json()),
     fetch('data/ai-brain/courses.json').then(r => r.json()),
-    fetch('data/ai-brain/installation.json').then(r => r.json()),
-    fetch('data/ai-brain/troubleshooting.json').then(r => r.json())
-  ]).then(([faqs, courses, installs, troubles]) => {
+    fetch('data/ai-brain/troubleshooting.json').then(r => r.json()),
+    fetch('data/ai-brain/automation_templates.json').then(r => r.json())
+  ]).then(([faqs, courses, troubles, templates]) => {
+    _localFaqs = faqs;  // store for local matching
 
-    aiGlobalContext += "FAQ:\n";
-    faqs.forEach(f => { aiGlobalContext += `Q: ${f.question} - A: ${f.answer}\n`; });
+    aiGlobalContext += "FREQUENTLY ASKED QUESTIONS:\n";
+    faqs.forEach(f => { aiGlobalContext += `Q: ${f.question}\nA: ${f.answer}\n\n`; });
 
-    aiGlobalContext += "\nCOURSES:\n";
-    courses.forEach(c => { aiGlobalContext += `- ${c.title} (${c.level}): Modules include ${c.modules.join(', ')}\n`; });
-
-    aiGlobalContext += "\nINSTALLATION GUIDES:\n";
-    installs.forEach(i => { aiGlobalContext += `- ${i.tool} Download: ${i.download} Steps: ${i.steps.join(' -> ')}\n`; });
+    aiGlobalContext += "COURSES OFFERED:\n";
+    courses.forEach(c => {
+      aiGlobalContext += `- ${c.title} (${c.level}): ${c.modules.join(', ')}. Outcome: ${c.outcome}\n`;
+    });
 
     aiGlobalContext += "\nTROUBLESHOOTING:\n";
-    troubles.forEach(t => { aiGlobalContext += `- If ${t.problem}, then ${t.solution}\n`; });
+    troubles.forEach(t => { aiGlobalContext += `- Problem: ${t.problem} → Solution: ${t.solution}\n`; });
 
-    console.log("AI Brain local context loaded successfully.");
-  }).catch(err => console.error("Failed to load AI brain datasets:", err));
+    aiGlobalContext += "\nAUTOMATION WORKFLOW EXAMPLES:\n";
+    templates.forEach(t => { aiGlobalContext += `- ${t.name} (${t.platform}): ${t.description}\n`; });
+
+    console.log("AI Brain loaded.");
+  }).catch(err => console.error("AI Brain load error:", err));
+
+  // Match user query against local FAQ — returns answer string or null
+  function _matchLocalFaq(query) {
+    if (!_localFaqs.length) return null;
+    const q = query.toLowerCase().replace(/[^\w\s]/g, ' ');
+    const words = q.split(/\s+/).filter(w => w.length > 3);
+    let best = null, bestScore = 0;
+    _localFaqs.forEach(entry => {
+      const eq = entry.question.toLowerCase().replace(/[^\w\s]/g, ' ');
+      const score = words.filter(w => eq.includes(w)).length;
+      if (score >= 2 && score > bestScore) { bestScore = score; best = entry; }
+    });
+    return best ? best.answer : null;
+  }
 
   // Add clear history button to chat header
   const clearBtn = document.createElement('button');
@@ -1097,17 +1119,26 @@ RULES:
     chatMessages.scrollTop = chatMessages.scrollHeight;
     const bubble = aiMsgElem.querySelector('.msg-bubble');
 
-    // --- 1. Check Local Cache First ---
-    const cacheKey = `ai_cache_${text.toLowerCase()}`;
+    // --- 1. Check Local Cache ---
+    const cacheKey = `ai_cache_${text.toLowerCase().trim()}`;
     const cachedResponse = localStorage.getItem(cacheKey);
-
     if (cachedResponse) {
-      // Cached value is already escaped+processed HTML from a prior API call
-      setTimeout(() => { bubble.innerHTML = cachedResponse; }, 500);
+      setTimeout(() => { bubble.innerHTML = cachedResponse; }, 300);
       return;
     }
 
-    // --- 2. Call server-side proxy (keeps OpenAI key off the client) ---
+    // --- 2. Local FAQ Match (zero API cost) ---
+    const localAnswer = _matchLocalFaq(text);
+    if (localAnswer) {
+      const rendered = escapeHtml(localAnswer).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      setTimeout(() => {
+        bubble.innerHTML = rendered;
+        localStorage.setItem(cacheKey, rendered);
+      }, 400);
+      return;
+    }
+
+    // --- 3. Call server-side proxy (keeps OpenAI key off the client) ---
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -1161,7 +1192,7 @@ RULES:
     .then(d => { hubData = d.courses; })
     .catch(() => {});
 
-  window.openLearningHub = function(courseKey) {
+  window.openLearningHub = function(courseKey, goToQuiz) {
     const modal = document.getElementById('hub-modal');
     if (!modal) return;
     // Stop Lenis so wheel events go to the modal's inner scrollable box
@@ -1173,9 +1204,16 @@ RULES:
     if (inner) inner.scrollTop = 0;
     _hubShowStep('courses');
     _hubShowResumeBanner();
-    // If a specific course was requested (e.g. from free course card), go straight there
     if (courseKey && hubData && hubData[courseKey]) {
-      selectHubCourse(courseKey);
+      hubCurrentCourse = courseKey;
+      localStorage.setItem('hub_last_course', courseKey);
+      _quizAutoOpened = false;
+      if (goToQuiz) {
+        // "Practice & Get Cert" path — skip module gate, go straight to quiz
+        startHubQuiz();
+      } else {
+        selectHubCourse(courseKey);
+      }
     }
   };
 
@@ -1230,7 +1268,7 @@ RULES:
     if (!hubData || !hubData[courseKey]) return;
     hubCurrentCourse = courseKey;
     localStorage.setItem('hub_last_course', courseKey);
-    _quizAutoOpened = false;  // reset so quiz can auto-open once user reaches 75%
+    _quizAutoOpened = false;  // reset so quiz can auto-open once user reaches 50%
     const course = hubData[courseKey];
 
     const saved = JSON.parse(localStorage.getItem(`hub_prog_${courseKey}`) || '[]');
@@ -1238,13 +1276,17 @@ RULES:
       const title    = typeof m === 'string' ? m : m.title;
       const videoUrl = typeof m === 'string' ? '' : (m.video_url || '');
       const watched  = saved.includes(i);
-      const safetitle = title.replace(/'/g, "\\'");
+      // Use JSON.stringify for safe JS-in-HTML-attribute encoding
+      const safeUrlJson   = JSON.stringify(videoUrl);
+      const safeTitleJson = JSON.stringify(title);
       const watchBtn = videoUrl
         ? `<button class="hub-watch-btn${watched ? ' watched' : ''}"
-                  onclick="openHubVideo(${i},'${videoUrl}','${safetitle}')">
+                  onclick="openHubVideo(${i},${safeUrlJson},${safeTitleJson})">
             ${watched ? '&#10003; Watched' : '&#9654; Watch'}
            </button>`
-        : `<button class="hub-watch-btn" disabled style="opacity:0.3;cursor:default;pointer-events:none;">Coming Soon</button>`;
+        : watched
+          ? `<button class="hub-watch-btn watched" onclick="markModuleReviewed(${i})">&#10003; Reviewed</button>`
+          : `<button class="hub-watch-btn" onclick="markModuleReviewed(${i})">&#10003; Mark Reviewed</button>`;
       return `
         <div class="hub-mod-item${watched ? ' checked' : ''}" data-idx="${i}">
           <span class="hub-check-box"></span>
@@ -1312,6 +1354,22 @@ RULES:
     closeHubVideo();
   };
 
+  // Mark a no-video module as reviewed directly in the list (no modal needed)
+  window.markModuleReviewed = function(idx) {
+    if (!hubCurrentCourse) return;
+    const key  = `hub_prog_${hubCurrentCourse}`;
+    let saved  = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!saved.includes(idx)) saved.push(idx);
+    localStorage.setItem(key, JSON.stringify(saved));
+    const row = document.querySelector(`.hub-mod-item[data-idx="${idx}"]`);
+    if (row) {
+      row.classList.add('checked');
+      const btn = row.querySelector('.hub-watch-btn');
+      if (btn) { btn.classList.add('watched'); btn.innerHTML = '&#10003; Reviewed'; btn.onclick = null; }
+    }
+    _hubUpdateProgress(hubCurrentCourse);
+  };
+
   let _quizAutoOpened = false;  // prevent repeated auto-open within same session
 
   function _hubUpdateProgress(courseKey) {
@@ -1327,17 +1385,17 @@ RULES:
     if (pctEl) pctEl.textContent  = pct + '%';
     if (barEl) barEl.style.width  = pct + '%';
 
-    const locked = pct < 75;
+    const locked = pct < 50;
     if (quizBtn) {
       quizBtn.disabled      = locked;
       quizBtn.style.opacity = locked ? '0.35' : '1';
       quizBtn.style.cursor  = locked ? 'not-allowed' : 'pointer';
       quizBtn.title = locked
-        ? `Complete at least 75% of modules to unlock the quiz (${pct}% done)`
+        ? `Complete at least 50% of modules to unlock the quiz (${pct}% done)`
         : 'Start the quiz';
     }
 
-    // Auto-open quiz when user crosses 75% threshold for the first time
+    // Auto-open quiz when user crosses 50% threshold for the first time
     if (!locked && !_quizAutoOpened) {
       _quizAutoOpened = true;
       if (quizBtn) {
@@ -1354,21 +1412,56 @@ RULES:
     }
   }
 
-  window.startHubQuiz = function() {
-    if (!hubData || !hubCurrentCourse) return;
-    // Shuffle full bank (15 questions) and pick 10 — different every attempt
-    const allQ = hubData[hubCurrentCourse].questions.slice();
-    for (let i = allQ.length - 1; i > 0; i--) {
+  function _shuffleAndPick(arr, n) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [allQ[i], allQ[j]] = [allQ[j], allQ[i]];
+      [a[i], a[j]] = [a[j], a[i]];
     }
-    hubQuizState = {
-      currentQ:  0,
-      answers:   [],
-      questions: allQ.slice(0, 10)   // 10 random questions each session
-    };
-    _hubRenderQuestion();
+    return a.slice(0, n);
+  }
+
+  window.startHubQuiz = async function() {
+    if (!hubCurrentCourse) return;
     _hubShowStep('quiz');
+
+    // Show loading state while fetching dynamic questions
+    const qnum  = document.getElementById('hub-q-num');
+    const qtext = document.getElementById('hub-q-text');
+    const qopts = document.getElementById('hub-q-options');
+    if (qnum)  qnum.textContent  = 'Loading questions…';
+    if (qtext) qtext.textContent = 'AI is generating fresh questions for you…';
+    if (qopts) qopts.innerHTML   = '';
+
+    let questions = null;
+
+    // 1. Try dynamic AI-generated questions
+    try {
+      const resp = await fetch('/api/quiz/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ course_key: hubCurrentCourse })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.questions && data.questions.length >= 5) {
+          questions = data.questions;
+        }
+      }
+    } catch(e) { /* fallback below */ }
+
+    // 2. Fallback: shuffle static bank from quiz.json
+    if (!questions && hubData && hubData[hubCurrentCourse]) {
+      questions = _shuffleAndPick(hubData[hubCurrentCourse].questions, 10);
+    }
+
+    if (!questions || !questions.length) {
+      if (qtext) qtext.textContent = 'Could not load questions. Please try again.';
+      return;
+    }
+
+    hubQuizState = { currentQ: 0, answers: [], questions };
+    _hubRenderQuestion();
   };
 
   function _hubRenderQuestion() {
@@ -1377,7 +1470,7 @@ RULES:
 
     const q = questions[currentQ];
     const optHTML = q.options.map((opt, i) =>
-      `<button class="hub-opt-btn" onclick="hubSelectAnswer(${i})">${opt}</button>`
+      `<button class="hub-opt-btn" onclick="hubSelectAnswer(${i})">${escapeHtml(String(opt))}</button>`
     ).join('');
 
     const qnum  = document.getElementById('hub-q-num');
@@ -1410,16 +1503,13 @@ RULES:
 
   function _hubFinishQuiz() {
     const { answers, questions } = hubQuizState;
-    const correct     = answers.filter(a => a.selected === a.correct).length;
-    const quizPct     = Math.round((correct / questions.length) * 100);
-    const course      = hubData[hubCurrentCourse];
-    const saved       = JSON.parse(localStorage.getItem(`hub_prog_${hubCurrentCourse}`) || '[]');
-    const learningPct = Math.round((saved.length / course.modules.length) * 100);
-    const finalScore  = Math.round((learningPct * 0.75) + (quizPct * 0.25));
-    const passed      = finalScore >= 70;
+    const correct    = answers.filter(a => a.selected === a.correct).length;
+    const quizPct    = Math.round((correct / questions.length) * 100);
+    const course     = hubData[hubCurrentCourse];
+    const passed     = quizPct >= 75;
 
-    document.getElementById('hub-res-score').textContent    = finalScore + '%';
-    document.getElementById('hub-res-learning').textContent = learningPct + '%';
+    document.getElementById('hub-res-score').textContent    = quizPct + '%';
+    document.getElementById('hub-res-learning').textContent = correct + '/' + questions.length + ' correct';
     document.getElementById('hub-res-quiz').textContent     = quizPct + '%';
     document.getElementById('hub-res-course').textContent   = course.title;
 
@@ -1427,15 +1517,18 @@ RULES:
     if (statusEl) {
       statusEl.textContent = passed
         ? 'Congratulations! You passed. Your certificate is ready below.'
-        : `Keep going — you need 70% to pass. Current score: ${finalScore}%. Retake the quiz anytime.`;
+        : `You need 75% to pass. Your score: ${quizPct}%. Retake the quiz anytime.`;
       statusEl.style.color = passed ? '#00ffff' : '#ff8c42';
     }
 
     const certSection = document.getElementById('hub-cert-section');
-    if (certSection) certSection.style.display = passed ? 'block' : 'none';
+    if (certSection) {
+      certSection.style.display = passed ? 'block' : 'none';
+      if (passed) setTimeout(() => certSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    }
 
     window._hubCertPayload = {
-      learningPct, quizPct, finalScore,
+      quizPct, finalScore: quizPct,
       course: course.title, courseKey: hubCurrentCourse
     };
     _hubShowStep('results');
@@ -1490,7 +1583,7 @@ RULES:
       doc.text(d.course, W/2, 136, { align: 'center' });
 
       doc.setTextColor(0, 200, 200); doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-      doc.text(`Score: ${d.finalScore}%  (Learning: ${d.learningPct}%  |  Quiz: ${d.quizPct}%)`, W/2, 150, { align: 'center' });
+      doc.text(`Quiz Score: ${d.finalScore}%`, W/2, 150, { align: 'center' });
 
       const ds = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       doc.setTextColor(120, 120, 150); doc.setFontSize(9);
@@ -1517,7 +1610,7 @@ RULES:
           course:         d.course,
           course_key:     d.courseKey,
           score:          d.finalScore,
-          learning_score: d.learningPct,
+          learning_score: d.quizPct,
           quiz_score:     d.quizPct
         })
       });

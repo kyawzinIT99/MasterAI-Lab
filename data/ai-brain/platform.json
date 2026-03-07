@@ -1,82 +1,41 @@
 {
   "platform": {
-    "name": "Antigravity AI Automation Training",
-    "founder": "Mr. Kyaw Zin Tun",
-    "version": "2.0",
-    "mission": "Teach AI automation, coding, and cloud systems through a guided AI assistant.",
-    "languages_supported": [
-      "English",
-      "Burmese"
-    ]
+    "name": "IT Solutions MM",
+    "founder": "MR. KYAW ZIN TUN",
+    "email": "itsolutions.mm@gmail.com",
+    "website": "https://itsolutions-mm--main-web.modal.run",
+    "telegram_bot": "@MaterAITraining_bot",
+    "whatsapp": "+66949567820",
+    "mission": "Provide free AI automation training and certified courses to learners in Myanmar and Southeast Asia.",
+    "languages_supported": ["English", "Burmese"]
   },
   "assistant_policy": {
     "allowed_topics": [
-      "AI training",
-      "AI coding",
-      "automation workflows",
-      "prompt engineering",
-      "cloud deployment",
-      "network automation",
-      "AI tool installation"
+      "IT Solutions MM courses and services",
+      "N8N workflow automation",
+      "Make.com automation",
+      "Agentic AI and AI agents",
+      "Cloud deployment (AWS, GCP, Azure, Modal)",
+      "Network engineering",
+      "AI business consulting",
+      "Prompt engineering",
+      "OpenAI API usage",
+      "Python for automation",
+      "Troubleshooting automation tools"
     ],
     "blocked_topics": [
       "politics",
       "religion",
       "medical advice",
-      "financial speculation"
+      "financial speculation",
+      "anything unrelated to AI, tech, automation, or cloud"
     ],
-    "response_style": "educational"
+    "hallucination_policy": "NEVER invent information not in the knowledge base. If unsure, redirect to contact.",
+    "response_style": "concise, educational, max 3 sentences"
   },
-  "subscription_control": {
-    "plans": {
-      "free": {
-        "daily_questions": 40,
-        "api_access": "limited",
-        "features": [
-          "Beginner AI courses",
-          "Tool installation guides",
-          "Basic troubleshooting"
-        ]
-      },
-      "pro": {
-        "price_usd": 9,
-        "daily_questions": 300,
-        "api_access": "priority",
-        "features": [
-          "Advanced AI courses",
-          "Automation workflow library",
-          "AI troubleshooting assistant"
-        ]
-      },
-      "enterprise": {
-        "price_usd": 49,
-        "daily_questions": "unlimited",
-        "api_access": "full",
-        "features": [
-          "Enterprise automation training",
-          "API integration labs",
-          "Private support"
-        ]
-      }
-    }
-  },
-  "api_usage_control": {
-    "strategy": "local_first",
-    "call_api_if": [
-      "complex programming question",
-      "unknown question",
-      "advanced explanation"
-    ],
-    "daily_budget_usd": 5,
-    "max_tokens": 300,
-    "cache_enabled": true
-  },
-  "response_engine": {
-    "logic": [
-      "Detect intent",
-      "Search local dataset",
-      "Return answer if found",
-      "If not found call AI API"
-    ]
+  "contact": {
+    "telegram": "@MaterAITraining_bot",
+    "whatsapp": "https://wa.me/66949567820",
+    "email": "itsolutions.mm@gmail.com"
   }
 }

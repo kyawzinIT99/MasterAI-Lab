@@ -15,631 +15,241 @@
         {"title": "Deploying N8N to Production",                 "video_url": ""}
       ],
       "questions": [
-        {
-          "id": 1,
-          "question": "What is N8N primarily used for?",
-          "options": ["Database management", "Workflow automation", "Video editing", "Web hosting"],
-          "correct": 1
-        },
-        {
-          "id": 2,
-          "question": "Which trigger type starts a workflow when an external system sends data?",
-          "options": ["Schedule trigger", "Manual trigger", "Webhook trigger", "Cron trigger"],
-          "correct": 2
-        },
-        {
-          "id": 3,
-          "question": "What data format do most N8N nodes use internally?",
-          "options": ["XML", "CSV", "JSON", "YAML"],
-          "correct": 2
-        },
-        {
-          "id": 4,
-          "question": "What is a 'node' in N8N?",
-          "options": ["A server", "A single step or action in a workflow", "A database table", "A user account"],
-          "correct": 1
-        },
-        {
-          "id": 5,
-          "question": "Which node is used to make HTTP API calls in N8N?",
-          "options": ["API Node", "HTTP Request Node", "REST Node", "Fetch Node"],
-          "correct": 1
-        },
-        {
-          "id": 6,
-          "question": "What does the IF node do in N8N?",
-          "options": ["Sends emails", "Routes data based on conditions", "Stores data", "Loops through items"],
-          "correct": 1
-        },
-        {
-          "id": 7,
-          "question": "How do you handle errors gracefully in N8N workflows?",
-          "options": ["Delete the workflow", "Use the Error Trigger node", "Ignore all errors", "Restart N8N"],
-          "correct": 1
-        },
-        {
-          "id": 8,
-          "question": "What does 'Split in Batches' node do?",
-          "options": ["Splits the screen", "Processes large data sets in smaller chunks", "Deletes data", "Merges workflows"],
-          "correct": 1
-        },
-        {
-          "id": 9,
-          "question": "What is the correct N8N expression syntax to access a JSON field from the previous node?",
-          "options": ["$data.fieldName", "{{ $json.fieldName }}", "[node.output.field]", "get('fieldName')"],
-          "correct": 1
-        },
-        {
-          "id": 10,
-          "question": "What does the 'Merge' node do in N8N?",
-          "options": ["Deletes duplicate records", "Combines data streams from multiple branches into one", "Sends merged emails", "Creates a database merge"],
-          "correct": 1
-        },
-        {
-          "id": 11,
-          "question": "Where are API credentials (API keys, OAuth tokens) stored securely in N8N?",
-          "options": ["Inside each node configuration", "In the Credentials section, encrypted", "In a .env file on disk", "In the browser localStorage"],
-          "correct": 1
-        },
-        {
-          "id": 12,
-          "question": "What is the 'Code' node in N8N used for?",
-          "options": ["Displaying code snippets", "Writing and executing custom JavaScript logic inside a workflow", "Connecting to GitHub", "Formatting JSON output"],
-          "correct": 1
-        },
-        {
-          "id": 13,
-          "question": "Which N8N node would you use to pause execution until a specific time?",
-          "options": ["Delay Node", "Wait Node", "Timer Node", "Pause Node"],
-          "correct": 1
-        },
-        {
-          "id": 14,
-          "question": "What is the main advantage of self-hosted N8N over N8N Cloud?",
-          "options": ["More integrations available", "Full data privacy and control over infrastructure", "Faster execution speed", "Free forever with no limits"],
-          "correct": 1
-        },
-        {
-          "id": 15,
-          "question": "In N8N, what does 'pinning' data to a node allow you to do?",
-          "options": ["Lock the node from editing", "Test the workflow using fixed sample data without re-triggering", "Share the node publicly", "Copy the node to another workflow"],
-          "correct": 1
-        }
+        {"id":1,"question":"Your N8N workflow processes 5000 records from a database. The workflow times out after 500. Which node solves this?","options":["HTTP Request Node","Split In Batches Node","Merge Node","Set Node"],"correct":1},
+        {"id":2,"question":"A webhook trigger in N8N receives data but the next node shows empty fields. What is the most likely cause?","options":["Wrong HTTP method","The payload was not JSON","N8N is not running","The node is disabled"],"correct":1},
+        {"id":3,"question":"You need to call an API that requires Bearer token auth in N8N. Where do you set the Authorization header?","options":["In the workflow settings","In the HTTP Request node under Headers","In the N8N environment variables","In the Set node before the request"],"correct":1},
+        {"id":4,"question":"Which N8N node lets you run custom JavaScript code inside a workflow?","options":["Code Node","Script Node","Function Node","Execute Node"],"correct":0},
+        {"id":5,"question":"A workflow must send Slack messages only when order value exceeds $500. Which node implements this condition?","options":["Switch Node","Merge Node","IF Node","Wait Node"],"correct":2},
+        {"id":6,"question":"Your N8N webhook is accessible locally but external services cannot reach it. What is the correct fix?","options":["Change to port 443","Use ngrok or expose via reverse proxy","Restart N8N","Switch to polling trigger"],"correct":1},
+        {"id":7,"question":"An API returns paginated results — 100 items per page, 10 pages total. How do you collect all 1000 items in N8N?","options":["Run the workflow 10 times manually","Use a Loop node with page increment and Merge at end","Use Split In Batches on the first response","N8N cannot handle pagination"],"correct":1},
+        {"id":8,"question":"What does the Merge node's 'Merge By Key' mode do in N8N?","options":["Combines all items into one array","Matches items from two branches by a shared field value","Removes duplicate items","Splits items into two outputs"],"correct":1},
+        {"id":9,"question":"You want N8N to retry a failed HTTP request up to 3 times with a 5-second delay. Where is this configured?","options":["In the workflow settings under 'Retry'","In the HTTP Request node under 'On Error' settings","In the Error Trigger node","In the Code node before the request"],"correct":1},
+        {"id":10,"question":"Which expression retrieves the output of a previous node named 'Get User' in N8N?","options":["$node['Get User'].json","$data['Get User']","previous.json","$('Get User').first().json"],"correct":3},
+        {"id":11,"question":"A workflow runs every night at midnight UTC. Which trigger do you use?","options":["Interval Trigger","Cron Trigger","Time Trigger","Schedule Trigger"],"correct":3},
+        {"id":12,"question":"Your N8N workflow sends an email for each item returned by a database query. 200 records came in — 200 emails sent. How do you limit to 1 summary email?","options":["Add an IF node","Use Aggregate node then send once","Add a Wait node","Use the Limit node"],"correct":1},
+        {"id":13,"question":"What is the correct way to pass dynamic data into a URL parameter in an N8N HTTP Request node?","options":["Hard-code the value","Use {{ $json.fieldName }} in the URL field","Use a Set node to pre-build the URL","Use the Query Parameters section with expression mode"],"correct":3},
+        {"id":14,"question":"N8N shows 'Execution failed: ECONNREFUSED'. What does this mean?","options":["Authentication failed","The target server refused the connection — it may be down or wrong port","N8N ran out of memory","The node configuration is invalid"],"correct":1},
+        {"id":15,"question":"You need to transform an array of objects — adding a 'fullName' field combining firstName and lastName. Which node is most efficient?","options":["Set Node with expression","Code Node with map()","HTTP Request to an external service","Merge Node"],"correct":0},
+        {"id":16,"question":"How do you share credentials (API keys) between multiple workflows in N8N without re-entering them?","options":["Copy-paste into each workflow","Use N8N Credentials Manager — create once, reference everywhere","Store in a Set node at workflow start","Use environment variables in each node"],"correct":1},
+        {"id":17,"question":"A Switch node has 4 outputs. What happens to items that match none of the defined rules?","options":["They are deleted","They go to the 'fallback' or default output","The workflow stops","They loop back to the start"],"correct":1},
+        {"id":18,"question":"Which N8N feature lets you test a webhook without waiting for an external system to send data?","options":["Webhook Simulator","The 'Listen for Test Event' button in the Webhook node","The Execute Workflow node","Manual Trigger"],"correct":1},
+        {"id":19,"question":"You deploy N8N on a VPS but the UI is only accessible on localhost. What environment variable exposes it externally?","options":["N8N_PORT=80","N8N_HOST=0.0.0.0","N8N_EXTERNAL=true","WEBHOOK_TUNNEL_URL"],"correct":1},
+        {"id":20,"question":"An N8N workflow calls OpenAI. You want to log the full AI response to Google Sheets AND send it to Slack simultaneously. How?","options":["Use two sequential HTTP Request nodes","Connect the OpenAI node output to both Sheets and Slack nodes in parallel","Use a Merge node then split","Not possible in N8N"],"correct":1},
+        {"id":21,"question":"What is the purpose of the 'Item Lists' node in N8N?","options":["Creates HTTP request lists","Converts multiple items into a single item or splits one item into many","Filters items by condition","Sorts items alphabetically"],"correct":1},
+        {"id":22,"question":"A workflow must wait 24 hours before sending a follow-up email. Which node handles this?","options":["Delay Node","Wait Node","Pause Node","Timer Node"],"correct":1},
+        {"id":23,"question":"In N8N Cloud, where are execution logs stored?","options":["Local filesystem","N8N's execution database, viewable in the Executions tab","External logging service only","They are not stored"],"correct":1},
+        {"id":24,"question":"Your workflow has an Error Trigger node. When does it activate?","options":["When any node is disabled","When a specified workflow fails","When N8N restarts","When a webhook times out"],"correct":1},
+        {"id":25,"question":"Which N8N node is used to call another workflow from within the current workflow?","options":["Sub-Workflow Node","Execute Workflow Node","Trigger Node","Link Node"],"correct":1}
       ]
     },
     "makecom": {
-      "title": "Make.com Automation Professional",
+      "title": "Make.com Automation Masterclass",
       "modules": [
-        {"title": "Introduction to Make.com",           "video_url": ""},
-        {"title": "Building Your First Scenario",       "video_url": ""},
-        {"title": "Understanding Modules & Apps",       "video_url": ""},
-        {"title": "Data Mapping & Variables",           "video_url": ""},
-        {"title": "Routers, Filters & Conditions",      "video_url": ""},
-        {"title": "Error Handling & Rollback",          "video_url": ""},
-        {"title": "Webhooks & Custom API Calls",        "video_url": ""},
-        {"title": "Google Sheets & Drive Integration",  "video_url": ""},
-        {"title": "Building Multi-Step Automations",    "video_url": ""},
-        {"title": "Scheduling & Deployment",            "video_url": ""}
+        {"title": "Introduction to Make.com & Scenarios",         "video_url": ""},
+        {"title": "Connecting Apps & Services",                   "video_url": ""},
+        {"title": "Data Mapping & Transformations",               "video_url": ""},
+        {"title": "Filters, Routers & Conditional Logic",         "video_url": ""},
+        {"title": "Webhooks & Instant Triggers",                  "video_url": ""},
+        {"title": "Iterators & Aggregators",                      "video_url": ""},
+        {"title": "Error Handling & Notifications",               "video_url": ""},
+        {"title": "AI Integration (OpenAI, GPT in Make)",         "video_url": ""},
+        {"title": "Building End-to-End Business Automations",     "video_url": ""},
+        {"title": "Scheduling & Production Deployment",           "video_url": ""}
       ],
       "questions": [
-        {
-          "id": 1,
-          "question": "What is Make.com's basic building block called?",
-          "options": ["Node", "Module", "Block", "Step"],
-          "correct": 1
-        },
-        {
-          "id": 2,
-          "question": "What is a 'scenario' in Make.com?",
-          "options": ["A bug report", "An automated workflow", "A user profile", "A payment plan"],
-          "correct": 1
-        },
-        {
-          "id": 3,
-          "question": "What does the Router module do?",
-          "options": ["Connects to the internet", "Routes data to different paths based on conditions", "Sends emails", "Stores data"],
-          "correct": 1
-        },
-        {
-          "id": 4,
-          "question": "What is 'data mapping' in Make.com?",
-          "options": ["Creating maps", "Connecting output from one module to input of another", "Deleting data", "Backing up files"],
-          "correct": 1
-        },
-        {
-          "id": 5,
-          "question": "How often can Make.com scenarios be triggered?",
-          "options": ["Only manually", "Only daily", "On a schedule or triggered by webhooks", "Only weekly"],
-          "correct": 2
-        },
-        {
-          "id": 6,
-          "question": "What does a filter do in Make.com?",
-          "options": ["Removes modules", "Only allows data to pass if conditions are met", "Speeds up the scenario", "Duplicates data"],
-          "correct": 1
-        },
-        {
-          "id": 7,
-          "question": "What is an 'iterator' in Make.com?",
-          "options": ["A billing tool", "Processes each item in an array one by one", "A login system", "A module type"],
-          "correct": 1
-        },
-        {
-          "id": 8,
-          "question": "What happens during 'rollback' in Make.com error handling?",
-          "options": ["The scenario runs again", "Completed operations are undone to keep data consistent", "All data is deleted", "Make.com restarts"],
-          "correct": 1
-        },
-        {
-          "id": 9,
-          "question": "What is a 'bundle' in Make.com?",
-          "options": ["A paid plan", "A single unit of data processed by a module in one execution", "A group of scenarios", "A folder of modules"],
-          "correct": 1
-        },
-        {
-          "id": 10,
-          "question": "How does Make.com count 'operations' for billing purposes?",
-          "options": ["Per scenario created", "Each module execution counts as one operation", "Per webhook received", "Per hour of runtime"],
-          "correct": 1
-        },
-        {
-          "id": 11,
-          "question": "What does 'instant trigger' mean in Make.com?",
-          "options": ["Trigger runs at midnight", "Scenario starts immediately when a webhook event fires", "Trigger only works manually", "Trigger runs every second"],
-          "correct": 1
-        },
-        {
-          "id": 12,
-          "question": "What is a Make.com 'Data Store' used for?",
-          "options": ["Storing scenario logs", "A built-in database to persist and retrieve data across scenario runs", "Storing account settings", "A file system for images"],
-          "correct": 1
-        },
-        {
-          "id": 13,
-          "question": "What does the 'Aggregator' module do in Make.com?",
-          "options": ["Counts scenario runs", "Combines multiple bundles from an iterator into a single bundle", "Aggregates billing", "Merges two scenarios"],
-          "correct": 1
-        },
-        {
-          "id": 14,
-          "question": "What is the 'Set Variable' module used for in Make.com?",
-          "options": ["Changing account settings", "Storing a value in memory to reuse later in the same scenario", "Setting webhooks", "Renaming modules"],
-          "correct": 1
-        },
-        {
-          "id": 15,
-          "question": "What does Make.com's 'HTTP' module allow you to do?",
-          "options": ["Host a website", "Make custom API requests to any URL not covered by built-in apps", "Monitor HTTP traffic", "Block HTTP requests"],
-          "correct": 1
-        }
+        {"id":1,"question":"A Make.com scenario receives 500 items from a webhook but only processes 100. What setting controls this?","options":["Max Items filter","Scenario bundle limit","Module record cap","Router threshold"],"correct":1},
+        {"id":2,"question":"You receive a 429 error from an API in Make.com. What is the correct fix?","options":["Add an Error Handler and stop","Add a Sleep module before the API call","Switch to a different API","Increase the Make.com plan"],"correct":1},
+        {"id":3,"question":"A Router module in Make.com has 3 routes. What happens to items that match none of the route filters?","options":["They are processed by all routes","They go to the last route by default","They are dropped — no output","Make.com returns an error"],"correct":2},
+        {"id":4,"question":"You want to combine all array items into a single CSV string in Make.com. Which module do you use?","options":["Iterator","Array Aggregator","Text Aggregator","Merge module"],"correct":2},
+        {"id":5,"question":"What is the difference between a Webhook (Custom) and an Instant Trigger in Make.com?","options":["No difference","Webhook (Custom) listens for HTTP POST; Instant Trigger is app-specific and uses OAuth push","Instant triggers only work with premium apps","Webhooks require polling"],"correct":1},
+        {"id":6,"question":"A Make.com scenario maps a field but shows 'undefined'. The source module ran successfully. What is the most likely cause?","options":["Wrong data type","The module hasn't been run once to detect structure — click 'Run once' to map fields","Internet connection issue","Make.com bug"],"correct":1},
+        {"id":7,"question":"How do you handle an API error in Make.com so the scenario continues processing remaining items instead of stopping?","options":["Add an Error Handler module set to 'Resume'","Increase timeout settings","Use a Router before the API call","Add a retry filter"],"correct":0},
+        {"id":8,"question":"Your Make.com scenario needs to process each email attachment separately. Which module splits them?","options":["Router","Iterator","Splitter","Array module"],"correct":1},
+        {"id":9,"question":"What is the maximum scheduling frequency on Make.com's free plan?","options":["Every 1 minute","Every 15 minutes","Every 30 minutes","Every hour"],"correct":1},
+        {"id":10,"question":"You need to call an OpenAI API inside Make.com. The response contains JSON inside a string field. How do you parse it?","options":["Use the JSON Parse module","Use a Text module","Map it directly — Make.com auto-parses","Use a Router to split the string"],"correct":0},
+        {"id":11,"question":"A Make.com scenario must run only on weekdays at 9 AM. How do you configure this?","options":["Use Advanced Scheduling with day-of-week filter","Create 5 separate scenarios for each weekday","Use a Router to check the day","Make.com cannot filter by weekday"],"correct":0},
+        {"id":12,"question":"What does 'operations' mean in Make.com billing?","options":["Number of scenarios","Number of modules executed across all scenario runs","Number of API calls made","Number of active webhooks"],"correct":1},
+        {"id":13,"question":"You want to send a Slack message only if a Google Sheets row has Status = 'Approved'. Where do you add this condition?","options":["In the Google Sheets module settings","As a Filter between the Sheets module and Slack module","In the Scenario settings","In a separate scenario"],"correct":1},
+        {"id":14,"question":"An HTTP module in Make.com returns a response body as a string. How do you access nested JSON fields like response.data.id?","options":["Directly map response.data.id","First parse with JSON Parse module, then map the field","Use a Text module to extract it","Not possible without a custom app"],"correct":1},
+        {"id":15,"question":"What happens when a Make.com scenario hits an unhandled error mid-execution?","options":["It retries automatically 3 times then stops","It stops at the failed module and logs the incomplete execution","It skips the failed item and continues","It sends an email to the account owner"],"correct":1},
+        {"id":16,"question":"Which Make.com feature allows you to reprocess a failed execution after fixing the scenario?","options":["Re-run button in execution history","Incomplete Executions — reprocess stored bundles","Duplicate scenario and re-trigger","Manual trigger only"],"correct":1},
+        {"id":17,"question":"You need to merge data from two separate API calls into one record in Make.com. Which approach works?","options":["Use two HTTP modules and map fields from both into the next module","Use an Array Aggregator","Use a Router with two paths","Not possible — each module has isolated data"],"correct":0},
+        {"id":18,"question":"What is the purpose of the 'Set Variable' module in Make.com?","options":["Stores a value accessible across all modules in the scenario","Creates a global variable across all scenarios","Replaces data in an external app","Caches API responses"],"correct":0},
+        {"id":19,"question":"A webhook scenario in Make.com is not receiving data. The external service shows successful sends. What do you check first?","options":["Make.com server status","Whether the scenario is active (turned on) and the webhook URL is correctly copied","Your internet connection","The Make.com plan limits"],"correct":1},
+        {"id":20,"question":"How do you prevent sensitive data (like API keys) from appearing in Make.com execution logs?","options":["Store keys in environment variables","Use the 'Sensitive Data' toggle on the module — marks fields as hidden in logs","Delete execution logs after each run","Not possible in Make.com"],"correct":1},
+        {"id":21,"question":"In Make.com, what does the 'Rollback' error handling directive do?","options":["Retries the module that failed","Reverts all changes made in that execution (for supported apps) and stops","Skips the failed item","Sends an error notification"],"correct":1},
+        {"id":22,"question":"You need to transform a date from 'MM/DD/YYYY' to 'YYYY-MM-DD' in Make.com. Which approach is correct?","options":["Use the formatDate() function in a Set module","Use a Text module with regex","Call an external formatting API","Make.com cannot reformat dates"],"correct":0},
+        {"id":23,"question":"What is the correct way to test a Make.com webhook scenario without a real trigger?","options":["Use a Manual Trigger module at the start","Click 'Run once' — Make.com listens for one incoming webhook request for testing","Duplicate the scenario and use a different trigger","Make.com does not support webhook testing"],"correct":1},
+        {"id":24,"question":"A scenario processes 1000 rows from Google Sheets. You want to stop after the first row where Status = 'Error'. Which module achieves this?","options":["Router with stop route","Break directive in an Iterator with error filter","Filter on Sheets module","Array Aggregator with limit"],"correct":1},
+        {"id":25,"question":"How do you share a Make.com scenario template with another team member who has a different Make account?","options":["Export as JSON and import on their account","Share via the Make.com Team feature","Copy-paste module by module","Not possible across different accounts"],"correct":0}
       ]
     },
     "agentic": {
-      "title": "Agentic AI & RAG Systems",
+      "title": "Agentic AI Systems",
       "modules": [
-        {"title": "Introduction to Agentic AI",                 "video_url": ""},
-        {"title": "Understanding AI Agents & Tools",            "video_url": ""},
-        {"title": "LangChain & LlamaIndex Fundamentals",        "video_url": ""},
-        {"title": "Retrieval-Augmented Generation (RAG)",       "video_url": ""},
-        {"title": "Vector Databases (Pinecone, Chroma)",        "video_url": ""},
-        {"title": "Building a RAG Pipeline",                    "video_url": ""},
-        {"title": "Multi-Agent Orchestration",                  "video_url": ""},
-        {"title": "Memory & Context Management",                "video_url": ""},
-        {"title": "Deploying AI Agents to Production",          "video_url": ""},
-        {"title": "Evaluating & Monitoring Agents",             "video_url": ""}
+        {"title": "What are AI Agents & Multi-Agent Systems",      "video_url": ""},
+        {"title": "LLM Fundamentals & Prompt Engineering",        "video_url": ""},
+        {"title": "Tool Use & Function Calling",                  "video_url": ""},
+        {"title": "RAG (Retrieval-Augmented Generation) Basics",  "video_url": ""},
+        {"title": "Vector Databases & Embeddings",                "video_url": ""},
+        {"title": "Building Autonomous AI Agents",                "video_url": ""},
+        {"title": "Multi-Agent Orchestration",                    "video_url": ""},
+        {"title": "Memory & Context Management",                  "video_url": ""},
+        {"title": "Testing & Evaluating AI Agents",              "video_url": ""},
+        {"title": "Deploying Agentic Systems to Production",      "video_url": ""}
       ],
       "questions": [
-        {
-          "id": 1,
-          "question": "What is RAG (Retrieval-Augmented Generation)?",
-          "options": ["A gaming technique", "Combining LLMs with external knowledge retrieval", "A database type", "A programming language"],
-          "correct": 1
-        },
-        {
-          "id": 2,
-          "question": "What is a vector database used for in AI systems?",
-          "options": ["Storing images", "Storing and searching high-dimensional embeddings", "Running SQL queries", "Hosting websites"],
-          "correct": 1
-        },
-        {
-          "id": 3,
-          "question": "What makes an AI system 'agentic'?",
-          "options": ["It is very fast", "It can plan, use tools, and take actions autonomously", "It uses large models", "It runs offline"],
-          "correct": 1
-        },
-        {
-          "id": 4,
-          "question": "What is LangChain primarily used for?",
-          "options": ["Blockchain development", "Building LLM-powered applications and chains", "Database management", "Network security"],
-          "correct": 1
-        },
-        {
-          "id": 5,
-          "question": "What is an 'embedding' in the context of RAG?",
-          "options": ["A video format", "A numerical vector representation of text", "A type of database", "A Python library"],
-          "correct": 1
-        },
-        {
-          "id": 6,
-          "question": "What is the main advantage of RAG over fine-tuning?",
-          "options": ["It is cheaper to train", "It allows real-time knowledge updates without retraining", "It uses less memory", "It works offline"],
-          "correct": 1
-        },
-        {
-          "id": 7,
-          "question": "What does 'context window' mean in LLMs?",
-          "options": ["The app window size", "The maximum amount of text an LLM can process at once", "A UI element", "A caching mechanism"],
-          "correct": 1
-        },
-        {
-          "id": 8,
-          "question": "What is multi-agent orchestration?",
-          "options": ["Running multiple apps", "Coordinating multiple AI agents to solve complex tasks together", "Managing servers", "A database pattern"],
-          "correct": 1
-        },
-        {
-          "id": 9,
-          "question": "What is 'chunking' in a RAG pipeline?",
-          "options": ["Splitting model weights", "Breaking source documents into smaller pieces before embedding", "Compressing vector databases", "Batching API requests"],
-          "correct": 1
-        },
-        {
-          "id": 10,
-          "question": "In a ReAct agent pattern, what does 'ReAct' stand for?",
-          "options": ["Responsive Actions", "Reasoning and Acting — the agent thinks step by step then acts", "Real-time Actions", "Recursive Action Trees"],
-          "correct": 1
-        },
-        {
-          "id": 11,
-          "question": "What is 'hallucination' in the context of LLMs?",
-          "options": ["A visual rendering bug", "When the model generates confident but factually incorrect information", "Slow response time", "A training data issue only"],
-          "correct": 1
-        },
-        {
-          "id": 12,
-          "question": "What is 'temperature' in LLM inference settings?",
-          "options": ["The server's CPU heat level", "A parameter controlling randomness — low=deterministic, high=creative", "The time to respond", "The number of tokens generated"],
-          "correct": 1
-        },
-        {
-          "id": 13,
-          "question": "What is semantic search?",
-          "options": ["Searching by exact keyword match", "Searching based on meaning and conceptual similarity using embeddings", "Searching file metadata", "Searching code syntax"],
-          "correct": 1
-        },
-        {
-          "id": 14,
-          "question": "What is LlamaIndex primarily designed for?",
-          "options": ["Training llama models", "Connecting LLMs to external data sources and building RAG applications", "Visualising neural networks", "Managing vector hardware"],
-          "correct": 1
-        },
-        {
-          "id": 15,
-          "question": "What is 'model drift' and why does it matter for deployed AI agents?",
-          "options": ["The model moving between servers", "Performance degradation over time as real-world data patterns change from training data", "GPU memory overflow", "API version mismatch"],
-          "correct": 1
-        }
+        {"id":1,"question":"An AI agent answers questions incorrectly because its training data is outdated. Which architecture solves this without retraining?","options":["Fine-tuning on new data","RAG — retrieve current documents at query time and inject into context","Increasing max_tokens","Switching to a larger model"],"correct":1},
+        {"id":2,"question":"What is 'function calling' in the context of OpenAI GPT models?","options":["Running Python functions inside the LLM","Allowing the LLM to output structured JSON to trigger defined external functions","Calling the API multiple times per request","A deprecated feature replaced by plugins"],"correct":1},
+        {"id":3,"question":"Your RAG system retrieves 10 chunks but the answer is still wrong. Which metric helps diagnose whether relevant chunks are being retrieved?","options":["Latency","Context recall — measures if the correct chunks appear in retrieved results","Token count","Model temperature"],"correct":1},
+        {"id":4,"question":"What is the key difference between a vector embedding and a keyword search index?","options":["Embeddings are faster","Embeddings capture semantic meaning, keyword search matches exact terms","Keyword search is more accurate","There is no practical difference"],"correct":1},
+        {"id":5,"question":"In a multi-agent system, what is the role of an 'orchestrator' agent?","options":["It stores memory for all agents","It coordinates tasks between specialist agents and decides which agent handles each subtask","It embeds documents into a vector database","It evaluates the final output quality"],"correct":1},
+        {"id":6,"question":"You want an AI agent to remember a user's preferences across sessions. Which approach is correct?","options":["Increase the context window","Store preferences in an external database, retrieve and inject into system prompt at session start","Use a larger model","Enable streaming responses"],"correct":1},
+        {"id":7,"question":"What does 'hallucination' mean in LLM outputs and how does RAG reduce it?","options":["Model slowness — RAG caches responses","Confidently wrong answers — RAG grounds responses in retrieved source documents","Token limit errors — RAG compresses context","Output formatting errors — RAG structures responses"],"correct":1},
+        {"id":8,"question":"Which chunking strategy is best for a document where meaning spans multiple paragraphs?","options":["Character-level chunking","Fixed-size chunking with no overlap","Semantic chunking with overlap between chunks","One chunk per sentence"],"correct":2},
+        {"id":9,"question":"An agentic workflow loops indefinitely — the agent keeps calling tools without reaching a final answer. What is the fix?","options":["Reduce max_tokens","Add a maximum iteration limit and a termination condition check","Switch to a smaller model","Remove all tools"],"correct":1},
+        {"id":10,"question":"What is 'temperature' in an LLM and when should you set it to 0?","options":["Processing speed — set to 0 for accuracy","Randomness of output — set to 0 for deterministic, consistent answers (e.g. data extraction)","Memory allocation — set to 0 to disable caching","Context window size"],"correct":1},
+        {"id":11,"question":"You embed 10,000 documents into Pinecone. A user queries 'AI regulations in EU'. The retrieval returns irrelevant results. What is the most likely cause?","options":["Pinecone is down","The embedding model used for documents differs from the one used for the query","Too many documents in the index","The query is too short"],"correct":1},
+        {"id":12,"question":"What is 'ReAct' prompting in agentic AI?","options":["A React.js framework for AI apps","A prompting pattern where the agent reasons step-by-step then acts, alternating Thought and Action","A retrieval method","A fine-tuning technique"],"correct":1},
+        {"id":13,"question":"Your AI agent must choose between 3 specialist sub-agents. Which pattern is most appropriate for dynamic routing?","options":["Hard-code routing logic","Use an LLM router that reads the task description and selects the appropriate agent","Random selection","Always use all 3 agents and merge results"],"correct":1},
+        {"id":14,"question":"What is the purpose of a 'system prompt' in an AI agent?","options":["Controls the model's training data","Sets the agent's identity, constraints, and behavioral rules for the session","Limits the number of tokens","Selects the model version"],"correct":1},
+        {"id":15,"question":"When should you fine-tune an LLM instead of using RAG?","options":["When you need up-to-date information","When you need to change the model's writing style, format, or domain-specific reasoning patterns","When you have more than 1000 documents","When RAG latency is too high"],"correct":1},
+        {"id":16,"question":"What does 'context window' mean and why does it matter for agents?","options":["The UI window showing the conversation","Maximum tokens the model can process in one call — limits how much history/context you can include","The database size limit","Response speed"],"correct":1},
+        {"id":17,"question":"An agent uses tool calls in a loop. After 5 iterations it should stop even if not complete. How do you implement this?","options":["Set max_tokens=100","Add a counter variable and a conditional check before each tool call","Use a smaller model","Set temperature=0"],"correct":1},
+        {"id":18,"question":"What metric measures whether an AI agent's final answer is supported by the retrieved context?","options":["Accuracy","Faithfulness — checks if the answer is grounded in the retrieved documents","F1 score","BLEU score"],"correct":1},
+        {"id":19,"question":"You want your agent to use a calculator tool for math instead of relying on the LLM. What is the correct implementation approach?","options":["Include math instructions in the system prompt","Define a 'calculate' function, register it as a tool, and let the LLM call it via function calling","Pre-compute all math and hard-code results","Use a code interpreter plugin"],"correct":1},
+        {"id":20,"question":"What is the risk of setting chunk_overlap too high in RAG document chunking?","options":["Chunks become too small","Duplicate content appears in retrieved results, wasting context window space","Embeddings become inaccurate","The vector database crashes"],"correct":1},
+        {"id":21,"question":"Which database type is optimized for storing and querying high-dimensional embedding vectors?","options":["PostgreSQL","Redis","Pinecone, Weaviate, or pgvector — purpose-built vector databases","MongoDB"],"correct":2},
+        {"id":22,"question":"What does 'streaming' mean in LLM API responses and when is it useful?","options":["Sending multiple requests simultaneously","Receiving token-by-token output as generated, enabling real-time display in chat UIs","Caching responses for reuse","Parallel model inference"],"correct":1},
+        {"id":23,"question":"An agentic pipeline must handle both text and image inputs. Which OpenAI model supports this?","options":["GPT-3.5 Turbo","GPT-4o — supports both text and vision inputs in the same call","Whisper","DALL-E 3"],"correct":1},
+        {"id":24,"question":"What is the purpose of 'guardrails' in production AI agents?","options":["Speed optimization","Input/output validation to prevent harmful, off-topic, or policy-violating responses","Cost reduction","Context compression"],"correct":1},
+        {"id":25,"question":"Your multi-agent system has Agent A pass results to Agent B. Agent B returns an error. How should a robust orchestrator handle this?","options":["Stop the entire pipeline","Retry Agent B with modified input, log the failure, and fall back to a default result if retries fail","Restart Agent A","Ignore the error and continue"],"correct":1}
       ]
     },
     "cloud": {
-      "title": "Cloud Architecture (AWS/GCP/Azure)",
+      "title": "Cloud Deployment for AI",
       "modules": [
-        {"title": "Cloud Computing Fundamentals",       "video_url": ""},
-        {"title": "AWS Core Services (EC2, S3, IAM)",   "video_url": ""},
-        {"title": "Lambda & Serverless Architecture",   "video_url": ""},
-        {"title": "API Gateway & Microservices",        "video_url": ""},
-        {"title": "Google Cloud Platform Overview",     "video_url": ""},
-        {"title": "Azure Fundamentals & AD",            "video_url": ""},
-        {"title": "Modal Serverless Deployment",        "video_url": ""},
-        {"title": "Cost Optimization Strategies",       "video_url": ""},
-        {"title": "Security & Compliance in Cloud",     "video_url": ""},
-        {"title": "CI/CD & DevOps on Cloud",            "video_url": ""}
+        {"title": "Cloud Fundamentals (AWS, GCP, Azure, Modal)",  "video_url": ""},
+        {"title": "Serverless Architecture & Functions",           "video_url": ""},
+        {"title": "Containerisation with Docker",                 "video_url": ""},
+        {"title": "Deploying AI Apps on Modal",                   "video_url": ""},
+        {"title": "AWS Lambda & API Gateway",                     "video_url": ""},
+        {"title": "Database Services (RDS, Supabase, Firebase)",  "video_url": ""},
+        {"title": "CI/CD Pipelines for AI Projects",             "video_url": ""},
+        {"title": "Cost Optimisation Strategies",                 "video_url": ""},
+        {"title": "Security & IAM Best Practices",                "video_url": ""},
+        {"title": "Monitoring & Logging in Production",           "video_url": ""}
       ],
       "questions": [
-        {
-          "id": 1,
-          "question": "What does AWS stand for?",
-          "options": ["Automated Web Services", "Amazon Web Services", "Advanced Web Systems", "Azure Web Services"],
-          "correct": 1
-        },
-        {
-          "id": 2,
-          "question": "What is serverless computing?",
-          "options": ["Computing without any servers", "Computing where you don't manage or provision servers", "Offline computing", "Free cloud computing"],
-          "correct": 1
-        },
-        {
-          "id": 3,
-          "question": "What is IAM in AWS?",
-          "options": ["Internet Access Module", "Identity and Access Management", "Internal API Manager", "Image Asset Management"],
-          "correct": 1
-        },
-        {
-          "id": 4,
-          "question": "What does 'auto-scaling' mean in cloud architecture?",
-          "options": ["Scaling images automatically", "Automatically adjusting resources based on demand", "Manual resource allocation", "Reducing server size"],
-          "correct": 1
-        },
-        {
-          "id": 5,
-          "question": "What is a CDN (Content Delivery Network) used for?",
-          "options": ["Managing databases", "Delivering content faster by serving from geographically closer servers", "Sending emails", "Running AI models"],
-          "correct": 1
-        },
-        {
-          "id": 6,
-          "question": "Which cloud service model gives you the most infrastructure control?",
-          "options": ["SaaS", "PaaS", "IaaS", "FaaS"],
-          "correct": 2
-        },
-        {
-          "id": 7,
-          "question": "What is AWS Lambda?",
-          "options": ["A database service", "A serverless function execution service", "A CDN service", "A storage service"],
-          "correct": 1
-        },
-        {
-          "id": 8,
-          "question": "What is the purpose of an API Gateway in cloud architecture?",
-          "options": ["Store files", "Act as entry point for APIs, handling auth, rate limiting, and routing", "Run databases", "Monitor servers"],
-          "correct": 1
-        },
-        {
-          "id": 9,
-          "question": "What is an AWS VPC?",
-          "options": ["Virtual Payment Cluster", "Virtual Private Cloud — an isolated network environment in AWS", "Video Processing Center", "Verified Public Connection"],
-          "correct": 1
-        },
-        {
-          "id": 10,
-          "question": "What does S3 stand for in AWS, and what is it used for?",
-          "options": ["Simple Server Storage — running VMs", "Simple Storage Service — scalable object/file storage", "Secure Server System — database hosting", "Scalable Service Stack — microservices"],
-          "correct": 1
-        },
-        {
-          "id": 11,
-          "question": "What is the difference between horizontal and vertical scaling?",
-          "options": ["Horizontal = faster CPU, Vertical = more RAM", "Horizontal = add more instances, Vertical = increase single instance size", "They are the same thing", "Horizontal = cloud, Vertical = on-premise"],
-          "correct": 1
-        },
-        {
-          "id": 12,
-          "question": "What is a 'cold start' in serverless functions?",
-          "options": ["Deploying functions in cold regions", "The startup delay when a function is invoked after being idle", "Running functions without internet", "Caching function results"],
-          "correct": 1
-        },
-        {
-          "id": 13,
-          "question": "What is the cloud 'shared responsibility model'?",
-          "options": ["Customers share costs with the provider", "Provider secures infrastructure; customer is responsible for data, app, and access", "Both share equal security duties for all layers", "Provider handles everything including customer data"],
-          "correct": 1
-        },
-        {
-          "id": 14,
-          "question": "What is Kubernetes used for?",
-          "options": ["Writing Python scripts", "Orchestrating and managing containerised applications at scale", "Monitoring network traffic", "Running SQL databases"],
-          "correct": 1
-        },
-        {
-          "id": 15,
-          "question": "What is a CI/CD pipeline in cloud DevOps?",
-          "options": ["A network cable type", "Continuous Integration / Continuous Delivery — automating build, test, and deployment", "A container format", "A cost management tool"],
-          "correct": 1
-        }
+        {"id":1,"question":"A Docker container starts but exits immediately with code 1. How do you diagnose the issue?","options":["Delete and recreate the image","Run: docker logs <container_id> to see the error output","Rebuild with a different base image","Increase container memory"],"correct":1},
+        {"id":2,"question":"Your AWS Lambda function times out processing large AI model responses. What is the correct fix?","options":["Switch to EC2","Increase the Lambda timeout (max 15 min) and memory allocation","Add more Lambda functions","Use SQS to queue requests"],"correct":1},
+        {"id":3,"question":"What is the key difference between AWS Lambda and a traditional EC2 server?","options":["Lambda is faster","Lambda runs code only when triggered (pay-per-execution), EC2 runs continuously (pay-per-hour)","EC2 is serverless","Lambda supports more languages"],"correct":1},
+        {"id":4,"question":"You deploy an AI app on Modal and need persistent storage for model weights between invocations. Which Modal feature do you use?","options":["Modal Volumes — persistent network storage attached to functions","Modal Secrets","Modal Queues","Local disk storage"],"correct":0},
+        {"id":5,"question":"Your Docker image is 8GB because it includes the full PyTorch library. How do you reduce it?","options":["Use a smaller base image (python:3.11-slim) and install only required packages","Compress the image with zip","Use fewer layers in Dockerfile","Reduce the model size"],"correct":0},
+        {"id":6,"question":"An IAM policy must allow a Lambda function to read from S3 but nothing else. Which principle guides this?","options":["Zero Trust","Least Privilege — grant only the minimum permissions required","Defense in Depth","Separation of Duties"],"correct":1},
+        {"id":7,"question":"What is the purpose of AWS API Gateway in an AI deployment?","options":["Stores API keys","Provides a managed HTTPS endpoint, request throttling, and auth for Lambda functions","Hosts the frontend","Runs the AI model"],"correct":1},
+        {"id":8,"question":"Your CI/CD pipeline deploys to production automatically on every git push. A bad commit breaks production. What process prevents this?","options":["Deploy less frequently","Add automated tests and a staging environment — production only deploys on passing tests","Use manual deployments","Lock the main branch"],"correct":1},
+        {"id":9,"question":"What is 'cold start' in serverless functions and how do you reduce it for AI apps?","options":["Server overheating — use cooling solutions","Delay when a new function instance initializes — reduce by keeping functions warm or using provisioned concurrency","Database connection latency","Network timeout"],"correct":1},
+        {"id":10,"question":"You need to store user chat history for an AI app. The data is unstructured and schema may evolve. Which database is most appropriate?","options":["MySQL","PostgreSQL","Supabase (PostgreSQL with JSON support) or MongoDB","SQLite"],"correct":2},
+        {"id":11,"question":"A Modal deployment fails with 'OOM killed'. What does this mean and how do you fix it?","options":["Network error — increase bandwidth","Out of Memory — increase the memory parameter in @app.function(memory=...)","Storage full — clean up volumes","CPU overload — add more instances"],"correct":1},
+        {"id":12,"question":"What is the purpose of environment variables in cloud deployments vs hardcoding values?","options":["Environment variables run faster","They separate configuration from code — secrets stay out of source control and can change per environment","Hardcoding is more secure","No practical difference"],"correct":1},
+        {"id":13,"question":"Your AWS costs spike unexpectedly. CloudWatch shows Lambda invocation count is 100x normal. What is the most likely cause?","options":["Model became more popular","A recursive Lambda trigger — the function is invoking itself in a loop","AWS billing error","Cost per invocation increased"],"correct":1},
+        {"id":14,"question":"What does 'container orchestration' solve that running a single Docker container does not?","options":["Faster image builds","Automatic scaling, self-healing, load balancing, and rolling deployments across multiple containers","Better logging","Smaller image sizes"],"correct":1},
+        {"id":15,"question":"You want to run a GPU-accelerated AI model on Modal. What do you specify in the function decorator?","options":["gpu=True","gpu='A10G' or gpu=modal.gpu.A10G() in @app.function()","Use a special GPU image","GPU is automatic on Modal"],"correct":1},
+        {"id":16,"question":"What is the difference between horizontal and vertical scaling in cloud?","options":["No difference","Horizontal = add more instances; Vertical = give each instance more CPU/RAM","Horizontal = more RAM; Vertical = more instances","Horizontal is only for databases"],"correct":1},
+        {"id":17,"question":"A Supabase row-level security (RLS) policy is enabled but all queries return no rows. What is the most likely cause?","options":["Supabase is down","No RLS policy has been created for the table — RLS blocks all access until policies are defined","Wrong API key","Database is empty"],"correct":1},
+        {"id":18,"question":"What does a Dockerfile's ENTRYPOINT instruction define?","options":["The base image","The command that runs when the container starts","The exposed port","The build context"],"correct":1},
+        {"id":19,"question":"You need to send 10,000 AI processing jobs to Modal without overwhelming it. Which pattern is correct?","options":["Send all 10,000 simultaneously","Use Modal's .map() or Queue to process concurrently within configured limits","Process one at a time sequentially","Split into 10 separate deployments"],"correct":1},
+        {"id":20,"question":"What is 'blue-green deployment' in CI/CD?","options":["Using two different cloud providers","Running two identical production environments — route traffic to green after validating, then decommission blue","A Docker networking mode","A GitHub branching strategy"],"correct":1},
+        {"id":21,"question":"Your AI app's API latency is 3 seconds. 80% of requests ask the same questions. How do you reduce latency?","options":["Use a faster model","Add Redis caching — cache common responses, return cached result in <50ms","Increase server memory","Switch cloud providers"],"correct":1},
+        {"id":22,"question":"What is the purpose of a VPC (Virtual Private Cloud) in AWS?","options":["Reduces compute cost","Isolates your cloud resources in a private network, preventing external access to internal services","Speeds up deployments","Manages DNS records"],"correct":1},
+        {"id":23,"question":"A secret API key is accidentally committed to a public GitHub repo. What is the immediate correct action?","options":["Delete the commit","Rotate/revoke the key immediately — assume it is compromised — then remove from git history","Make the repo private","Add .gitignore"],"correct":1},
+        {"id":24,"question":"In Modal, what does @modal.concurrent(max_inputs=50) do?","options":["Limits to 50 total requests lifetime","Allows each container instance to handle up to 50 simultaneous requests","Creates 50 container instances","Queues 50 requests then stops"],"correct":1},
+        {"id":25,"question":"What is the role of a load balancer in a cloud deployment?","options":["Compresses data transfers","Distributes incoming traffic across multiple server instances to prevent overload","Manages database connections","Encrypts API responses"],"correct":1}
       ]
     },
     "network": {
-      "title": "Network Engineering (CCNA Level)",
+      "title": "Network Engineering for AI Systems",
       "modules": [
-        {"title": "OSI Model & TCP/IP Fundamentals",        "video_url": ""},
-        {"title": "IP Addressing & Subnetting",             "video_url": ""},
-        {"title": "VLANs & Layer 2 Switching",              "video_url": ""},
-        {"title": "Routing Protocols (OSPF & BGP)",         "video_url": ""},
-        {"title": "Firewalls & Access Control Lists",       "video_url": ""},
-        {"title": "SD-WAN Concepts",                        "video_url": ""},
-        {"title": "Zero Trust Security Model",              "video_url": ""},
-        {"title": "Network Monitoring & Troubleshooting",   "video_url": ""},
-        {"title": "Wireless Networking",                    "video_url": ""},
-        {"title": "CCNA Exam Preparation",                  "video_url": ""}
+        {"title": "Network Fundamentals (OSI, TCP/IP)",           "video_url": ""},
+        {"title": "VLAN & Subnet Design",                         "video_url": ""},
+        {"title": "Routing Protocols: BGP & OSPF",               "video_url": ""},
+        {"title": "SD-WAN Architecture & Implementation",         "video_url": ""},
+        {"title": "Zero Trust Network Security",                  "video_url": ""},
+        {"title": "Firewall Rules & NAT",                         "video_url": ""},
+        {"title": "VPN Setup & Remote Access",                    "video_url": ""},
+        {"title": "Network Automation with Python",               "video_url": ""},
+        {"title": "Monitoring: SNMP, NetFlow, Grafana",           "video_url": ""},
+        {"title": "Enterprise Network Design Patterns",           "video_url": ""}
       ],
       "questions": [
-        {
-          "id": 1,
-          "question": "What does BGP stand for?",
-          "options": ["Border Gateway Protocol", "Basic Gateway Protocol", "Binary Group Protocol", "Bridge Gateway Protocol"],
-          "correct": 0
-        },
-        {
-          "id": 2,
-          "question": "What is OSPF used for?",
-          "options": ["File sharing", "Email routing", "Interior gateway routing protocol for IP networks", "Security"],
-          "correct": 2
-        },
-        {
-          "id": 3,
-          "question": "What is a VLAN?",
-          "options": ["Virtual Local Area Network", "Very Large Area Network", "Virtual LAN Authentication", "Variable Length Area Network"],
-          "correct": 0
-        },
-        {
-          "id": 4,
-          "question": "What does Zero Trust security mean?",
-          "options": ["Trusting all internal users", "Never trust, always verify — every user and device must be authenticated", "Trusting external users only", "No security at all"],
-          "correct": 1
-        },
-        {
-          "id": 5,
-          "question": "What does subnetting allow you to do?",
-          "options": ["Speed up internet", "Divide a large network into smaller, manageable sub-networks", "Connect to WiFi", "Block websites"],
-          "correct": 1
-        },
-        {
-          "id": 6,
-          "question": "What layer of the OSI model do switches primarily operate at?",
-          "options": ["Layer 1", "Layer 2", "Layer 3", "Layer 4"],
-          "correct": 1
-        },
-        {
-          "id": 7,
-          "question": "What is SD-WAN?",
-          "options": ["Software-Defined Wide Area Network", "Secure Data Wireless Area Network", "Standard Domain WAN", "Structured Data WAN"],
-          "correct": 0
-        },
-        {
-          "id": 8,
-          "question": "What does an ACL (Access Control List) do?",
-          "options": ["Speeds up network", "Controls which traffic is allowed or denied in a network", "Assigns IP addresses", "Monitors bandwidth"],
-          "correct": 1
-        },
-        {
-          "id": 9,
-          "question": "What is NAT (Network Address Translation)?",
-          "options": ["A routing protocol", "Maps private IP addresses to a public IP for internet communication", "A type of firewall", "A wireless standard"],
-          "correct": 1
-        },
-        {
-          "id": 10,
-          "question": "What does CIDR notation '/24' mean for an IP subnet?",
-          "options": ["24 hosts allowed", "24 bits used for the network, leaving 8 bits for hosts (256 addresses)", "24 VLANs configured", "24 Mbps bandwidth"],
-          "correct": 1
-        },
-        {
-          "id": 11,
-          "question": "What is ARP (Address Resolution Protocol) used for?",
-          "options": ["Resolving domain names to IPs", "Mapping IP addresses to MAC addresses on a local network", "Assigning IP addresses dynamically", "Encrypting network traffic"],
-          "correct": 1
-        },
-        {
-          "id": 12,
-          "question": "What is a 'trunk port' in network switching?",
-          "options": ["The main uplink port only", "A port configured to carry traffic for multiple VLANs simultaneously", "The management port", "A port that blocks all traffic"],
-          "correct": 1
-        },
-        {
-          "id": 13,
-          "question": "What is the key difference between TCP and UDP?",
-          "options": ["TCP is wireless, UDP is wired", "TCP is reliable with error checking; UDP is fast with no guaranteed delivery", "UDP is newer than TCP", "They are identical protocols"],
-          "correct": 1
-        },
-        {
-          "id": 14,
-          "question": "What does DHCP do in a network?",
-          "options": ["Encrypts data", "Automatically assigns IP addresses, subnet masks, and gateway info to devices", "Routes traffic between subnets", "Monitors network health"],
-          "correct": 1
-        },
-        {
-          "id": 15,
-          "question": "What is a 'default route' (0.0.0.0/0) used for?",
-          "options": ["Blocking all traffic", "The route of last resort — used when no specific route matches the destination", "Connecting to VPN", "Assigning IPs"],
-          "correct": 1
-        }
+        {"id":1,"question":"Two VLANs (10 and 20) are on the same switch but cannot communicate. What is required for inter-VLAN routing?","options":["Add another switch","A Layer 3 switch or router with subinterfaces (router-on-a-stick)","Configure the same IP subnet for both VLANs","Enable spanning tree"],"correct":1},
+        {"id":2,"question":"BGP neighbor adjacency is stuck in 'Active' state. What does this indicate?","options":["BGP session is established","The router is trying to connect but cannot reach the neighbor — check IP, ACL, or BGP port 179","BGP is functioning normally","The router needs a reboot"],"correct":1},
+        {"id":3,"question":"What is the primary advantage of SD-WAN over traditional WAN?","options":["Lower hardware cost","Centralized policy management, application-aware routing, and ability to use multiple links (MPLS + internet) intelligently","Faster physical speeds","No configuration required"],"correct":1},
+        {"id":4,"question":"A Zero Trust architecture rejects the idea of a trusted internal network. What does it enforce instead?","options":["Stronger perimeter firewalls","Verify every user and device on every request regardless of location — never trust, always verify","VPN for all internal users","MAC address filtering"],"correct":1},
+        {"id":5,"question":"A host cannot reach the internet but can ping the default gateway. Which OSI layer is the most likely problem?","options":["Layer 1 (Physical)","Layer 3 (Network) — routing or NAT issue above the gateway","Layer 2 (Data Link)","Layer 7 (Application)"],"correct":1},
+        {"id":6,"question":"What does a NAT overload (PAT) do that basic NAT does not?","options":["Translates one private IP to one public IP","Maps multiple private IPs to one public IP using port numbers to distinguish sessions","Filters traffic by protocol","Provides VPN functionality"],"correct":1},
+        {"id":7,"question":"OSPF neighbors are stuck in EXSTART state. What is the most common cause?","options":["Wrong area ID","MTU mismatch between the two interfaces","Wrong OSPF process ID","No route redistribution"],"correct":1},
+        {"id":8,"question":"You write a Python Netmiko script to push config to 50 routers sequentially. It takes 25 minutes. How do you speed this up?","options":["Use a faster computer","Use concurrent.futures or asyncio to connect to multiple routers simultaneously","Use a different library","Optimize the config commands"],"correct":1},
+        {"id":9,"question":"What is the difference between a stateful and stateless firewall?","options":["Stateful is faster","Stateful tracks connection state and allows return traffic automatically; stateless evaluates each packet independently","Stateless is more secure","No difference in modern firewalls"],"correct":1},
+        {"id":10,"question":"A subnet needs to host exactly 30 devices. Which subnet mask wastes the fewest IPs?","options":["/26 (62 hosts)","No suitable mask exists","/27 (30 hosts)","Both /26 and /27 work — use /27 for less waste"],"correct":3},
+        {"id":11,"question":"What does SNMPv3 provide that SNMPv1 does not?","options":["More OIDs","Authentication and encryption — SNMPv1 sends community strings in plaintext","Faster polling","Support for IPv6"],"correct":1},
+        {"id":12,"question":"An MPLS label is added to a packet. At which OSI layer does this occur?","options":["Layer 2","Between Layer 2 and Layer 3 (Layer 2.5)","Layer 3","Layer 4"],"correct":1},
+        {"id":13,"question":"You need to automate parsing of 'show ip route' output from 100 Cisco routers. Which Python library is best suited?","options":["Paramiko","TextFSM or pyATS — built for parsing structured CLI output from network devices","Requests","Scapy"],"correct":1},
+        {"id":14,"question":"What problem does Spanning Tree Protocol (STP) solve?","options":["Routing loops","Layer 2 switching loops — prevents broadcast storms by blocking redundant paths","IP address conflicts","VPN connectivity"],"correct":1},
+        {"id":15,"question":"A site-to-site IPsec VPN tunnel is down. Phase 1 is up but Phase 2 fails. What should you check?","options":["Check ISP connection","Verify the IPsec transform set (encryption/hash algorithms) and ACL/traffic selectors match on both sides","Reboot the firewall","Check the public IP"],"correct":1},
+        {"id":16,"question":"What is the purpose of NetFlow in network monitoring?","options":["Captures full packet payloads","Exports flow records (source/dest IP, ports, byte counts) for traffic analysis and bandwidth monitoring","Monitors CPU on network devices","Provides SNMP alerting"],"correct":1},
+        {"id":17,"question":"BGP route reflector eliminates the need for what?","options":["External BGP peering","Full mesh iBGP — the reflector distributes routes to clients without requiring all routers to peer with each other","OSPF redistribution","Static default routes"],"correct":1},
+        {"id":18,"question":"You use Ansible to configure network devices. A playbook runs but makes no changes. What most likely explains this?","options":["Ansible is broken","Idempotency — the device config already matches the desired state, so Ansible made no changes","Wrong YAML syntax","SSH not enabled"],"correct":1},
+        {"id":19,"question":"What is microsegmentation in a Zero Trust network?","options":["Splitting the network into smaller subnets","Applying granular security policies between individual workloads — even east-west traffic is controlled","Using VLANs for segmentation","A firewall vendor feature"],"correct":1},
+        {"id":20,"question":"A Grafana dashboard shows interface utilization at 95% for 6 hours. What is the correct engineering response?","options":["Ignore it — occasional spikes are normal","Investigate the traffic source, consider QoS policies, and plan capacity upgrade if sustained","Reboot the router","Disable the interface temporarily"],"correct":1},
+        {"id":21,"question":"What does 'route summarization' achieve in OSPF or BGP?","options":["Faster convergence","Reduces the number of routes advertised — smaller routing tables, less memory and CPU on routers","Increases route redundancy","Enables multicast routing"],"correct":1},
+        {"id":22,"question":"Which Python library lets you send crafted network packets (e.g. custom TCP/ICMP) for testing?","options":["Requests","Netmiko","Scapy","Paramiko"],"correct":2},
+        {"id":23,"question":"A wireless client gets IP 169.254.x.x. What does this indicate?","options":["VPN is active","APIPA address — the client failed to get a DHCP response and self-assigned a link-local address","The IP was manually set","DNS resolution failed"],"correct":1},
+        {"id":24,"question":"What is the key difference between OSPF and BGP?","options":["OSPF is faster","OSPF is an interior gateway protocol for within an AS; BGP is an exterior gateway protocol used between autonomous systems (the internet's routing protocol)","BGP is simpler to configure","No meaningful difference for enterprise networks"],"correct":1},
+        {"id":25,"question":"You need to collect logs from 50 network devices and alert when error rate exceeds a threshold. What stack achieves this?","options":["Wireshark only","Syslog → Elasticsearch/Loki → Grafana with alerting rules","SNMP polling only","Manual log review"],"correct":1}
       ]
     },
     "consulting": {
-      "title": "AI Consulting Fundamentals",
+      "title": "AI Business Consulting",
       "modules": [
-        {"title": "Understanding AI Business Value",            "video_url": ""},
-        {"title": "AI Readiness Assessment",                    "video_url": ""},
-        {"title": "Identifying Automation Opportunities",       "video_url": ""},
-        {"title": "Building an AI Roadmap",                     "video_url": ""},
-        {"title": "ROI Calculation for AI Projects",            "video_url": ""},
-        {"title": "Change Management & Adoption",               "video_url": ""},
-        {"title": "AI Ethics & Responsible AI",                 "video_url": ""},
-        {"title": "Vendor Selection & Tool Evaluation",         "video_url": ""},
-        {"title": "Presenting AI Solutions to Stakeholders",    "video_url": ""},
-        {"title": "Building Long-Term AI Strategy",             "video_url": ""}
+        {"title": "Understanding Business Process Analysis",       "video_url": ""},
+        {"title": "Identifying AI Automation Opportunities",      "video_url": ""},
+        {"title": "Tool Selection: N8N vs Make vs Custom",        "video_url": ""},
+        {"title": "ROI Calculation for AI Projects",             "video_url": ""},
+        {"title": "Presenting AI Solutions to Clients",          "video_url": ""},
+        {"title": "Project Scoping & Proposal Writing",          "video_url": ""},
+        {"title": "Implementation Roadmaps",                     "video_url": ""},
+        {"title": "Change Management for AI Adoption",           "video_url": ""},
+        {"title": "Building AI Consulting Packages",             "video_url": ""},
+        {"title": "Case Studies: Myanmar & Southeast Asia",      "video_url": ""}
       ],
       "questions": [
-        {
-          "id": 1,
-          "question": "What is the first step in an AI consulting engagement?",
-          "options": ["Buy AI tools immediately", "Conduct an AI readiness assessment", "Hire data scientists", "Build a custom model"],
-          "correct": 1
-        },
-        {
-          "id": 2,
-          "question": "What does ROI stand for in AI projects?",
-          "options": ["Rate of Intelligence", "Return on Investment", "Risk of Implementation", "Reach of Innovation"],
-          "correct": 1
-        },
-        {
-          "id": 3,
-          "question": "Which processes are best candidates for AI automation?",
-          "options": ["Creative brainstorming only", "Repetitive, rule-based, high-volume tasks", "One-time strategic decisions", "Physical tasks only"],
-          "correct": 1
-        },
-        {
-          "id": 4,
-          "question": "What is 'change management' in AI adoption?",
-          "options": ["Changing AI models", "Managing people, processes and culture during AI transformation", "Changing vendors", "Updating software"],
-          "correct": 1
-        },
-        {
-          "id": 5,
-          "question": "What is responsible AI?",
-          "options": ["AI that responds quickly", "Developing AI that is ethical, fair, transparent, and accountable", "AI with no errors", "AI that saves money"],
-          "correct": 1
-        },
-        {
-          "id": 6,
-          "question": "What should an AI roadmap include?",
-          "options": ["Only technical specs", "Vision, milestones, resource requirements, and success metrics", "A list of tools", "Marketing plans only"],
-          "correct": 1
-        },
-        {
-          "id": 7,
-          "question": "What is a key factor when evaluating AI vendors?",
-          "options": ["Brand logo", "Integration capability, support, pricing, and data security", "Office location", "Number of employees"],
-          "correct": 1
-        },
-        {
-          "id": 8,
-          "question": "How should AI solutions be presented to non-technical stakeholders?",
-          "options": ["With heavy technical jargon", "Focus on business outcomes, ROI, and risk mitigation", "Only show code", "Avoid showing results"],
-          "correct": 1
-        },
-        {
-          "id": 9,
-          "question": "What is a 'Proof of Concept' (POC) in AI consulting?",
-          "options": ["A legal document", "A small-scale test to validate whether an AI solution is viable before full investment", "A marketing pitch", "A vendor contract"],
-          "correct": 1
-        },
-        {
-          "id": 10,
-          "question": "What is 'shadow AI' in an enterprise context?",
-          "options": ["AI that works invisibly", "Employees using AI tools without IT or management approval or oversight", "AI trained on dark data", "A competitor's AI system"],
-          "correct": 1
-        },
-        {
-          "id": 11,
-          "question": "What is 'data governance' in AI projects?",
-          "options": ["Paying for data storage", "Policies and processes ensuring data quality, security, access control, and compliance", "Deleting old data", "Migrating databases"],
-          "correct": 1
-        },
-        {
-          "id": 12,
-          "question": "What KPI best measures success of an AI automation project?",
-          "options": ["Number of AI tools purchased", "Time saved, error rate reduction, cost per transaction, and throughput", "Lines of code written", "Size of training dataset"],
-          "correct": 1
-        },
-        {
-          "id": 13,
-          "question": "What is the 'build vs buy' decision in AI consulting?",
-          "options": ["Whether to buy hardware", "Choosing between developing custom AI internally or purchasing an existing vendor solution", "Whether to hire consultants", "Cloud vs on-premise decision"],
-          "correct": 1
-        },
-        {
-          "id": 14,
-          "question": "What is 'model drift' and why does a consultant need to address it?",
-          "options": ["Moving models between servers", "When an AI model's accuracy degrades over time as real data patterns shift from training data", "Budget overrun on AI projects", "A model switching between vendors"],
-          "correct": 1
-        },
-        {
-          "id": 15,
-          "question": "What does an AI readiness assessment evaluate?",
-          "options": ["Which AI tools to buy immediately", "Data quality, infrastructure maturity, team skills, and cultural readiness for AI adoption", "Competitor AI capabilities", "Number of employees available"],
-          "correct": 1
-        }
+        {"id":1,"question":"A client spends 40 hours/week on data entry that could be automated. The automation costs $5,000 to build. Staff cost $20/hr. What is the break-even point?","options":["3 months","~6 weeks — 40hr × $20 × 6.25 weeks = $5,000","6 months","1 year"],"correct":1},
+        {"id":2,"question":"A client wants AI automation but their data is stored in 5 different unconnected systems. What must be addressed first?","options":["Build the automation immediately","Data integration — connect or consolidate data sources before automation can work reliably","Buy more software","Train staff on AI"],"correct":1},
+        {"id":3,"question":"When should you recommend N8N over Make.com for a client?","options":["Always — N8N is better","When the client needs self-hosted deployment for data privacy, has technical staff, or requires custom code nodes","When cost is the only concern","When the client uses Google Workspace"],"correct":1},
+        {"id":4,"question":"A client asks 'What is the ROI of implementing AI in our business?' What information do you need to calculate this?","options":["Just the software cost","Current process cost (time × rate), implementation cost, ongoing maintenance, and measurable output improvement","The AI vendor's published ROI stats","Only the time saved"],"correct":1},
+        {"id":5,"question":"A client's CEO is enthusiastic about AI automation but department heads are resistant. What is the correct consulting approach?","options":["Force the implementation","Address change management — involve department heads early, show quick wins, and demonstrate how automation helps rather than replaces them","Replace resistant managers","Delay the project"],"correct":1},
+        {"id":6,"question":"What should a consulting proposal scope document always include to protect both parties?","options":["Only the deliverables","Deliverables, timeline, assumptions, out-of-scope items, payment terms, and revision limits","Just the price","Technical specifications only"],"correct":1},
+        {"id":7,"question":"A client wants to automate customer support with AI. They get 500 tickets/day, 80% are repetitive questions. What metric do you track post-implementation?","options":["Server uptime","Deflection rate — % of tickets resolved without human intervention, and customer satisfaction score (CSAT)","Number of AI API calls","Cost per API call"],"correct":1},
+        {"id":8,"question":"You discover mid-project that the client's data quality is too poor for the AI system to work. What do you do?","options":["Continue and deliver a poor result","Stop, document the finding in a change request, propose a data cleanup phase with revised timeline and cost","Quietly abandon the project","Blame the client"],"correct":1},
+        {"id":9,"question":"Which process is best suited for AI automation: a creative brainstorming session or a monthly invoice reconciliation process?","options":["Creative brainstorming","Invoice reconciliation — it is rule-based, repetitive, and high-volume with measurable outcomes","Both are equally suitable","Neither — AI cannot automate business processes"],"correct":1},
+        {"id":10,"question":"A client insists on automating a process that involves frequent exceptions and human judgment. What is your recommendation?","options":["Automate it fully","Implement assisted automation — AI handles the standard cases, flags exceptions for human review","Refuse the project","Build fully custom AI"],"correct":1},
+        {"id":11,"question":"What is the difference between AI automation consulting and software development consulting?","options":["No difference","AI automation consulting focuses on process identification, tool selection, and business ROI; software dev focuses on building custom systems from scratch","AI consulting is cheaper","Software consulting is faster"],"correct":1},
+        {"id":12,"question":"A client has a $10,000 budget for AI automation. Their top 3 processes could each save $8,000/year. How do you prioritize?","options":["Automate all three simultaneously","Automate the highest-value, lowest-complexity process first to deliver quick ROI and build trust","Let the client decide without guidance","Automate the cheapest process first"],"correct":1},
+        {"id":13,"question":"What is a 'process map' and why is it essential before building automation?","options":["A geographic map of office locations","A visual diagram of every step, decision point, and actor in a business process — ensures automation mirrors reality, not assumptions","A project timeline","A network diagram"],"correct":1},
+        {"id":14,"question":"A client wants to use AI to generate sales proposals automatically. What risk must you highlight?","options":["AI proposals will be perfect","AI may generate inaccurate pricing or commitments — human review and approval gates are required before sending","This is not possible","The client's CRM may not support it"],"correct":1},
+        {"id":15,"question":"You are presenting an AI solution to a non-technical CEO. Which approach is most effective?","options":["Show detailed technical architecture diagrams","Lead with business outcomes (cost saved, hours reduced, revenue impact) and show a live demo of the working solution","Use technical jargon to establish credibility","Present a 50-page report"],"correct":1},
+        {"id":16,"question":"What does 'pilot project' mean in AI consulting and why is it recommended?","options":["A test flight — unrelated to consulting","A small-scale implementation of the automation on one process or team — validates the approach before full rollout, reducing risk","A free project for the client","The first invoice"],"correct":1},
+        {"id":17,"question":"A Myanmar SME client has no IT infrastructure. They want AI automation. Where do you start?","options":["Build custom software immediately","Assess their digital maturity first — tools they currently use, data availability, team tech literacy — then recommend appropriate entry-level automation (e.g. Make.com + Google Sheets)","Tell them they are not ready","Recommend a full ERP system"],"correct":1},
+        {"id":18,"question":"What is a key sign that a business process is NOT ready for automation?","options":["It is repetitive","The process has no consistent rules — outcomes depend heavily on human judgment, relationships, or informal knowledge","It is time-consuming","It uses multiple systems"],"correct":1},
+        {"id":19,"question":"A client wants to know how their AI chatbot is performing. Which KPIs do you track?","options":["Number of messages sent","Containment rate, user satisfaction score, escalation rate, and average resolution time","Server uptime only","Number of users registered"],"correct":1},
+        {"id":20,"question":"What is the primary difference between a retainer consulting model and a project-based model?","options":["No difference","Retainer = ongoing monthly fee for continued support and improvements; Project = fixed scope and price for a defined deliverable","Retainer is always cheaper","Project model includes maintenance"],"correct":1},
+        {"id":21,"question":"A client asks you to automate a process that handles personal data of EU customers. What compliance framework applies?","options":["CCPA only","GDPR — you must ensure data processing is lawful, data is protected, and the client has a privacy policy","ISO 27001","No compliance required for automation"],"correct":1},
+        {"id":22,"question":"After delivering an automation, the client reports it stopped working after they changed their CRM. What should your contract have included?","options":["This is the client's problem","A maintenance clause defining responsibility for updates when dependent systems change, with an agreed support rate","A longer initial build time","A refund policy"],"correct":1},
+        {"id":23,"question":"What is the correct way to present cost savings to a skeptical CFO?","options":["Use optimistic projections","Show conservative, auditable calculations based on current labor costs with before/after comparison — offer a pilot to prove ROI before full investment","Use vendor case studies only","Avoid discussing costs"],"correct":1},
+        {"id":24,"question":"A client's staff fears AI will replace their jobs. How do you address this during implementation?","options":["Ignore the concern — it is not your problem","Involve staff in the automation design, reframe AI as handling tedious tasks so they can focus on higher-value work, and provide training","Confirm their fears honestly","Replace staff gradually"],"correct":1},
+        {"id":25,"question":"What distinguishes a successful AI consulting engagement from a failed one in Southeast Asia markets?","options":["Using the most advanced AI technology","Understanding local business context, building trust through face-to-face relationships, delivering visible quick wins, and ensuring the solution fits the client's actual technical capacity","Having the lowest price","Completing on time regardless of quality"],"correct":1}
       ]
     }
   }

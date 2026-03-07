@@ -1,14 +1,82 @@
 [
   {
-    "question": "How do I start learning AI?",
-    "answer": "Start with Python basics, then learn prompt engineering and automation tools like n8n."
+    "question": "What courses do you offer?",
+    "answer": "We offer 6 courses: N8N AI Automation, Make.com Automation, Agentic AI Systems, Cloud Deployment (AWS/GCP/Azure/Modal), Network Engineering, and AI Business Consulting. All are available free in the Learning Hub."
   },
   {
-    "question": "What is AI automation?",
-    "answer": "AI automation combines artificial intelligence with automated workflows to perform tasks without manual work."
+    "question": "Are the courses free?",
+    "answer": "Yes, all courses on our platform are completely free. You can access them via the Learning Hub on our website and earn a verified certificate after passing the quiz."
   },
   {
-    "question": "What is prompt engineering?",
-    "answer": "Prompt engineering is the practice of designing instructions that guide AI systems to produce accurate outputs."
+    "question": "How do I get a certificate?",
+    "answer": "Open any free course card and click 'Practice & Get Cert'. Answer the quiz with 75% or above and your certificate is generated instantly — both a PDF download and a permanent online URL."
+  },
+  {
+    "question": "What is n8n?",
+    "answer": "N8N is an open-source workflow automation tool that connects apps and services without code. IT Solutions MM teaches N8N for building AI-powered automations, webhook triggers, API integrations, and real-world business workflows."
+  },
+  {
+    "question": "What is Make.com?",
+    "answer": "Make.com (formerly Integromat) is a visual automation platform. Our Make.com course covers scenario building, data mapping, error handling, and integrating AI into automated business processes."
+  },
+  {
+    "question": "What is agentic AI?",
+    "answer": "Agentic AI refers to AI systems that can plan, reason, and take actions autonomously. Our Agentic AI course covers building autonomous agents, RAG (retrieval-augmented generation), multi-agent pipelines, and production deployment."
+  },
+  {
+    "question": "What cloud platforms do you cover?",
+    "answer": "Our cloud course covers AWS, Google Cloud Platform (GCP), Microsoft Azure, and Modal serverless. Topics include cloud architecture, cost optimisation, serverless deployment, and CI/CD pipelines."
+  },
+  {
+    "question": "What network topics do you teach?",
+    "answer": "Our network course covers BGP, OSPF, SD-WAN, Zero Trust security, VLAN configuration, firewall rules, and network automation with Python — from CCNA-level fundamentals to enterprise-grade design."
+  },
+  {
+    "question": "What is AI consulting?",
+    "answer": "Our AI Business Consulting course teaches how to apply AI automation to real business problems: process analysis, ROI calculation, tool selection, and presenting AI solutions to clients in Myanmar and Southeast Asia."
+  },
+  {
+    "question": "How do I contact you?",
+    "answer": "You can reach us via Telegram @MaterAITraining_bot, WhatsApp +66949567820, or email itsolutions.mm@gmail.com. Use the Contact form on our website for inquiries."
+  },
+  {
+    "question": "Who is the founder?",
+    "answer": "IT Solutions MM was founded by MR. KYAW ZIN TUN, an expert in AI Automation, N8N, Make.com, Python, Cloud (AWS/GCP/Azure/Modal), and Network Engineering based in Myanmar."
+  },
+  {
+    "question": "What is IT Solutions MM?",
+    "answer": "IT Solutions MM is an AI Automation training platform based in Myanmar. We provide free AI courses, live Telegram AI support, and certified training in N8N, Make.com, Cloud, and Network Engineering."
+  },
+  {
+    "question": "How long do the courses take?",
+    "answer": "Each course has 10 modules. You can study at your own pace. To unlock the certificate quiz you need to review at least 50% of the modules, then score 75% on the quiz."
+  },
+  {
+    "question": "What score do I need to pass the quiz?",
+    "answer": "You need 75% or above on the quiz to earn your certificate. The quiz has 10 random questions drawn from a 15-question bank for each course."
+  },
+  {
+    "question": "Is there a Telegram bot?",
+    "answer": "Yes — @MaterAITraining_bot on Telegram is our AI assistant. It answers questions about AI automation, our courses, and IT Solutions MM services in both English and Burmese."
+  },
+  {
+    "question": "Do you support Burmese language?",
+    "answer": "Yes. Our AI assistant on the website and on Telegram automatically detects if you write in Burmese (Myanmar script) and replies entirely in Burmese."
+  },
+  {
+    "question": "What is the AI Pulse feed?",
+    "answer": "AI Pulse is our live news section that aggregates the latest AI industry updates from OpenAI, Anthropic, Google DeepMind, Meta AI, Mistral, HuggingFace, and NVIDIA — refreshed every 6 hours."
+  },
+  {
+    "question": "Can I subscribe to AI news updates?",
+    "answer": "Yes. Enter your email in the AI Pulse section of our website to receive a free weekly AI digest every Monday with the top AI industry updates."
+  },
+  {
+    "question": "How do I install n8n?",
+    "answer": "Install n8n globally with: npm install n8n -g. Then run it with: n8n start. For cloud deployment use Docker or a VPS. IT Solutions MM's N8N course covers both local and cloud installation step by step."
+  },
+  {
+    "question": "How do I connect an API in n8n?",
+    "answer": "In n8n, add an HTTP Request node, set the method (GET/POST), enter the API URL, and add headers or authentication as needed. Our N8N course covers REST API connections, webhooks, and OAuth in detail."
   }
 ]

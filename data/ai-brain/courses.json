@@ -1,35 +1,110 @@
 [
   {
-    "id": "AI-101",
-    "title": "AI Automation Fundamentals",
-    "level": "Beginner",
+    "id": "n8n",
+    "title": "N8N AI Automation Masterclass",
+    "level": "Beginner to Intermediate",
     "modules": [
-      "Introduction to AI",
-      "Prompt engineering basics",
-      "Automation concepts",
-      "Using AI APIs"
-    ]
+      "Introduction to N8N & Workflow Automation",
+      "Installing N8N (Local & Cloud)",
+      "Understanding Nodes & Connections",
+      "HTTP Request & REST API Nodes",
+      "Webhook Triggers & External Integrations",
+      "Conditional Logic (IF Node & Switch)",
+      "Loops, Split in Batches & Merge",
+      "Error Handling & Retry Logic",
+      "Building a Real-World Automation Project",
+      "Deploying N8N to Production"
+    ],
+    "outcome": "Build and deploy production-grade automation workflows using N8N"
   },
   {
-    "id": "AI-201",
-    "title": "n8n Workflow Automation",
+    "id": "makecom",
+    "title": "Make.com Automation Masterclass",
+    "level": "Beginner to Intermediate",
+    "modules": [
+      "Introduction to Make.com & Scenarios",
+      "Connecting Apps & Services",
+      "Data Mapping & Transformations",
+      "Filters, Routers & Conditional Logic",
+      "Webhooks & Instant Triggers",
+      "Iterators & Aggregators",
+      "Error Handling & Notifications",
+      "AI Integration (OpenAI, GPT in Make)",
+      "Building End-to-End Business Automations",
+      "Scheduling & Production Deployment"
+    ],
+    "outcome": "Automate complex business processes using Make.com with AI integration"
+  },
+  {
+    "id": "agentic",
+    "title": "Agentic AI Systems",
+    "level": "Intermediate to Advanced",
+    "modules": [
+      "What are AI Agents & Multi-Agent Systems",
+      "LLM Fundamentals & Prompt Engineering",
+      "Tool Use & Function Calling",
+      "RAG (Retrieval-Augmented Generation) Basics",
+      "Vector Databases & Embeddings",
+      "Building Autonomous AI Agents",
+      "Multi-Agent Orchestration",
+      "Memory & Context Management",
+      "Testing & Evaluating AI Agents",
+      "Deploying Agentic Systems to Production"
+    ],
+    "outcome": "Design and deploy autonomous AI agent pipelines for real business use cases"
+  },
+  {
+    "id": "cloud",
+    "title": "Cloud Deployment for AI",
     "level": "Intermediate",
     "modules": [
-      "Workflow triggers",
-      "API connections",
-      "Webhook automation",
-      "Data transformation"
-    ]
+      "Cloud Fundamentals (AWS, GCP, Azure, Modal)",
+      "Serverless Architecture & Functions",
+      "Containerisation with Docker",
+      "Deploying AI Apps on Modal",
+      "AWS Lambda & API Gateway",
+      "Database Services (RDS, Supabase, Firebase)",
+      "CI/CD Pipelines for AI Projects",
+      "Cost Optimisation Strategies",
+      "Security & IAM Best Practices",
+      "Monitoring & Logging in Production"
+    ],
+    "outcome": "Deploy and manage AI applications on major cloud platforms cost-effectively"
   },
   {
-    "id": "AI-301",
-    "title": "Advanced AI Systems",
-    "level": "Advanced",
+    "id": "network",
+    "title": "Network Engineering for AI Systems",
+    "level": "Intermediate",
     "modules": [
-      "AI agents",
-      "Vector search",
-      "AI deployment",
-      "Production pipelines"
-    ]
+      "Network Fundamentals (OSI, TCP/IP)",
+      "VLAN & Subnet Design",
+      "Routing Protocols: BGP & OSPF",
+      "SD-WAN Architecture & Implementation",
+      "Zero Trust Network Security",
+      "Firewall Rules & NAT",
+      "VPN Setup & Remote Access",
+      "Network Automation with Python",
+      "Monitoring: SNMP, NetFlow, Grafana",
+      "Enterprise Network Design Patterns"
+    ],
+    "outcome": "Design and automate enterprise-grade networks with security best practices"
+  },
+  {
+    "id": "consulting",
+    "title": "AI Business Consulting",
+    "level": "Intermediate",
+    "modules": [
+      "Understanding Business Process Analysis",
+      "Identifying AI Automation Opportunities",
+      "Tool Selection: N8N vs Make vs Custom",
+      "ROI Calculation for AI Projects",
+      "Presenting AI Solutions to Clients",
+      "Project Scoping & Proposal Writing",
+      "Implementation Roadmaps",
+      "Change Management for AI Adoption",
+      "Building AI Consulting Packages",
+      "Case Studies: Myanmar & Southeast Asia"
+    ],
+    "outcome": "Sell and deliver AI automation consulting services to businesses in Myanmar and Southeast Asia"
   }
 ]

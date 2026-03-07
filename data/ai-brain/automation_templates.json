@@ -1,17 +1,42 @@
 [
   {
-    "name": "AI Chatbot Workflow",
+    "name": "AI Chatbot Workflow (N8N)",
     "platform": "n8n",
-    "description": "Receive user message → send to AI → return response."
+    "description": "Webhook trigger receives user message → HTTP Request to OpenAI GPT-4o → format response → return reply. Add memory by storing chat history in a database node."
   },
   {
-    "name": "Email AI Auto Responder",
-    "platform": "Make",
-    "description": "Automatically generate replies for incoming emails."
+    "name": "Email Auto-Responder (Make.com)",
+    "platform": "Make.com",
+    "description": "Gmail trigger watches inbox → filter by keywords → send email content to OpenAI → compose reply using AI output → send reply via Gmail. Runs every 15 minutes."
   },
   {
-    "name": "AI Web Data Extractor",
+    "name": "Telegram Bot with AI (N8N)",
     "platform": "n8n",
-    "description": "Scrape website data and summarize using AI."
+    "description": "Telegram webhook trigger → extract message text and chat_id → send to OpenAI → send AI reply back via Telegram sendMessage API. Add rate limiting with a Function node."
+  },
+  {
+    "name": "Lead Capture to CRM (Make.com)",
+    "platform": "Make.com",
+    "description": "Website form webhook → create contact in CRM (HubSpot/Airtable) → send welcome email via Gmail → notify team on Slack. Fully automated lead pipeline."
+  },
+  {
+    "name": "AI Web Scraper + Summariser (N8N)",
+    "platform": "n8n",
+    "description": "Schedule trigger → HTTP Request to target URL → extract HTML with HTML Extract node → send content to GPT-4o for summarisation → save summary to Google Sheets or Notion."
+  },
+  {
+    "name": "Invoice Processing (Make.com)",
+    "platform": "Make.com",
+    "description": "Email attachment trigger → extract PDF text → send to OpenAI to parse fields (amount, vendor, date) → create record in Airtable → send Slack notification to finance team."
+  },
+  {
+    "name": "Social Media Auto-Poster (N8N)",
+    "platform": "n8n",
+    "description": "Schedule trigger → read content from Google Sheets → use OpenAI to rewrite for each platform → post to Twitter/X via API, post to Facebook via Graph API. One workflow, multi-platform."
+  },
+  {
+    "name": "AI Customer Support Agent (N8N + RAG)",
+    "platform": "n8n",
+    "description": "Webhook receives customer question → search vector database (Pinecone/Supabase) for relevant knowledge base chunks → inject context into GPT-4o prompt → return grounded answer. No hallucination."
   }
 ]

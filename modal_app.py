@@ -39,6 +39,11 @@ def _check_rate_limit(ip: str, limit: int = 20, window: int = 60) -> bool:
     if len(_rate_store[ip]) >= limit:
         return False
     _rate_store[ip].append(now)
+    # Prune stale keys to prevent unbounded memory growth
+    if len(_rate_store) > 5000:
+        stale = [k for k, v in _rate_store.items() if not v]
+        for k in stale:
+            del _rate_store[k]
     return True
 
 app = modal.App("main")
@@ -206,15 +211,18 @@ def send_weekly_digest():
         return
 
     # Build HTML email
+    from html import escape as _esc
     rows = ""
     for item in updates:
+        link = item.get('official_link', '')
+        safe_link = link if link.startswith(('https://', 'http://')) else '#'
         rows += f"""
         <tr>
           <td style="padding:12px 0;border-bottom:1px solid #1a1a2e;">
-            <span style="font-size:10px;color:#00cccc;text-transform:uppercase;letter-spacing:1px;">{item['company']} · {item.get('release_type','Update')}</span><br>
-            <a href="{item['official_link']}" style="font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">{item['title']}</a><br>
-            <span style="font-size:13px;color:#888;line-height:1.5;">{item.get('digest','')}</span><br>
-            <span style="font-size:11px;color:#555;">{item.get('date','')}</span>
+            <span style="font-size:10px;color:#00cccc;text-transform:uppercase;letter-spacing:1px;">{_esc(item['company'])} · {_esc(item.get('release_type','Update'))}</span><br>
+            <a href="{_esc(safe_link)}" style="font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">{_esc(item['title'])}</a><br>
+            <span style="font-size:13px;color:#888;line-height:1.5;">{_esc(item.get('digest',''))}</span><br>
+            <span style="font-size:11px;color:#555;">{_esc(item.get('date',''))}</span>
           </td>
         </tr>"""
 
@@ -306,27 +314,33 @@ def web():
         if not openai_key:
             return JSONResponse({"error": "API key not configured"}, status_code=500)
 
-        # Strip all fields — only forward sanitised messages, lock model + token cap
+        # Sanitise messages — allow one system message (AI Brain context from JS),
+        # then user/assistant history only. Reject all other roles.
         raw_messages = body.get("messages", [])
         if not isinstance(raw_messages, list):
             return JSONResponse({"error": "Invalid messages"}, status_code=400)
 
-        safe_messages = [
-            {"role": "user", "content": str(m.get("content", ""))[:2000]}
+        # Allow first system message (capped), then interleaved user/assistant only
+        system_msgs = [
+            {"role": "system", "content": str(m.get("content", ""))[:6000]}
             for m in raw_messages
-            if isinstance(m, dict) and m.get("role") == "user"
-        ][-20:]  # last 20 user turns max
+            if isinstance(m, dict) and m.get("role") == "system"
+        ][:1]
 
-        if not safe_messages:
+        history_msgs = [
+            {"role": m["role"], "content": str(m.get("content", ""))[:2000]}
+            for m in raw_messages
+            if isinstance(m, dict) and m.get("role") in ("user", "assistant")
+        ][-20:]
+
+        if not any(m["role"] == "user" for m in history_msgs):
             return JSONResponse({"error": "No valid messages"}, status_code=400)
 
         safe_body = {
             "model": "gpt-4o",
             "max_tokens": 300,
-            "messages": body.get("messages", []),  # full history including system from JS
+            "messages": system_msgs + history_msgs,
         }
-        # Enforce max_tokens cap regardless of what client sends
-        safe_body["max_tokens"] = min(int(body.get("max_tokens", 300)), 300)
 
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
@@ -420,28 +434,18 @@ def web():
         return JSONResponse({"ok": True})
 
     # --- Telegram bot webhook: AI Brain replies to users via GPT-4o ---
-    TELEGRAM_AI_SYSTEM = """You are the AI Brain of MR. KYAW ZIN TUN — an expert in AI Automation, N8N, Make.com, Python, Cloud (AWS/GCP/Azure/Modal), and Network Engineering based in Myanmar.
+    TELEGRAM_AI_SYSTEM = """You are the AI assistant of IT Solutions MM (founder: MR. KYAW ZIN TUN), a free AI automation training platform in Myanmar.
 
-IDENTITY: You represent IT Solutions MM and the AI Automation Society (https://www.skool.com/ai-automation-society).
+SERVICES: Free courses in N8N, Make.com, Agentic AI, Cloud (AWS/GCP/Azure/Modal), Network Engineering, AI Business Consulting. Certificate issued after 75% quiz score.
+CONTACT (share ONLY when user asks to enroll, asks pricing, or asks how to reach us): Telegram @MaterAITraining_bot | WhatsApp wa.me/66949567820 | Email itsolutions.mm@gmail.com
+WEBSITE: https://itsolutions-mm--main-web.modal.run
 
-CONTACT METHODS (only share when user asks how to reach us, requests human assistance, asks about enrollment, or asks about pricing):
-- Telegram: @MaterAITraining_bot
-- WhatsApp: https://wa.me/66949567820
-- Email: itsolutions.mm@gmail.com
-
-SERVICES OFFERED:
-- AI Automation Training (N8N, Make.com, Zapier, Agentic AI, RAG)
-- Cloud Architecture (AWS, GCP, Azure, Modal serverless)
-- Network Engineering (BGP, OSPF, SD-WAN, Zero Trust, CCNA-level)
-- AI Consulting for businesses in Myanmar and Southeast Asia
-
-RULES:
-1. Keep answers to 2-3 sentences maximum.
-2. ONLY share contact details (Telegram/WhatsApp/Email) when the user explicitly asks how to contact, requests human assistance, asks about pricing, or asks to enroll. Do NOT include contact info in every reply.
-3. When sharing contact, list all three: Telegram @MaterAITraining_bot, WhatsApp wa.me/66949567820, and Email itsolutions.mm@gmail.com.
-4. If asked ANYTHING unrelated to AI, tech, coding, automation, or cloud — decline in exactly one sentence: "I only assist with AI and automation topics."
-5. Be friendly, confident, and professional.
-6. LANGUAGE: Detect the user's language automatically. If the user writes in Burmese (Myanmar script), reply entirely in Burmese. If in English, reply in English. Match the user's language always."""
+STRICT RULES:
+1. Answer in 1-2 sentences only — no long explanations.
+2. ONLY answer about IT Solutions MM services, AI automation, N8N, Make.com, cloud, network, or Python. For anything else say: "I only assist with AI and automation topics."
+3. NEVER invent course content, pricing, or features not stated above.
+4. If you don't know the specific answer, say: "Contact us at @MaterAITraining_bot or itsolutions.mm@gmail.com for details."
+5. LANGUAGE: Burmese script → reply in Burmese. English → reply in English. Always match user language."""
 
     @api.post("/api/telegram-webhook")
     async def telegram_webhook(request: Request):
@@ -494,7 +498,7 @@ RULES:
                     headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
                     json={
                         "model": "gpt-4o",
-                        "max_tokens": 200,
+                        "max_tokens": 120,
                         "messages": [
                             {"role": "system", "content": TELEGRAM_AI_SYSTEM},
                             {"role": "user", "content": user_text[:500]},
@@ -514,6 +518,76 @@ RULES:
             )
 
         return JSONResponse({"ok": True})
+
+    # --- Dynamic quiz question generator: fresh AI questions every session ---
+    _COURSE_TOPICS = {
+        "n8n":        "N8N workflow automation — nodes, webhooks, HTTP requests, error handling, expressions, scheduling, credentials, loops, merging, and deploying N8N to production",
+        "makecom":    "Make.com (Integromat) automation — scenarios, modules, routers, filters, iterators, aggregators, webhooks, error handling, operations, scheduling, and data mapping",
+        "agentic":    "Agentic AI systems — LLMs, RAG, vector databases, embeddings, function calling, multi-agent orchestration, memory management, hallucination prevention, and production deployment",
+        "cloud":      "Cloud deployment for AI — AWS Lambda, Modal serverless, Docker, CI/CD pipelines, IAM, VPC, cost optimisation, monitoring, Supabase, and container orchestration",
+        "network":    "Network engineering — OSPF, BGP, VLANs, SD-WAN, Zero Trust, IPsec VPN, NAT, firewall rules, Netmiko/Python automation, SNMP, NetFlow, and enterprise network design",
+        "consulting": "AI business consulting — process analysis, ROI calculation, tool selection (N8N vs Make), change management, proposal writing, pilot projects, KPIs, and Southeast Asia market context",
+    }
+
+    @api.post("/api/quiz/questions")
+    async def quiz_questions(request: Request):
+        import json, re
+        ip = request.client.host if request.client else "unknown"
+        if not _check_rate_limit(f"quiz_{ip}", limit=5, window=3600):
+            return JSONResponse({"error": "Too many quiz attempts. Try again later."}, status_code=429)
+        try:
+            body = await request.json()
+        except Exception:
+            return JSONResponse({"error": "Invalid JSON"}, status_code=400)
+
+        course_key = str(body.get("course_key", "")).strip().lower()[:20]
+        if course_key not in _COURSE_TOPICS:
+            return JSONResponse({"error": "Invalid course"}, status_code=400)
+
+        openai_key = os.environ.get("OPENAI_API_KEY", "")
+        if not openai_key:
+            return JSONResponse({"error": "Not configured"}, status_code=500)
+
+        topic = _COURSE_TOPICS[course_key]
+        prompt = (
+            f"Generate exactly 10 multiple-choice quiz questions about: {topic}.\n\n"
+            "Requirements:\n"
+            "- Intermediate to advanced difficulty — scenario-based, practical, NOT pure definition recall\n"
+            "- Each question has exactly 4 options\n"
+            "- Exactly one correct answer per question\n"
+            "- Questions must be unique and vary in topic coverage\n"
+            "- Return ONLY a JSON array, no markdown, no extra text:\n"
+            '[{"question":"...","options":["A","B","C","D"],"correct":0},...]\n'
+            "correct is the 0-based index of the correct answer."
+        )
+        try:
+            async with httpx.AsyncClient(timeout=45) as client:
+                resp = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                    json={"model": "gpt-4o", "max_tokens": 2000, "temperature": 0.8,
+                          "messages": [{"role": "user", "content": prompt}]},
+                )
+            raw = resp.json()["choices"][0]["message"]["content"].strip()
+            if raw.startswith("```"):
+                raw = raw.split("```")[1].strip()
+                if raw.startswith("json"): raw = raw[4:].strip()
+            questions = json.loads(raw)
+            # Validate structure
+            if not isinstance(questions, list) or len(questions) < 5:
+                raise ValueError("Bad response")
+            clean = []
+            for q in questions[:10]:
+                if isinstance(q.get("options"), list) and len(q["options"]) == 4 and isinstance(q.get("correct"), int):
+                    clean.append({"question": str(q["question"])[:300],
+                                  "options": [str(o)[:150] for o in q["options"]],
+                                  "correct": max(0, min(3, q["correct"]))})
+            if len(clean) < 5:
+                raise ValueError("Too few valid questions")
+            return JSONResponse({"questions": clean})
+        except Exception as e:
+            print(f"[Quiz Gen] Failed for {course_key}: {e}")
+            return JSONResponse({"error": "generation_failed"}, status_code=500)
 
     # --- AI Pulse feed: serve live JSON from volume, fallback to baked file ---
     @api.get("/api/ai-feed")
@@ -550,8 +624,8 @@ RULES:
 
         if not name or not course:
             return JSONResponse({"error": "Name and course are required."}, status_code=400)
-        if score < 70:
-            return JSONResponse({"error": "Score must be >= 70% to earn a certificate."}, status_code=400)
+        if score < 75:
+            return JSONResponse({"error": "Score must be >= 75% to earn a certificate."}, status_code=400)
 
         cert_id = str(uuid_lib.uuid4())
         cert_data = {
@@ -582,6 +656,7 @@ RULES:
     async def certificate_view(cert_id: str):
         import json, re
         from pathlib import Path
+        from html import escape as _esc
 
         if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', cert_id):
             return HTMLResponse("<h1>Invalid certificate ID</h1>", status_code=400)
@@ -599,12 +674,14 @@ RULES:
         except Exception:
             date_fmt = cert.get("date", "")
 
-        n   = cert["name"]
-        crs = cert["course"]
-        sc  = cert["score"]
-        ls  = cert["learning_score"]
-        qs  = cert["quiz_score"]
-        cid = cert_id[:8].upper()
+        # Escape all user-supplied values before HTML interpolation (XSS prevention)
+        n   = _esc(str(cert["name"]))
+        crs = _esc(str(cert["course"]))
+        sc  = _esc(str(cert["score"]))
+        ls  = _esc(str(cert["learning_score"]))
+        qs  = _esc(str(cert["quiz_score"]))
+        cid = _esc(cert_id[:8].upper())
+        date_fmt = _esc(date_fmt)
 
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -612,6 +689,7 @@ RULES:
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Certificate — {n} | IT Solutions MM</title>
+<meta name="robots" content="noindex">
 <meta property="og:title" content="Certificate of Completion — {n}">
 <meta property="og:description" content="{n} completed {crs} with {sc}% at IT Solutions MM.">
 <link rel="preconnect" href="https://fonts.googleapis.com">

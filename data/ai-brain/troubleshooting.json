@@ -1,14 +1,50 @@
 [
   {
-    "problem": "python command not recognized",
-    "solution": "Ensure Python is installed and added to system PATH."
+    "problem": "n8n command not found after npm install",
+    "solution": "Run: npm install -g n8n. If still not found, check that npm global bin is in your PATH with: npm bin -g. On Mac: add export PATH=$PATH:$(npm bin -g) to your ~/.zshrc."
   },
   {
-    "problem": "docker daemon not running",
-    "solution": "Open Docker Desktop and start the Docker service."
+    "problem": "n8n webhook not triggering",
+    "solution": "Make sure your n8n instance is accessible from the internet. Use ngrok for local testing: ngrok http 5678. Copy the ngrok URL as your webhook URL in the external service."
   },
   {
-    "problem": "n8n command not found",
-    "solution": "Install n8n globally using npm install n8n -g."
+    "problem": "HTTP Request node in n8n returns 401 Unauthorized",
+    "solution": "Add the correct authentication header. For Bearer tokens: set Header Auth with name 'Authorization' and value 'Bearer YOUR_TOKEN'. For API keys: check the external API docs for the correct header name."
+  },
+  {
+    "problem": "Make.com scenario stops with a 429 error",
+    "solution": "429 means rate limit exceeded on the external API. Add a 'Sleep' module before the API call (set to 1-2 seconds), or use Make's built-in throttling in the scenario settings."
+  },
+  {
+    "problem": "Make.com webhook data not mapping correctly",
+    "solution": "Run the scenario once with a test webhook payload to let Make detect the data structure. Then re-map fields using the data inspector. Ensure the payload Content-Type is application/json."
+  },
+  {
+    "problem": "OpenAI API returns error 'context length exceeded'",
+    "solution": "Reduce the conversation history you're sending. Keep only the last 5-10 messages. Trim the system prompt. Or switch to a model with larger context like gpt-4o which supports 128k tokens."
+  },
+  {
+    "problem": "Python not found or wrong version",
+    "solution": "Install Python 3.10+ from python.org. On Mac use: brew install python3. Check version with: python3 --version. Use virtual environments to avoid conflicts: python3 -m venv venv && source venv/bin/activate."
+  },
+  {
+    "problem": "Docker container exits immediately",
+    "solution": "Check logs with: docker logs <container_id>. Common causes: wrong entrypoint, missing environment variables, or port already in use. Run with -it flag to debug interactively."
+  },
+  {
+    "problem": "Modal deploy fails with secret not found",
+    "solution": "Create the secret first: modal secret create secret-name KEY=value. Then reference it in your @app.function with secrets=[modal.Secret.from_name('secret-name')]."
+  },
+  {
+    "problem": "n8n workflow runs but data is missing between nodes",
+    "solution": "Check the output of the previous node using the 'Execute Node' button. Make sure you're accessing the correct property path. N8N uses $json.fieldName or $node['NodeName'].json.fieldName syntax."
+  },
+  {
+    "problem": "Cannot connect to n8n on a VPS",
+    "solution": "Ensure port 5678 is open in your firewall/security group. Set N8N_HOST=0.0.0.0 in your environment. Use a reverse proxy (nginx/caddy) with SSL for production access."
+  },
+  {
+    "problem": "Make.com scenario data mapping shows undefined",
+    "solution": "The webhook hasn't been triggered yet for Make to see the data structure. Click 'Run once' and trigger the webhook with a real or test payload. Then the fields will appear in the mapper."
   }
 ]
