@@ -65,7 +65,7 @@ _FEED_SOURCES = [
 # ── Scraper image (lighter — no static assets needed) ─────────────────────────
 scraper_image = (
     modal.Image.debian_slim()
-    .pip_install("firecrawl-py", "httpx")
+    .pip_install("httpx")
 )
 
 # ── Scheduled scraper: runs every 6 hours, zero human effort ──────────────────
@@ -81,12 +81,11 @@ scraper_image = (
 )
 def scrape_ai_feed():
     import os, json
-    from firecrawl import FirecrawlApp
     import httpx
 
-    fc  = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
-    oai = os.environ["OPENAI_API_KEY"]
-    today = datetime.utcnow().strftime("%Y-%m-%d")
+    fc_key = os.environ["FIRECRAWL_API_KEY"]
+    oai    = os.environ["OPENAI_API_KEY"]
+    today  = datetime.utcnow().strftime("%Y-%m-%d")
 
     # Load existing feed from volume, or bootstrap empty
     feed_file = Path(FEED_PATH)
@@ -101,9 +100,17 @@ def scrape_ai_feed():
 
     for src in _FEED_SOURCES:
         try:
-            result  = fc.scrape_url(src["url"], formats=["markdown"])
-            content = (result.markdown or "")[:3000]
+            # Use Firecrawl REST API directly — immune to SDK version changes
+            fc_resp = httpx.post(
+                "https://api.firecrawl.dev/v1/scrape",
+                headers={"Authorization": f"Bearer {fc_key}", "Content-Type": "application/json"},
+                json={"url": src["url"], "formats": ["markdown"]},
+                timeout=40,
+            )
+            fc_data = fc_resp.json()
+            content = (fc_data.get("data", {}).get("markdown") or "")[:3000]
             if not content:
+                print(f"[AI Feed] ✗ {src['company']}: empty content")
                 continue
 
             resp = httpx.post(
