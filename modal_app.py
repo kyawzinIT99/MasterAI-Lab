@@ -79,7 +79,7 @@ scraper_image = (
 # ── Scheduled scraper: runs every 6 hours, zero human effort ──────────────────
 @app.function(
     image=scraper_image,
-    schedule=modal.Cron("0 */12 * * *"),
+    schedule=modal.Cron("0 8 * * *"),
     volumes={"/feed": feed_vol},
     secrets=[
         modal.Secret.from_name("openai-key"),
