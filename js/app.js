@@ -387,14 +387,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const toolsRes = await fetch('data/AI%20Training%20Tools.json');
       const toolsData = await toolsRes.json();
 
-      // Render Training Tools at ~84% scroll (first clear zone after Docker section ends at 82%)
-      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 84);
-
-      // Render AI Pulse at ~88% — desktop: after Tools (83–92% is conflict-free zone)
-      // Mobile: HTML order places it between Free Courses and Tools naturally
+      // Render AI Pulse at 80% — between Free Courses (76%) and Tools (85%)
+      // FastAPI/Docker static sections moved to 57-62% to clear this zone
       const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 88);
+      renderAIPulseSection(pulseData, 'ai-pulse-container', 80);
 
       // Auto-refresh AI Pulse every 60 minutes — picks up new scraper runs
       const refreshMs = 60 * 60 * 1000;
@@ -402,9 +399,12 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 88);
+          renderAIPulseSection(d, 'ai-pulse-container', 80);
         } catch (e) {}
       }, refreshMs);
+
+      // Render Training Tools at ~85% scroll
+      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
 
       // Render Portfolio / Case Studies at ~92% scroll
       const portfolioRes = await fetch('data/portfolio.json');
