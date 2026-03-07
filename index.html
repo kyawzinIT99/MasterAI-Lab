@@ -288,6 +288,11 @@
           <span class="stat-suffix">ms</span>
           <span class="stat-label">Inference Latency</span>
         </div>
+        <div class="stat">
+          <span id="live-student-count" class="stat-number">0</span>
+          <span class="stat-suffix">+</span>
+          <span class="stat-label">Student Inquiries</span>
+        </div>
       </div>
     </section>
 
@@ -405,6 +410,7 @@
           <textarea name="message" placeholder="Your Message" class="form-input form-textarea" rows="3" data-en-placeholder="Your Message" data-mm-placeholder="သင့်မက်ဆေ့ဂျ်" required></textarea>
           <button type="submit" class="cta-button" style="margin-top:1rem;" data-en="Send Message" data-mm="ပို့ပါ">Send Message</button>
         </form>
+        <button onclick="document.getElementById('cert-modal').style.display='flex'" style="margin-top:1rem;background:transparent;border:1px solid rgba(0,255,255,0.3);color:rgba(0,255,255,0.7);padding:0.5rem 1rem;border-radius:4px;font-size:0.7rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;">🎓 Download Certificate</button>
       </div>
     </section>
 
@@ -451,10 +457,32 @@
     </button>
   </div>
 
+  <!-- Certificate PDF generator -->
+  <div id="cert-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+    <div style="background:#0a0a0f;border:1px solid rgba(0,255,255,0.2);border-radius:8px;padding:2rem 2.5rem;width:90%;max-width:420px;position:relative;">
+      <button onclick="document.getElementById('cert-modal').style.display='none'" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.2rem;cursor:pointer;">✕</button>
+      <div style="font-size:0.6rem;color:#00ffff;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.5rem;">Certificate Generator</div>
+      <h3 style="font-family:var(--font-display);font-size:1.4rem;color:#fff;margin:0 0 1.5rem;">Download Certificate</h3>
+      <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        <input id="cert-name" type="text" placeholder="Your Full Name" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.6rem 0.8rem;color:#fff;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;">
+        <select id="cert-course" style="background:#0a0a0f;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.6rem 0.8rem;color:#fff;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;">
+          <option value="">Select Course</option>
+          <option>N8N AI Automation Masterclass</option>
+          <option>Make.com Automation Professional</option>
+          <option>Agentic AI & RAG Systems</option>
+          <option>Cloud Architecture (AWS/GCP/Azure)</option>
+          <option>Network Engineering (CCNA Level)</option>
+          <option>AI Consulting Fundamentals</option>
+        </select>
+        <button onclick="generateCertificate()" style="background:linear-gradient(135deg,#00ffff20,#00ffff10);border:1px solid #00ffff;color:#00ffff;padding:0.7rem;border-radius:4px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;">Download PDF ↓</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="js/app.js?v=29"></script>
+  <script src="js/app.js?v=30"></script>
 
 
 </body>

@@ -365,6 +365,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // === DYNAMIC SECTIONS FROM JSON ===
     loadDynamicSections();
+
+    // === LIVE STUDENT COUNT ===
+    fetch('/api/student-count').then(r => r.json()).then(d => {
+      const el = document.getElementById('live-student-count');
+      if (el && d.count > 0) {
+        gsap.to({ val: 0 }, {
+          val: d.count, duration: 2, ease: 'power1.out',
+          onUpdate: function() { el.textContent = Math.floor(this.targets()[0].val); }
+        });
+      }
+    }).catch(() => {});
   }
 
   async function loadDynamicSections() {
@@ -618,7 +629,7 @@ document.addEventListener("DOMContentLoaded", () => {
       container.style.transform = 'translateY(-50%)';
     }
 
-    const updates = (data.updates || []).slice(0, (data.frontend_usage && data.frontend_usage.display_limit) || 10);
+    const allUpdates = (data.updates || []).slice(0, (data.frontend_usage && data.frontend_usage.display_limit) || 10);
     const updatedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     const typeColor = {
@@ -626,6 +637,12 @@ document.addEventListener("DOMContentLoaded", () => {
       'Open AI Models': '#34d399', 'Generative AI': '#f472b6', 'AI Infrastructure': '#fbbf24',
       'AI Hardware': '#60a5fa', 'AI API': '#00ffff', 'AI Assistant': '#a78bfa', 'AI Model': '#00ffff',
     };
+
+    // Build unique company list for filter buttons
+    const companies = ['All', ...new Set(allUpdates.map(u => u.company))];
+
+    const filterBtnStyle = (active) =>
+      `font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;padding:0.2rem 0.6rem;border-radius:2px;border:1px solid ${active ? '#00ffff' : 'rgba(255,255,255,0.15)'};background:${active ? 'rgba(0,255,255,0.1)' : 'transparent'};color:${active ? '#00ffff' : 'var(--text-muted)'};cursor:pointer;transition:all 0.2s;`;
 
     let html = `
       <div class="service-group-header">
@@ -635,13 +652,16 @@ document.addEventListener("DOMContentLoaded", () => {
           Live feed · auto-refreshes every 60min · last loaded ${updatedAt}
         </div>
       </div>
-      <div style="padding:0 5vw 1.5rem;">
+      <div style="padding:0.5rem 5vw 1rem;display:flex;flex-wrap:wrap;gap:0.4rem;" id="pulse-filters">
+        ${companies.map((c, i) => `<button onclick="pulseFilter('${c}')" id="pf-${c.replace(/\s/g,'_')}" style="${filterBtnStyle(i===0)}">${c}</button>`).join('')}
+      </div>
+      <div id="pulse-feed" style="padding:0 5vw 1.5rem;">
     `;
 
-    updates.forEach(item => {
+    allUpdates.forEach(item => {
       const accentColor = typeColor[item.category] || '#00ffff';
       html += `
-        <a href="${item.official_link}" target="_blank" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;">
+        <a href="${item.official_link}" target="_blank" data-company="${item.company}" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;">
           <div style="flex:1;">
             <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;flex-wrap:wrap;">
               <span style="font-size:0.58rem;color:${accentColor};text-transform:uppercase;letter-spacing:0.15em;border:1px solid ${accentColor}40;padding:0.1rem 0.45rem;border-radius:2px;">${item.company}</span>
@@ -666,6 +686,114 @@ document.addEventListener("DOMContentLoaded", () => {
 
     container.innerHTML = html;
   }
+
+  // AI Pulse company filter — global so onclick can reach it
+  window.pulseFilter = function(company) {
+    const feed = document.getElementById('pulse-feed');
+    if (!feed) return;
+    feed.querySelectorAll('a[data-company]').forEach(row => {
+      row.style.display = (company === 'All' || row.dataset.company === company) ? 'flex' : 'none';
+    });
+    document.querySelectorAll('#pulse-filters button').forEach(btn => {
+      const active = btn.textContent === company;
+      btn.style.borderColor = active ? '#00ffff' : 'rgba(255,255,255,0.15)';
+      btn.style.background = active ? 'rgba(0,255,255,0.1)' : 'transparent';
+      btn.style.color = active ? '#00ffff' : 'var(--text-muted)';
+    });
+  };
+
+  // Certificate PDF Generator — uses jsPDF (loaded from CDN)
+  window.generateCertificate = function() {
+    const name = document.getElementById('cert-name').value.trim();
+    const course = document.getElementById('cert-course').value;
+    if (!name) { alert('Please enter your full name.'); return; }
+    if (!course) { alert('Please select a course.'); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const W = 297, H = 210;
+
+    // Background
+    doc.setFillColor(6, 6, 15);
+    doc.rect(0, 0, W, H, 'F');
+
+    // Cyan border
+    doc.setDrawColor(0, 255, 255);
+    doc.setLineWidth(0.5);
+    doc.rect(8, 8, W - 16, H - 16);
+    doc.setLineWidth(0.2);
+    doc.rect(11, 11, W - 22, H - 22);
+
+    // Header label
+    doc.setTextColor(0, 200, 200);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text('IT SOLUTIONS MM  ·  AI AUTOMATION SOCIETY', W / 2, 30, { align: 'center' });
+
+    // Title
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(28);
+    doc.setFont('helvetica', 'bold');
+    doc.text('CERTIFICATE OF COMPLETION', W / 2, 60, { align: 'center' });
+
+    // Divider
+    doc.setDrawColor(0, 255, 255);
+    doc.setLineWidth(0.3);
+    doc.line(60, 67, W - 60, 67);
+
+    // Body text
+    doc.setTextColor(180, 180, 200);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('This is to certify that', W / 2, 85, { align: 'center' });
+
+    // Student name
+    doc.setTextColor(0, 255, 255);
+    doc.setFontSize(26);
+    doc.setFont('helvetica', 'bold');
+    doc.text(name, W / 2, 105, { align: 'center' });
+
+    // Underline name
+    const nameWidth = doc.getTextWidth(name);
+    doc.setDrawColor(0, 255, 255);
+    doc.setLineWidth(0.2);
+    doc.line((W - nameWidth) / 2, 108, (W + nameWidth) / 2, 108);
+
+    // Course text
+    doc.setTextColor(180, 180, 200);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('has successfully completed', W / 2, 122, { align: 'center' });
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(course, W / 2, 136, { align: 'center' });
+
+    // Date & issuer
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.setTextColor(120, 120, 150);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Issued: ${dateStr}`, W / 2, 158, { align: 'center' });
+
+    // Signature line
+    doc.setDrawColor(100, 100, 130);
+    doc.setLineWidth(0.2);
+    doc.line(W / 2 - 35, 178, W / 2 + 35, 178);
+    doc.setTextColor(100, 100, 130);
+    doc.setFontSize(8);
+    doc.text('MR. KYAW ZIN TUN', W / 2, 183, { align: 'center' });
+    doc.text('Founder · IT Solutions MM', W / 2, 188, { align: 'center' });
+
+    // Footer
+    doc.setTextColor(60, 60, 80);
+    doc.setFontSize(7);
+    doc.text('itsolutions.mm@gmail.com  ·  t.me/MaterAITraining_bot  ·  wa.me/66949567820', W / 2, 198, { align: 'center' });
+
+    doc.save(`Certificate_${name.replace(/\s+/g, '_')}_${course.split(' ')[0]}.pdf`);
+    document.getElementById('cert-modal').style.display = 'none';
+  };
 
   function setupCardReveal() {
     const observer = new IntersectionObserver((entries) => {
@@ -745,6 +873,7 @@ RULES:
 3. When sharing contact, list all three: Telegram @MaterAITraining_bot, WhatsApp wa.me/66949567820, and Email itsolutions.mm@gmail.com.
 4. If asked ANYTHING unrelated to AI, tech, coding, automation, or cloud — decline in exactly one sentence: "I only assist with AI and automation topics."
 5. Be friendly, confident, and professional.
+6. LANGUAGE: Detect the user's language automatically. If the user writes in Burmese (Myanmar script), reply entirely in Burmese. If in English, reply in English. Always match the user's language.
 
 --- PLATFORM KNOWLEDGE BASE ---
 
@@ -799,13 +928,31 @@ RULES:
     }
   }
 
+  // Chatbot memory — name stored in localStorage across sessions
+  let userName = localStorage.getItem('ai_user_name') || '';
+  let awaitingName = false;
+
+  function applyUserName(name) {
+    userName = name.trim();
+    localStorage.setItem('ai_user_name', userName);
+    // Inject name into system context so AI addresses user by name
+    aiGlobalContext = aiGlobalContext.replace('--- PLATFORM KNOWLEDGE BASE ---',
+      `USER NAME: ${userName}. Greet them by name on first reply and occasionally use their name naturally.\n\n--- PLATFORM KNOWLEDGE BASE ---`);
+  }
+
+  if (userName) applyUserName(userName);
+
   clearBtn.addEventListener('click', () => {
     localStorage.removeItem('chat_history');
+    localStorage.removeItem('ai_user_name');
+    userName = '';
+    awaitingName = false;
     chatMessages.innerHTML = `
       <div class="message ai-message">
         <div class="msg-avatar">MR</div>
-        <div class="msg-bubble">Chat cleared. How can I help you with AI and automation?</div>
+        <div class="msg-bubble">Chat cleared. What's your name? I'd love to know who I'm speaking with!</div>
       </div>`;
+    awaitingName = true;
   });
 
   // Toggle Chat
@@ -813,10 +960,19 @@ RULES:
     chatWindow.classList.toggle('hidden');
     if (!chatWindow.classList.contains('hidden')) {
       chatInput.focus();
-      // Load history on first open
       if (!chatWindow.dataset.historyLoaded) {
         loadChatHistory();
         chatWindow.dataset.historyLoaded = '1';
+        // If no name and no history — ask for name
+        if (!userName && chatMessages.children.length === 0) {
+          addMessage("Hello! 👋 I'm the IT Solutions MM AI Brain. What's your name?", 'ai', false);
+          awaitingName = true;
+        } else if (userName) {
+          // Returning user — greet by name if no history loaded
+          if (chatMessages.children.length === 0) {
+            addMessage(`Welcome back, ${userName}! How can I help you today?`, 'ai', false);
+          }
+        }
       }
     }
   });
@@ -860,6 +1016,16 @@ RULES:
   async function handleChatSend() {
     const text = chatInput.value.trim();
     if (!text) return;
+
+    // If awaiting name — capture it, greet, and exit
+    if (awaitingName) {
+      awaitingName = false;
+      applyUserName(text);
+      addMessage(text, 'user');
+      chatInput.value = '';
+      addMessage(`Nice to meet you, ${userName}! 🙌 How can I help you with AI, automation, or cloud today?`, 'ai');
+      return;
+    }
 
     addMessage(text, 'user');
     chatInput.value = '';

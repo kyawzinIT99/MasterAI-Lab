@@ -255,8 +255,21 @@ def web():
         return JSONResponse(resp.json(), status_code=resp.status_code)
 
     # --- Contact form: forward to Telegram bot ---
+    COUNT_PATH = "/feed/student_count.json"
+
+    @api.get("/api/student-count")
+    async def student_count():
+        import json
+        from pathlib import Path
+        f = Path(COUNT_PATH)
+        if f.exists():
+            return JSONResponse(json.loads(f.read_text()))
+        return JSONResponse({"count": 0})
+
     @api.post("/api/contact")
     async def contact(request: Request):
+        import json
+        from pathlib import Path
         ip = request.client.host if request.client else "unknown"
         # Rate limit: 5 contact submissions per IP per 10 minutes
         if not _check_rate_limit(f"contact_{ip}", limit=5, window=600):
@@ -285,6 +298,16 @@ def web():
                     json={"chat_id": chat_id, "text": text},
                 )
 
+        # Increment live student inquiry counter
+        try:
+            cf = Path(COUNT_PATH)
+            data = json.loads(cf.read_text()) if cf.exists() else {"count": 0}
+            data["count"] = data.get("count", 0) + 1
+            cf.write_text(json.dumps(data))
+            feed_vol.commit()
+        except Exception:
+            pass
+
         return JSONResponse({"ok": True})
 
     # --- Telegram bot webhook: AI Brain replies to users via GPT-4o ---
@@ -308,7 +331,8 @@ RULES:
 2. ONLY share contact details (Telegram/WhatsApp/Email) when the user explicitly asks how to contact, requests human assistance, asks about pricing, or asks to enroll. Do NOT include contact info in every reply.
 3. When sharing contact, list all three: Telegram @MaterAITraining_bot, WhatsApp wa.me/66949567820, and Email itsolutions.mm@gmail.com.
 4. If asked ANYTHING unrelated to AI, tech, coding, automation, or cloud — decline in exactly one sentence: "I only assist with AI and automation topics."
-5. Be friendly, confident, and professional."""
+5. Be friendly, confident, and professional.
+6. LANGUAGE: Detect the user's language automatically. If the user writes in Burmese (Myanmar script), reply entirely in Burmese. If in English, reply in English. Match the user's language always."""
 
     @api.post("/api/telegram-webhook")
     async def telegram_webhook(request: Request):
