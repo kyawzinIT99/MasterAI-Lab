@@ -390,15 +390,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render Training Tools at ~85% scroll (spaced past Free Courses)
       renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
 
-      // Render Portfolio / Case Studies at ~88% scroll
-      const portfolioRes = await fetch('data/portfolio.json');
-      const portfolioData = await portfolioRes.json();
-      renderPortfolioSection(portfolioData, 'portfolio-container', 88);
-
-      // Render AI Pulse — live from volume via /api/ai-feed, fallback to baked JSON
+      // Render AI Pulse right after Tools at ~87% — grouped for easy discovery
       const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 91);
+      renderAIPulseSection(pulseData, 'ai-pulse-container', 87);
 
       // Auto-refresh AI Pulse every 60 minutes — picks up new scraper runs
       const refreshMs = 60 * 60 * 1000;
@@ -406,9 +401,14 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 91);
+          renderAIPulseSection(d, 'ai-pulse-container', 87);
         } catch (e) {}
       }, refreshMs);
+
+      // Render Portfolio / Case Studies at ~90% scroll
+      const portfolioRes = await fetch('data/portfolio.json');
+      const portfolioData = await portfolioRes.json();
+      renderPortfolioSection(portfolioData, 'portfolio-container', 90);
 
       // Setup reveal animations
       setupCardReveal();
