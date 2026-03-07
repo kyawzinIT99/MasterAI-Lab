@@ -390,22 +390,22 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render Training Tools at ~85%
       renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
 
-      // Render Portfolio at ~90%
+      // Render Portfolio at ~88%
       const portfolioRes = await fetch('data/portfolio.json');
       const portfolioData = await portfolioRes.json();
-      renderPortfolioSection(portfolioData, 'portfolio-container', 90);
+      renderPortfolioSection(portfolioData, 'portfolio-container', 88);
 
-      // Render AI Pulse at ~91% — accessible via nav link "AI Pulse"
+      // Render AI Pulse at ~92% — accessible via nav link, clear of Portfolio (88%) and Testimonials (93%)
       const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 91);
+      renderAIPulseSection(pulseData, 'ai-pulse-container', 92);
 
       // Auto-refresh AI Pulse every 60 minutes
       setInterval(async () => {
         try {
           const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 91);
+          renderAIPulseSection(d, 'ai-pulse-container', 92);
         } catch (e) {}
       }, 60 * 60 * 1000);
 
