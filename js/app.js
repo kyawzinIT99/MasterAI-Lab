@@ -1230,6 +1230,7 @@ RULES:
     if (!hubData || !hubData[courseKey]) return;
     hubCurrentCourse = courseKey;
     localStorage.setItem('hub_last_course', courseKey);
+    _quizAutoOpened = false;  // reset so quiz can auto-open once user reaches 75%
     const course = hubData[courseKey];
 
     const saved = JSON.parse(localStorage.getItem(`hub_prog_${courseKey}`) || '[]');
@@ -1311,6 +1312,8 @@ RULES:
     closeHubVideo();
   };
 
+  let _quizAutoOpened = false;  // prevent repeated auto-open within same session
+
   function _hubUpdateProgress(courseKey) {
     if (!hubData) return;
     const total = hubData[courseKey].modules.length;
@@ -1324,12 +1327,30 @@ RULES:
     if (pctEl) pctEl.textContent  = pct + '%';
     if (barEl) barEl.style.width  = pct + '%';
 
+    const locked = pct < 75;
     if (quizBtn) {
-      const locked = pct < 70;
       quizBtn.disabled      = locked;
       quizBtn.style.opacity = locked ? '0.35' : '1';
       quizBtn.style.cursor  = locked ? 'not-allowed' : 'pointer';
-      quizBtn.title = locked ? 'Complete at least 70% of modules to unlock the quiz' : 'Start the quiz';
+      quizBtn.title = locked
+        ? `Complete at least 75% of modules to unlock the quiz (${pct}% done)`
+        : 'Start the quiz';
+    }
+
+    // Auto-open quiz when user crosses 75% threshold for the first time
+    if (!locked && !_quizAutoOpened) {
+      _quizAutoOpened = true;
+      if (quizBtn) {
+        // Flash the button to draw attention, then scroll it into view
+        quizBtn.style.transition = 'box-shadow 0.3s, opacity 0.3s';
+        quizBtn.style.boxShadow  = '0 0 0 3px rgba(0,255,255,0.5)';
+        quizBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          quizBtn.style.boxShadow = 'none';
+          // Auto-start quiz after a brief pause so user sees they've unlocked it
+          setTimeout(() => startHubQuiz(), 1200);
+        }, 800);
+      }
     }
   }
 
