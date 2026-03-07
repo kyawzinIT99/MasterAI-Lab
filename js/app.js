@@ -384,16 +384,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Render Free Courses at ~76% scroll
       renderFreeCoursesSection(freeData, 'ai-free-course-container', 76);
 
-      const toolsRes = await fetch('data/AI%20Training%20Tools.json');
-      const toolsData = await toolsRes.json();
-
-      // Render Training Tools at ~85% scroll (spaced past Free Courses)
-      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 85);
-
-      // Render AI Pulse right after Tools at ~87% — grouped for easy discovery
+      // Render AI Pulse between Free Courses and Tools at ~80%
       const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
-      renderAIPulseSection(pulseData, 'ai-pulse-container', 87);
+      renderAIPulseSection(pulseData, 'ai-pulse-container', 80);
 
       // Auto-refresh AI Pulse every 60 minutes — picks up new scraper runs
       const refreshMs = 60 * 60 * 1000;
@@ -401,9 +395,15 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
-          renderAIPulseSection(d, 'ai-pulse-container', 87);
+          renderAIPulseSection(d, 'ai-pulse-container', 80);
         } catch (e) {}
       }, refreshMs);
+
+      const toolsRes = await fetch('data/AI%20Training%20Tools.json');
+      const toolsData = await toolsRes.json();
+
+      // Render Training Tools at ~84% scroll
+      renderTrainingToolsSection(toolsData, 'ai-training-tools-container', 84);
 
       // Render Portfolio / Case Studies at ~90% scroll
       const portfolioRes = await fetch('data/portfolio.json');
