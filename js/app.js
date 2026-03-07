@@ -1137,14 +1137,51 @@ RULES:
   window.openLearningHub = function() {
     const modal = document.getElementById('hub-modal');
     if (!modal) return;
+    // Pause Lenis so wheel events reach the modal's native overflow-y scroll
+    if (lenis) lenis.stop();
+    document.body.style.overflow = 'hidden';
     modal.style.display = 'flex';
+    modal.scrollTop = 0;
     _hubShowStep('courses');
+    _hubShowResumeBanner();
   };
 
   window.closeHub = function() {
     const modal = document.getElementById('hub-modal');
     if (modal) modal.style.display = 'none';
+    // Restore Lenis / page scroll
+    if (lenis) lenis.start();
+    document.body.style.overflow = '';
   };
+
+  // Show a "Welcome back — resume" banner if user has in-progress work
+  function _hubShowResumeBanner() {
+    const banner = document.getElementById('hub-resume-banner');
+    if (!banner) return;
+    const lastCourse = localStorage.getItem('hub_last_course');
+    if (!lastCourse || !hubData || !hubData[lastCourse]) {
+      banner.style.display = 'none';
+      return;
+    }
+    const saved = JSON.parse(localStorage.getItem(`hub_prog_${lastCourse}`) || '[]');
+    if (saved.length === 0) { banner.style.display = 'none'; return; }
+    const total  = hubData[lastCourse].modules.length;
+    const pct    = Math.round((saved.length / total) * 100);
+    const title  = hubData[lastCourse].title || lastCourse;
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:0.55rem;color:#00cccc;text-transform:uppercase;letter-spacing:0.18em;margin-bottom:0.25rem;">Welcome back &#9654;</div>
+          <div style="font-size:0.85rem;color:#fff;font-weight:600;">${title}</div>
+          <div style="font-size:0.65rem;color:rgba(200,200,230,0.45);margin-top:0.15rem;">${pct}% modules complete · continue where you left off</div>
+        </div>
+        <button onclick="selectHubCourse('${lastCourse}')"
+          style="flex-shrink:0;padding:0.55rem 1.2rem;background:linear-gradient(135deg,rgba(0,255,255,0.18),rgba(0,255,255,0.07));border:1px solid rgba(0,255,255,0.45);color:#00ffff;font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border-radius:4px;cursor:pointer;">
+          Resume &#8594;
+        </button>
+      </div>`;
+    banner.style.display = 'block';
+  }
 
   function _hubShowStep(step) {
     ['courses', 'learn', 'quiz', 'results'].forEach(s => {
@@ -1160,6 +1197,7 @@ RULES:
   window.selectHubCourse = function(courseKey) {
     if (!hubData || !hubData[courseKey]) return;
     hubCurrentCourse = courseKey;
+    localStorage.setItem('hub_last_course', courseKey);
     const course = hubData[courseKey];
 
     const saved = JSON.parse(localStorage.getItem(`hub_prog_${courseKey}`) || '[]');
