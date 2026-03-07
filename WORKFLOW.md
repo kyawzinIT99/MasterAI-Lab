@@ -20,7 +20,9 @@
 | AI Brain | OpenAI GPT-4o — website chat widget + Telegram bot replies |
 | Analytics | Google Analytics 4 (`G-0CJHM3JXHS`) |
 | Telegram Bot | @MaterAITraining_bot — AI replies + contact form notifications |
-| Secrets | Modal Secret vault (`openai-key`, `telegram-bot`) |
+| Secrets | Modal Secret vault (`openai-key`, `telegram-bot`, `firecrawl`) |
+| AI Feed | Firecrawl REST API + GPT-4o digest — scrapes 8 AI company blogs every 6h |
+| Feed Storage | Modal Volume `ai-feed-vol` — persistent JSON, auto-trimmed to 30 records |
 | Version Control | GitHub |
 
 ---
@@ -31,7 +33,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │  DESKTOP BROWSER                                                │
 │                                                                 │
-│  index.html + css/style.css?v=8 + js/app.js?v=17               │
+│  index.html + css/style.css?v=8 + js/app.js?v=20               │
 │    ├── Canvas: 121 JPEG frames lazy-loaded (25 ahead / 5 back)  │
 │    ├── GSAP ScrollTrigger — 25+ scroll-driven sections          │
 │    ├── Lenis smooth scroll — desktop only                       │
@@ -41,7 +43,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │  MOBILE BROWSER                                                 │
 │                                                                 │
-│  index.html + css/style.css?v=8 + js/app.js?v=17               │
+│  index.html + css/style.css?v=8 + js/app.js?v=20               │
 │    ├── Canvas: HIDDEN — no frame downloads (saves ~10MB)        │
 │    ├── Layout: natural CSS flow (position:relative sections)    │
 │    ├── Scroll: native + IntersectionObserver for stat countup   │
@@ -71,7 +73,22 @@ Both browsers:
 
 Modal serverless infra:
   modal_app.py → FastAPI ASGI → itsolutions-mm--main-web.modal.run
-  Secrets: openai-key (OPENAI_API_KEY), telegram-bot (BOT_TOKEN + CHAT_ID + WEBHOOK_SECRET)
+  Secrets: openai-key, telegram-bot (BOT_TOKEN + CHAT_ID + WEBHOOK_SECRET), firecrawl
+
+┌─────────────────────────────────────────────────────────────────┐
+│  AI PULSE — AUTO SCRAPER (modal cron, zero human effort)        │
+│                                                                 │
+│  Every 6 hours → scrape_ai_feed()                              │
+│    ├── Firecrawl REST API → scrapes 8 AI company blogs          │
+│    ├── GPT-4o → extracts title + one-sentence digest            │
+│    ├── Deduplicates by title                                    │
+│    ├── Saves to Modal Volume ai-feed-vol                        │
+│    └── Auto-trims to 30 records (oldest deleted)               │
+│                                                                 │
+│  Website → GET /api/ai-feed                                     │
+│    └── Serves live JSON from volume, fallback to baked file     │
+│          └── Frontend auto-refreshes every 60 minutes           │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -89,6 +106,8 @@ Modal serverless infra:
 - [x] Testimonials section, Cloud Native section (`#cloud-section`)
 - [x] 5 testimonials total — 2 foreign company endorsements (Singapore, Bangkok) with "100% recommended"
 - [x] Training Tools section redesigned as compact 2-column grid (name + difficulty + download link only)
+- [x] AI Pulse section (027 / Industry Intelligence) at 91% scroll — live industry feed
+- [x] Portfolio / Case Studies at 88% scroll (`data/portfolio.json`)
 
 ### Mobile
 - [x] Canvas hidden, Lenis disabled, frame downloads skipped (saves ~10MB)
@@ -111,6 +130,9 @@ Modal serverless infra:
 - [x] `/api/contact` — rate limited: 5 submissions/IP/10min to prevent spam floods
 - [x] `/api/telegram-webhook` — `X-Telegram-Bot-Api-Secret-Token` header verified (fake calls silently rejected)
 - [x] Telegram webhook re-registered with `secret_token` parameter
+- [x] AI Pulse scraper — `scrape_ai_feed()` cron job every 6h (Firecrawl + GPT-4o)
+- [x] Modal Volume `ai-feed-vol` — persistent feed storage, served via `/api/ai-feed`
+- [x] Auto-delete oldest records when > 30 entries
 
 ### AI Brain
 - [x] GPT-4o system prompt: IT Solutions MM identity, services, FAQ rules
@@ -118,6 +140,8 @@ Modal serverless infra:
 - [x] Telegram bot: same AI Brain, auto-replies to user messages
 - [x] Off-topic questions declined in one sentence (cost control)
 - [x] Max 2-3 sentences per reply (cost control)
+- [x] Contact details (Telegram/WhatsApp/Email) shared only when user explicitly asks — not on every reply
+- [x] WhatsApp `wa.me/66949567820` added to both website chat and Telegram bot contact info
 
 ---
 
@@ -136,8 +160,17 @@ modal secret create telegram-bot \
   TELEGRAM_CHAT_ID="2010982723" \
   TELEGRAM_WEBHOOK_SECRET="<webhook_secret>" --force
 
-# Deploy site + backend
+# Add Firecrawl secret
+modal secret create firecrawl FIRECRAWL_API_KEY="fc-..." --force
+
+# Create persistent feed volume (one-time)
+modal volume create ai-feed-vol
+
+# Deploy site + backend + scraper cron
 modal deploy modal_app.py
+
+# Trigger AI feed scrape immediately (without waiting for next 6h cron)
+modal run modal_app.py::scrape_ai_feed
 
 # Re-register Telegram webhook after deploy (always include secret_token)
 curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://itsolutions-mm--main-web.modal.run/api/telegram-webhook&secret_token=<webhook_secret>"
@@ -174,12 +207,13 @@ git add -A && git commit -m "message" && git push origin main
 │   ├── ai_learning_hub_dataset.json  # Free courses
 │   ├── AI Training Tools.json  # Tools list
 │   ├── portfolio.json          # Case studies (update with real client results)
+│   └── Update AI feed.json     # AI Pulse source config + fallback updates
 ├── js/
-│   └── app.js?v=17         # GSAP, Lenis, lazy frames, chat widget, portfolio
+│   └── app.js?v=20         # GSAP, Lenis, lazy frames, chat widget, portfolio, AI Pulse
 ├── frames/                 # 121 JPEG frames (canvas animation)
 ├── data/                   # JSON (courses, tools, training, services, ai-brain)
 │   └── ai-brain/           # FAQ, courses, installation, troubleshooting JSON
-├── modal_app.py            # Modal + FastAPI: static + 3 API endpoints
+├── modal_app.py            # Modal + FastAPI: static + API endpoints + cron scraper
 ├── WORKFLOW.md             # This file
 ├── .gitignore
 └── .env                    # Local dev only — NEVER committed
@@ -191,11 +225,11 @@ git add -A && git commit -m "message" && git push origin main
 
 ### Priority 3 — Sections & Services
 - [ ] **Pricing page / modal** — training program pricing cards with enroll buttons
-- [x] ~~Portfolio / case studies~~ — DONE (`data/portfolio.json`, rendered at 88% scroll)
 
 ### Priority 5 — Security & Ops
-- [x] ~~OpenAI key rotation tracking~~ — DONE (`OPENAI_KEY_ROTATED_ON` in `modal_app.py`, logs days remaining on every deploy)
-- [x] ~~Telegram bot token rotation~~ — DOCUMENTED (BotFather → revoke → `modal secret create --force` → re-register webhook)
+- [x] ~~OpenAI key rotation tracking~~ — DONE
+- [x] ~~Telegram bot token rotation~~ — DOCUMENTED
+- [x] ~~AI Pulse auto-scraper~~ — DONE (Firecrawl + GPT-4o + Modal Cron + Volume)
 
 ---
 
@@ -206,7 +240,9 @@ git add -A && git commit -m "message" && git push origin main
 3. **Rotate Telegram bot token** via @BotFather if accidentally shared — old token dies immediately; re-register webhook after rotation
 4. **Never commit `.env`** — it is in `.gitignore`
 5. **Version-bust assets** after changes: increment `?v=N` on CSS/JS script tags in `index.html`
-6. **Current versions:** `css/style.css?v=8`, `js/app.js?v=17`
+6. **Current versions:** `css/style.css?v=8`, `js/app.js?v=20`
 7. **Telegram webhook** must be re-registered after bot token rotation — always include `secret_token` param
 8. **Concurrent users** — Modal auto-scales (100 req/container), static assets unlimited, OpenAI quota is the only real cap
 9. **Security hardened** — model injection blocked, contact spam limited, webhook secret verified
+10. **AI Pulse scraper** — runs `modal run modal_app.py::scrape_ai_feed` to trigger manually; cron fires automatically every 6h
+11. **Firecrawl key** — stored in Modal secret `firecrawl` as `FIRECRAWL_API_KEY`; rotate at firecrawl.dev if exposed
