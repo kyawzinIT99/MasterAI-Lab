@@ -45,6 +45,121 @@ app = modal.App("main")
 
 SITE_ROOT = Path(__file__).parent
 
+# ── Persistent Volume for live AI feed ────────────────────────────────────────
+feed_vol = modal.Volume.from_name("ai-feed-vol", create_if_missing=True)
+FEED_PATH = "/feed/ai_industry_feed.json"
+FEED_MAX  = 30
+
+# Sources to scrape every 6 hours
+_FEED_SOURCES = [
+    {"company": "OpenAI",         "url": "https://openai.com/blog",                                  "category": "AI API"},
+    {"company": "Anthropic",      "url": "https://www.anthropic.com/news",                           "category": "AI Safety Research"},
+    {"company": "Google DeepMind","url": "https://deepmind.google/discover/blog",                    "category": "AI Research"},
+    {"company": "Meta AI",        "url": "https://ai.meta.com/blog",                                 "category": "Open AI Models"},
+    {"company": "xAI",            "url": "https://x.ai/blog",                                        "category": "AI Research"},
+    {"company": "Mistral AI",     "url": "https://mistral.ai/news",                                  "category": "AI Models"},
+    {"company": "HuggingFace",    "url": "https://huggingface.co/blog",                              "category": "AI Infrastructure"},
+    {"company": "NVIDIA AI",      "url": "https://blogs.nvidia.com/blog/category/deep-learning",     "category": "AI Hardware"},
+]
+
+# ── Scraper image (lighter — no static assets needed) ─────────────────────────
+scraper_image = (
+    modal.Image.debian_slim()
+    .pip_install("firecrawl-py", "httpx")
+)
+
+# ── Scheduled scraper: runs every 6 hours, zero human effort ──────────────────
+@app.function(
+    image=scraper_image,
+    schedule=modal.Cron("0 */6 * * *"),
+    volumes={"/feed": feed_vol},
+    secrets=[
+        modal.Secret.from_name("openai-key"),
+        modal.Secret.from_name("firecrawl"),
+    ],
+    timeout=300,
+)
+def scrape_ai_feed():
+    import os, json
+    from firecrawl import FirecrawlApp
+    import httpx
+
+    fc  = FirecrawlApp(api_key=os.environ["FIRECRAWL_API_KEY"])
+    oai = os.environ["OPENAI_API_KEY"]
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+
+    # Load existing feed from volume, or bootstrap empty
+    feed_file = Path(FEED_PATH)
+    feed_file.parent.mkdir(parents=True, exist_ok=True)
+    if feed_file.exists():
+        data = json.loads(feed_file.read_text())
+    else:
+        data = {"updates": []}
+
+    existing = {u["title"].lower() for u in data.get("updates", [])}
+    new_updates = []
+
+    for src in _FEED_SOURCES:
+        try:
+            result  = fc.scrape_url(src["url"], formats=["markdown"])
+            content = (result.markdown or "")[:3000]
+            if not content:
+                continue
+
+            resp = httpx.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {oai}", "Content-Type": "application/json"},
+                json={
+                    "model": "gpt-4o",
+                    "max_tokens": 120,
+                    "messages": [
+                        {"role": "system", "content": (
+                            "Extract the single most recent AI product/model announcement from this blog page. "
+                            "Reply with JSON only, no markdown: "
+                            "{\"title\": \"...\", \"digest\": \"one sentence max\", \"release_type\": \"Model Update|Platform Update|Research Update|Update\"}. "
+                            "If no clear announcement found, reply {\"title\": null}."
+                        )},
+                        {"role": "user", "content": content},
+                    ],
+                },
+                timeout=25,
+            )
+            raw = resp.json()["choices"][0]["message"]["content"].strip()
+            # Strip code fences if model wraps in ```json
+            if raw.startswith("```"):
+                raw = raw.split("```")[1].strip()
+                if raw.startswith("json"):
+                    raw = raw[4:].strip()
+            item = json.loads(raw)
+
+            if not item.get("title") or item["title"].lower() in existing:
+                continue
+
+            new_updates.append({
+                "company":      src["company"],
+                "model":        src["company"],
+                "category":     src["category"],
+                "release_type": item.get("release_type", "Update"),
+                "title":        item["title"][:120],
+                "digest":       item.get("digest", "")[:220],
+                "official_link": src["url"],
+                "date":         today,
+            })
+            existing.add(item["title"].lower())
+            print(f"[AI Feed] ✓ {src['company']}: {item['title'][:60]}")
+
+        except Exception as e:
+            print(f"[AI Feed] ✗ {src['company']}: {e}")
+
+    if new_updates:
+        data["updates"] = (new_updates + data.get("updates", []))[:FEED_MAX]
+        feed_file.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+        feed_vol.commit()
+        print(f"[AI Feed] Saved {len(new_updates)} new updates. Total: {len(data['updates'])}")
+    else:
+        print("[AI Feed] No new updates this cycle.")
+
+# ── Web image (static site + API) ─────────────────────────────────────────────
 image = (
     modal.Image.debian_slim()
     .pip_install("fastapi[standard]", "aiofiles", "httpx")
@@ -58,6 +173,7 @@ image = (
 
 @app.function(
     image=image,
+    volumes={"/feed": feed_vol},
     secrets=[
         modal.Secret.from_name("openai-key"),
         modal.Secret.from_name("telegram-bot"),
@@ -258,6 +374,18 @@ RULES:
             )
 
         return JSONResponse({"ok": True})
+
+    # --- AI Pulse feed: serve live JSON from volume, fallback to baked file ---
+    @api.get("/api/ai-feed")
+    async def ai_feed_endpoint():
+        import json
+        live = Path(FEED_PATH)
+        if live.exists():
+            return JSONResponse(json.loads(live.read_text()))
+        baked = Path("/site/data/Update AI feed.json")
+        if baked.exists():
+            return JSONResponse(json.loads(baked.read_text()))
+        return JSONResponse({"updates": [], "sources": []})
 
     # --- SPA fallback: serve index.html for all other routes ---
     @api.get("/")

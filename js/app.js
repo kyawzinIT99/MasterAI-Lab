@@ -395,16 +395,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const portfolioData = await portfolioRes.json();
       renderPortfolioSection(portfolioData, 'portfolio-container', 88);
 
-      // Render AI Pulse — Industry Intelligence Feed at ~91% scroll
-      const pulseRes = await fetch('data/Update%20AI%20feed.json');
+      // Render AI Pulse — live from volume via /api/ai-feed, fallback to baked JSON
+      const pulseRes = await fetch('/api/ai-feed');
       const pulseData = await pulseRes.json();
       renderAIPulseSection(pulseData, 'ai-pulse-container', 91);
 
-      // Auto-refresh AI Pulse at interval defined in JSON
-      const refreshMs = ((pulseData.frontend_usage && pulseData.frontend_usage.auto_refresh_minutes) || 60) * 60 * 1000;
+      // Auto-refresh AI Pulse every 60 minutes — picks up new scraper runs
+      const refreshMs = 60 * 60 * 1000;
       setInterval(async () => {
         try {
-          const r = await fetch('data/Update%20AI%20feed.json?t=' + Date.now());
+          const r = await fetch('/api/ai-feed?t=' + Date.now());
           const d = await r.json();
           renderAIPulseSection(d, 'ai-pulse-container', 91);
         } catch (e) {}
