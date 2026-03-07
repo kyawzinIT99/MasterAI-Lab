@@ -240,8 +240,25 @@ git add -A && git commit -m "message" && git push origin main
 
 ## Next Enhancements
 
-### Priority 3 — Sections & Services
+### Priority 1 — Sections & Services
 - [ ] **Pricing page / modal** — training program pricing cards with enroll buttons
+- [ ] **Course enrollment form** — name + email + course choice → Telegram notification to owner
+
+### Priority 2 — AI & Automation
+- [ ] **AI Pulse company filter** — users filter feed by company (OpenAI, Anthropic, Google, etc.) or category
+- [ ] **AI Pulse weekly email digest** — user enters email → auto-sends weekly AI news digest from live feed
+- [ ] **Chatbot memory** — remember returning users by name across sessions (beyond 30-message history)
+- [ ] **Burmese AI chat** — AI Brain detects Burmese input and replies in Burmese automatically
+
+### Priority 3 — Trust & Social Proof
+- [ ] **Live student count** — "X students trained this month" counter pulled from backend (Modal KV or Supabase)
+- [ ] **Certificate generator** — after training completion, auto-generate PDF certificate with student name + course
+- [ ] **Student progress tracker** — dashboard showing which modules completed (localStorage + backend sync)
+
+### Priority 4 — Technical
+- [ ] **PWA / offline mode** — site installable on phone, works offline with cached content
+- [ ] **Admin dashboard** — owner sees contact form submissions, chat volume, AI Pulse scraper status in one view
+- [ ] **Multi-language AI chat** — AI Brain auto-detects Burmese and responds in same language
 
 ### Priority 5 — Security & Ops
 - [x] ~~OpenAI key rotation tracking~~ — DONE
